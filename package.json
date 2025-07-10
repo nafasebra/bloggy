@@ -16,5 +16,8 @@
   "keywords": [],
   "author": "Nafas Ebrahimi",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
 }
