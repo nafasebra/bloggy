@@ -171,7 +171,7 @@ export default function PostPage({ params }: PostPageProps) {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
           <div 
-            className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-ul:text-gray-700 dark:prose-ul:text-gray-300"
+            className="prose"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
           
