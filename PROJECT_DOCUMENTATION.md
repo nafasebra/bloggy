@@ -6,9 +6,10 @@
 3. [Entities & Data Models](#entities--data-models)
 4. [Use Cases](#use-cases)
 5. [Database Design](#database-design)
-6. [API Endpoints](#api-endpoints)
-7. [Frontend Components](#frontend-components)
-8. [Technical Stack](#technical-stack)
+6. [Database Schema](#database-schema)
+7. [API Endpoints](#api-endpoints)
+8. [Frontend Components](#frontend-components)
+9. [Technical Stack](#technical-stack)
 
 ## Project Overview
 
@@ -46,8 +47,6 @@ interface User {
   location?: string;      // Optional
   website?: string;       // Optional
   twitter?: string;       // Optional
-  isActive: boolean;      // Default: false
-  postsCount: number;     // Calculated field
   followers: number;      // Default: 0
   following: number;      // Default: 0
   category: string;       // Primary category/focus
@@ -70,19 +69,11 @@ interface Post {
   readTime: string;       // Calculated (e.g., "5 min read")
   category: string;       // Required
   tags: string[];         // Array of tags
-  status: PostStatus;     // draft, published, archived
   views: number;          // Default: 0
   likes: number;          // Default: 0
   commentsCount: number;  // Calculated field
-  featured: boolean;      // Default: false
   createdAt: Date;       // Auto-generated
   updatedAt: Date;       // Auto-generated
-}
-
-enum PostStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  ARCHIVED = 'archived'
 }
 ```
 
@@ -93,7 +84,6 @@ interface Comment {
   postId: ObjectId;       // Reference to Post
   author: string;         // Commenter name
   content: string;        // Required
-  avatar: string;         // Author initials
   parentId?: ObjectId;    // For nested comments (optional)
   likes: number;          // Default: 0
   createdAt: Date;       // Auto-generated
@@ -193,159 +183,7 @@ interface Tag {
    - Posts by category
    - Related posts
 
-## Database Design
 
-### MongoDB Collections
-
-#### 1. Users Collection
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  email: String,
-  bio: String,
-  avatar: String,
-  location: String,
-  website: String,
-  twitter: String,
-  isActive: Boolean,
-  postsCount: Number,
-  followers: Number,
-  following: Number,
-  category: String,
-  joinDate: Date,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-**Indexes:**
-- `{ email: 1 }` (unique)
-- `{ name: 1 }`
-- `{ category: 1 }`
-- `{ isActive: 1 }`
-
-#### 2. Posts Collection
-```javascript
-{
-  _id: ObjectId,
-  title: String,
-  excerpt: String,
-  content: String,
-  authorId: ObjectId,
-  author: String,
-  date: Date,
-  readTime: String,
-  category: String,
-  tags: [String],
-  status: String,
-  views: Number,
-  likes: Number,
-  commentsCount: Number,
-  featured: Boolean,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-**Indexes:**
-- `{ authorId: 1 }`
-- `{ category: 1 }`
-- `{ status: 1 }`
-- `{ date: -1 }`
-- `{ views: -1 }`
-- `{ likes: -1 }`
-- `{ tags: 1 }`
-- `{ title: "text", content: "text", excerpt: "text" }` (text index)
-
-#### 3. Comments Collection
-```javascript
-{
-  _id: ObjectId,
-  postId: ObjectId,
-  author: String,
-  content: String,
-  avatar: String,
-  parentId: ObjectId,
-  likes: Number,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-**Indexes:**
-- `{ postId: 1 }`
-- `{ parentId: 1 }`
-- `{ createdAt: -1 }`
-
-#### 4. Categories Collection
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  description: String,
-  slug: String,
-  postCount: Number,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-**Indexes:**
-- `{ name: 1 }` (unique)
-- `{ slug: 1 }` (unique)
-
-#### 5. Tags Collection
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  slug: String,
-  postCount: Number,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-**Indexes:**
-- `{ name: 1 }` (unique)
-- `{ slug: 1 }` (unique)
-
-### Database Relationships
-
-1. **One-to-Many**: User → Posts
-   - A user can have multiple posts
-   - Posts reference user via `authorId`
-
-2. **One-to-Many**: Post → Comments
-   - A post can have multiple comments
-   - Comments reference post via `postId`
-
-3. **Many-to-Many**: Posts ↔ Tags
-   - Posts can have multiple tags
-   - Tags can be used by multiple posts
-   - Implemented via array field in posts
-
-4. **One-to-Many**: Category → Posts
-   - A category can have multiple posts
-   - Posts reference category via `category` field
-
-### Data Integrity Considerations
-
-1. **Referential Integrity**
-   - When a user is deleted, handle their posts (archive or delete)
-   - When a post is deleted, delete associated comments
-   - When a category is deleted, update posts to use default category
-
-2. **Denormalization Strategy**
-   - Store author name in posts for faster queries
-   - Store comment count in posts for performance
-   - Store post count in categories and tags
-
-3. **Consistency Patterns**
-   - Use transactions for multi-document operations
-   - Implement eventual consistency for calculated fields
-   - Use background jobs for data aggregation
 
 ## API Endpoints
 
@@ -420,7 +258,7 @@ DELETE /tags/:id           - Delete tag
 ## Technical Stack
 
 ### Frontend
-- **Framework**: Next.js 14
+- **Framework**: Next.js 15
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **State Management**: React hooks
@@ -532,3 +370,135 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
    - User engagement metrics
    - SEO optimization tools
    - A/B testing capabilities 
+
+## Database Schema
+
+### Overview
+The Bloggy application uses MongoDB as its NoSQL database with a document-based schema design. The database consists of five main collections that work together to provide a complete blogging platform functionality.
+
+### Collections
+
+#### 1. Users Collection
+The users collection stores user profile information and authentication data.
+
+**Fields:**
+- `_id`: Unique identifier (ObjectId)
+- `name`: User's full name (required)
+- `email`: Email address (required, unique)
+- `bio`: User biography (optional)
+- `avatar`: Profile picture URL or initials (optional)
+- `location`: User's location (optional)
+- `website`: Personal website URL (optional)
+- `twitter`: Twitter handle (optional)
+- `followers`: Number of followers (default: 0)
+- `following`: Number of users being followed (default: 0)
+- `category`: Primary category/focus area
+- `joinDate`: Account creation date
+- `createdAt`: Document creation timestamp
+- `updatedAt`: Document last update timestamp
+
+#### 2. Posts Collection
+The posts collection stores all blog posts and articles.
+
+**Fields:**
+- `_id`: Unique identifier (ObjectId)
+- `title`: Post title (required)
+- `excerpt`: Post summary/excerpt (required)
+- `content`: Full post content in HTML format (required)
+- `authorId`: Reference to the author's user ID (ObjectId)
+- `author`: Denormalized author name for performance
+- `date`: Publication date
+- `readTime`: Estimated reading time (calculated)
+- `category`: Post category (required)
+- `tags`: Array of tag strings
+- `views`: View count (default: 0)
+- `likes`: Like count (default: 0)
+- `commentsCount`: Number of comments (calculated)
+- `createdAt`: Document creation timestamp
+- `updatedAt`: Document last update timestamp
+
+#### 3. Comments Collection
+The comments collection stores user comments on posts.
+
+**Fields:**
+- `_id`: Unique identifier (ObjectId)
+- `postId`: Reference to the post being commented on (ObjectId)
+- `author`: Commenter's name
+- `content`: Comment text content (required)
+- `parentId`: Reference to parent comment for nested replies (optional)
+- `likes`: Like count on the comment (default: 0)
+- `createdAt`: Document creation timestamp
+- `updatedAt`: Document last update timestamp
+
+#### 4. Categories Collection
+The categories collection manages post categorization.
+
+**Fields:**
+- `_id`: Unique identifier (ObjectId)
+- `name`: Category name (required, unique)
+- `description`: Category description (optional)
+- `slug`: URL-friendly category name
+- `postCount`: Number of posts in this category (calculated)
+- `createdAt`: Document creation timestamp
+- `updatedAt`: Document last update timestamp
+
+#### 5. Tags Collection
+The tags collection manages post tagging system.
+
+**Fields:**
+- `_id`: Unique identifier (ObjectId)
+- `name`: Tag name (required, unique)
+- `slug`: URL-friendly tag name
+- `postCount`: Number of posts using this tag (calculated)
+- `createdAt`: Document creation timestamp
+- `updatedAt`: Document last update timestamp
+
+### Relationships
+
+**One-to-Many Relationships:**
+- User → Posts: A user can create multiple posts
+- Post → Comments: A post can have multiple comments
+- Category → Posts: A category can contain multiple posts
+
+**Many-to-Many Relationships:**
+- Posts ↔ Tags: Posts can have multiple tags, tags can be used by multiple posts
+
+**Self-Referencing Relationships:**
+- Comments → Comments: Comments can have nested replies via parentId
+
+### Indexing Strategy
+
+**Primary Indexes:**
+- `_id`: Automatic primary key index on all collections
+- `email`: Unique index on users collection
+- `name`: Unique index on categories and tags collections
+
+**Performance Indexes:**
+- `authorId`: Index on posts collection for user queries
+- `postId`: Index on comments collection for post queries
+- `category`: Index on posts collection for category filtering
+- `tags`: Index on posts collection for tag searches
+- `date`: Index on posts collection for chronological sorting
+- `createdAt`: Index on all collections for time-based queries
+
+### Data Integrity
+
+**Constraints:**
+- Email uniqueness enforced at database level
+- Category and tag name uniqueness enforced
+- Required fields validated at application level
+- ObjectId references validated for data consistency
+
+**Calculated Fields:**
+- `commentsCount`: Updated via aggregation or application logic
+- `postCount`: Updated when posts are added/removed from categories/tags
+- `readTime`: Calculated based on content length
+- `views` and `likes`: Incremented via atomic operations
+
+### Schema Evolution
+
+The MongoDB schema is designed to be flexible and allow for future enhancements:
+- Optional fields can be added without breaking existing documents
+- New collections can be introduced for additional features
+- Indexes can be added or modified for performance optimization
+- Denormalized fields can be added for query performance 

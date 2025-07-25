@@ -2,7 +2,7 @@
 
 A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, share, and discover amazing content with a beautiful, modern interface.
 
-![Bloggy Platform](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Bloggy Platform](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
 ![NestJS](https://img.shields.io/badge/NestJS-11-red?style=for-the-badge&logo=nestjs)
 ![MongoDB](https://img.shields.io/badge/MongoDB-8-green?style=for-the-badge&logo=mongodb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
@@ -53,7 +53,7 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 14** - React framework with App Router
+- **Next.js 15** - React framework with App Router
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first CSS framework
 - **React Hooks** - State management
