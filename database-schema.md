@@ -5,6 +5,7 @@
 interface User {
   _id: ObjectId;
   name: string;           // Required
+  username: string;
   email: string;          // Required, unique
   bio?: string;           // Optional
   avatar?: string;        // Optional - avatar initials or image URL
@@ -76,6 +77,5 @@ interface Tag {
   slug: string;          // URL-friendly name
   postCount: number;     // Calculated field
   createdAt: Date;       // Auto-generated
-  updatedAt: Date;       // Auto-generated
 }
 ``` 

@@ -9,13 +9,34 @@ export class User {
   name: string;
 
   @Prop({ required: true, unique: true })
+  username: string;
+
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop()
   bio?: string;
 
-  @Prop({ default: false })
-  isActive: boolean;
+  @Prop()
+  avatar?: string;
+
+  @Prop()
+  location?: string;
+
+  @Prop()
+  website?: string;
+
+  @Prop()
+  twitter?: string;
+
+  @Prop()
+  followers?: number;
+
+  @Prop()
+  following?: number;
+
+  @Prop()
+  category: string;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User); 
+export const UserSchema = SchemaFactory.createForClass(User);
