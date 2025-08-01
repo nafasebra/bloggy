@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -14,21 +14,27 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<User> {
-    return this.userModel.findById(id).exec();
+  async findOne(username: string): Promise<User> {
+    const user = await this.userModel.findOne({ username }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async update(id: string, updateUserDto: Partial<User>): Promise<User> {
-    return this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .exec();
+    const user = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async remove(id: string): Promise<User> {
-    return this.userModel.findByIdAndDelete(id).exec();
+    const user = await this.userModel.findByIdAndDelete(id).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 } 
