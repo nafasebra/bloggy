@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId, SchemaType, SchemaTypes } from 'mongoose';
+import { Document, ObjectId, SchemaTypes } from 'mongoose';
 
 export type PostDocument = Post & Document;
 
@@ -20,7 +20,7 @@ export class Post {
   @Prop({ required: true })
   category: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
+  @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
   authorId: ObjectId;
 
   @Prop()

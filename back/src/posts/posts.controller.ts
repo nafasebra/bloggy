@@ -9,15 +9,17 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './schemas/post.schema';
-import { CreatePostDto, UpdatePostDto } from './dto';
+import { CreatePostDtoType, UpdatePostDtoType } from './dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  async cratePost(@Body() createPostDto: CreatePostDto): Promise<PostEntity> {
-    return this.postsService.create(createPostDto as PostEntity);
+  async cratePost(
+    @Body() createPostDto: CreatePostDtoType
+  ): Promise<PostEntity> {
+    return this.postsService.create(createPostDto);
   }
 
   @Get()
@@ -33,9 +35,9 @@ export class PostsController {
   @Put(':id')
   async updatePost(
     @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto
+    @Body() updatePostDto: UpdatePostDtoType
   ): Promise<PostEntity> {
-    return this.postsService.update(id, updatePostDto as PostEntity);
+    return this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
