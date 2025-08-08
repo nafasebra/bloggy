@@ -21,7 +21,7 @@ export class Comment {
   parentId?: ObjectId;
 
   @Prop({ default: Date.now, immutable: true })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Prop({ default: Date.now })
   updatedAt?: Date;
