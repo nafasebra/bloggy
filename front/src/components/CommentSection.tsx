@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 interface Comment {
@@ -75,29 +76,22 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         Comments ({comments.length})
       </h3>
 
+
+      {/** required login panel to comment */}
+      <div className="flex flex-col gap-2">
+        <p>Please login to comment</p>
+        <Link href="/auth/login">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200">
+            Login
+          </button>
+        </Link>
+      </div>
+
       {/* Add Comment Form */}
       <form
         onSubmit={handleSubmitComment}
         className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4"
       >
-        <div className="flex flex-col gap-2">
-          <label
-            htmlFor="author"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Name
-          </label>
-          <input
-            type="text"
-            id="author"
-            value={authorName}
-            onChange={(e) => setAuthorName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Your name"
-            required
-          />
-        </div>
-
         <div className="flex flex-col gap-2">
           <label
             htmlFor="comment"
