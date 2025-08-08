@@ -9,14 +9,14 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-    imports: [
-        DatabaseModule,
-        UsersModule,
-        CommentsModule,
-        PostsModule,
-        AuthModule,
-    ],
-    controllers: [AppController],
-    providers: [AppService, AuthService],
+  imports: [
+    DatabaseModule,
+    UsersModule,
+    CommentsModule,
+    PostsModule,
+    AuthModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService, AuthService],
 })
 export class AppModule {}

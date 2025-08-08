@@ -4,17 +4,17 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule);
 
-    const config = new DocumentBuilder()
-        .setTitle('Bloggy API')
-        .setDescription('Bloggy API Documentation')
-        .setVersion('1.0')
-        // .addBearerAuth()
-        .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
+  const config = new DocumentBuilder()
+    .setTitle('Bloggy API')
+    .setDescription('Bloggy API Documentation')
+    .setVersion('1.0')
+    // .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
-    await app.listen(process.env.PORT ?? 3030);
+  await app.listen(process.env.PORT ?? 3030);
 }
 bootstrap();

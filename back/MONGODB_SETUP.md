@@ -17,6 +17,7 @@ MONGODB_URI=mongodb://localhost:27017/bloggy
 ```
 
 For MongoDB Atlas, use:
+
 ```
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/bloggy?retryWrites=true&w=majority
 ```
@@ -24,6 +25,7 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/bloggy?retryWrit
 ## Local MongoDB Setup
 
 1. Install MongoDB locally or use Docker:
+
    ```bash
    docker run -d -p 27017:27017 --name mongodb mongo:latest
    ```
@@ -58,4 +60,4 @@ curl -X POST http://localhost:3000/users \
 
 # Get all users
 curl http://localhost:3000/users
-``` 
+```

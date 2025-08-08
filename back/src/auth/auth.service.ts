@@ -5,13 +5,13 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService) {}
 
-    async register(registerDto: RegisterDto) {
-        return this.userService.create(registerDto);
-    }
+  async register(registerDto: RegisterDto) {
+    return this.userService.create(registerDto);
+  }
 
-    async login(loginDto: LoginDto) {
-        return this.userService.findOne(loginDto.username);
-    }
+  async login(loginDto: LoginDto) {
+    return this.userService.findOne(loginDto.username);
+  }
 }
