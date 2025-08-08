@@ -68,4 +68,3 @@ export class PostResponseDto {
   })
   updatedAt?: Date;
 }
-

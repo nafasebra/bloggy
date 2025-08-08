@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment } from './schemas/comment.schema';
 import {
@@ -9,7 +10,9 @@ import {
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly commentModel: Model<Comment>) {}
+  constructor(
+    @InjectModel(Comment.name) private readonly commentModel: Model<Comment>
+  ) {}
 
   async create(comment: CreateCommentDtoType): Promise<Comment> {
     const newComment = new this.commentModel(comment);

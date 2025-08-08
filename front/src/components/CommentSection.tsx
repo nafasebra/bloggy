@@ -48,6 +48,8 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const [newComment, setNewComment] = useState("");
   const [authorName, setAuthorName] = useState("");
 
+  console.log(postId);
+
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
 
