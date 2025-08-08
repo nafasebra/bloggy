@@ -5,26 +5,26 @@ export type CommentDocument = Comment & Document;
 
 @Schema({ timestamps: true })
 export class Comment {
-  @Prop({ required: true })
-  content: string;
+    @Prop({ required: true })
+    content: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'Post' })
-  postId: ObjectId;
+    @Prop({ type: SchemaTypes.ObjectId, ref: 'Post' })
+    postId: ObjectId;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
-  authorId: ObjectId;
+    @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
+    authorId: ObjectId;
 
-  @Prop()
-  likes?: number;
+    @Prop()
+    likes?: number;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'Comment' })
-  parentId?: ObjectId;
+    @Prop({ type: SchemaTypes.ObjectId, ref: 'Comment' })
+    parentId?: ObjectId;
 
-  @Prop({ default: Date.now, immutable: true })
-  createdAt: Date;
+    @Prop({ default: Date.now, immutable: true })
+    createdAt: Date;
 
-  @Prop({ default: Date.now })
-  updatedAt?: Date;
+    @Prop({ default: Date.now })
+    updatedAt?: Date;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
