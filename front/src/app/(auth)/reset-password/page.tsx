@@ -1,11 +1,10 @@
+'use client';
+
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-'use client';
-
 
 const resetPasswordSchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters'),
