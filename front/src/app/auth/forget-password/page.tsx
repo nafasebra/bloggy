@@ -55,19 +55,19 @@ export default function ForgetPasswordPage() {
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="max-w-md w-full space-y-8 p-8">
-                    <div className="text-center">
-                        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+                <div className="max-w-md w-full space-y-8 p-8 text-center">
+                    <div>
+                        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                             Check your email
                         </h2>
                         <p className="mt-2 text-sm text-gray-600">
                             We've sent a password reset link to your email address.
                         </p>
-                        <div className="mt-4">
-                            <a href="/login" className="text-indigo-600 hover:text-indigo-500 text-sm">
-                                Back to login
-                            </a>
-                        </div>
+                    </div>
+                    <div>
+                        <a href="/login" className="text-indigo-600 hover:text-indigo-500 text-sm">
+                            Back to login
+                        </a>
                     </div>
                 </div>
             </div>
@@ -88,7 +88,7 @@ export default function ForgetPasswordPage() {
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email Address
+                            Email address
                         </label>
                         <input
                             id="email"
@@ -112,7 +112,7 @@ export default function ForgetPasswordPage() {
                             disabled={isLoading}
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                         >
-                            {isLoading ? 'Sending...' : 'Send Reset Link'}
+                            {isLoading ? 'Sending...' : 'Send reset link'}
                         </button>
                     </div>
 
