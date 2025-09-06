@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function Navigation() {
   const pathname = usePathname();
+  // Simulate user authentication state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navItems = [
     { href: "/", label: "Home" },
@@ -42,6 +45,29 @@ export default function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              {!isLoggedIn ? (
+                <>
+                  <button
+                    className="px-3 py-2 rounded-md text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    onClick={() => setIsLoggedIn(true)}
+                  >
+                    Login
+                  </button>
+                  <Link
+                    href="/signup"
+                    className="px-3 py-2 rounded-md text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/user/1"
+                  className="px-3 py-2 rounded-md text-sm font-medium bg-purple-500 text-white hover:bg-purple-600 transition-colors"
+                >
+                  My Account
+                </Link>
+              )}
             </div>
           </div>
 
