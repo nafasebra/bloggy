@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import UserPostCard from "@/components/pages/user/user-post-card";
 import FollowButton from "@/components/pages/user/follow-button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FollowerList from "@/components/pages/user/follower-list";
+import FollowingList from "@/components/pages/user/following-list";
 
 // Mock user data
 const users = [
@@ -235,7 +238,10 @@ export default function UserPage({ params }: UserPageProps) {
                 )}
                 {user.twitter && (
                   <a
-                    href={`https://twitter.com/${user.twitter.replace("@", "")}`}
+                    href={`https://twitter.com/${user.twitter.replace(
+                      "@",
+                      ""
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
@@ -281,46 +287,64 @@ export default function UserPage({ params }: UserPageProps) {
 
       {/* Posts Section */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Posts by {user.name}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            {posts.length} article{posts.length !== 1 ? "s" : ""} published
-          </p>
-        </div>
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList>
+            <TabsTrigger value="posts">Posts</TabsTrigger>
+            <TabsTrigger value="followers">Followers</TabsTrigger>
+            <TabsTrigger value="following">Following</TabsTrigger>
+          </TabsList>
+          <TabsContent value="posts">
+            <div className="space-y-4 pt-6">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Posts by {user.name}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {posts.length} article{posts.length !== 1 ? "s" : ""}{" "}
+                  published
+                </p>
+              </div>
 
-        {posts.length > 0 ? (
-          <div className="space-y-6">
-            {posts.map((post) => (
-              <UserPostCard key={post.id} post={post} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
+              {posts.length > 0 ? (
+                <div className="space-y-6">
+                  {posts.map((post) => (
+                    <UserPostCard key={post.id} post={post} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    No posts yet
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {user.name} hasn't published any articles yet.
+                  </p>
+                </div>
+              )}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              No posts yet
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              {user.name} hasn't published any articles yet.
-            </p>
-          </div>
-        )}
+          </TabsContent>
+          <TabsContent value="followers">
+            <FollowerList />
+          </TabsContent>
+          <TabsContent value="following">
+            <FollowingList />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
