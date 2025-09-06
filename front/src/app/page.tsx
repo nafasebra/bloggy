@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import Hero from '@/components/Hero';
-import LatestPosts from '@/components/LatestPosts';
-import AboutBlog from '@/components/AboutBlog';
-import LatestUsers from '@/components/LatestUsers';
-import Footer from '@/components/Footer';
+import Hero from '@/components/pages/home/hero';
+import LatestPosts from '@/components/pages/home/latest-posts';
+import AboutBlog from '@/components/pages/about/about-blog';
+import LatestUsers from '@/components/pages/home/latest-users';
+import Footer from '@/components/layout/footer';
 
 export default function Home() {
   return (

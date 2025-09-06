@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import UserPostCard from '@/components/UserPostCard';
+import UserPostCard from '@/components/pages/user/user-post-card';
 
 // Mock user data
 const users = [

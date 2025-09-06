@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import SearchBar from '@/components/SearchBar';
-import BlogCard from '@/components/BlogCard';
+import SearchBar from '@/components/pages/home/search-bar';
+import BlogCard from '@/components/pages/blog/blog-card';
 
 // Mock data for blog posts
 const blogPosts = [
