@@ -54,20 +54,22 @@ export default function ForgetPasswordPage() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="max-w-md w-full space-y-8 p-8 text-center">
-                    <div>
-                        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                            Check your email
-                        </h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            We've sent a password reset link to your email address.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="/login" className="text-indigo-600 hover:text-indigo-500 text-sm">
-                            Back to login
-                        </a>
+            <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
+                <div className="w-full max-w-sm mx-auto">
+                    <div className="bg-white shadow-lg rounded-lg px-8 py-10">
+                        <div className="mb-8 text-center">
+                            <h2 className="text-2xl font-bold text-gray-800">
+                                Check your email
+                            </h2>
+                            <p className="text-gray-600 mt-2 text-sm">
+                                We've sent a password reset link to your email address.
+                            </p>
+                        </div>
+                        <div className="text-center pt-4">
+                            <a href="/login" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200">
+                                Back to login
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -75,53 +77,58 @@ export default function ForgetPasswordPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full space-y-8 p-8">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Forgot your password?
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Enter your email address and we'll send you a link to reset your password.
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email address
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            placeholder="Enter your email address"
-                            {...register('email')}
-                        />
-                        {errors.email && (
-                            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                        )}
+        <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
+            <div className="w-full max-w-sm mx-auto">
+                <div className="bg-white shadow-lg rounded-lg px-8 py-10">
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-center text-gray-800">
+                            Forgot your password?
+                        </h2>
+                        <p className="text-center text-gray-600 mt-2 text-sm">
+                            Enter your email address and we'll send you a link to reset your password.
+                        </p>
                     </div>
+                    
+                    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                        <div className="space-y-4">
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email address
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                                    placeholder="Enter your email address"
+                                    {...register('email')}
+                                />
+                                {errors.email && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>
+                                )}
+                            </div>
+                        </div>
 
-                    {error && (
-                        <div className="text-red-600 text-sm text-center">{error}</div>
-                    )}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center">
+                                {error}
+                            </div>
+                        )}
 
-                    <div>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? 'Sending...' : 'Send reset link'}
                         </button>
-                    </div>
 
-                    <div className="text-center">
-                        <a href="/login" className="text-indigo-600 hover:text-indigo-500 text-sm">
-                            Back to login
-                        </a>
-                    </div>
-                </form>
+                        <div className="text-center pt-4">
+                            <a href="/login" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200">
+                                Back to login
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

@@ -55,67 +55,74 @@ export default function ResetPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full space-y-8 p-8">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Reset your password
-                    </h2>
+        <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
+            <div className="w-full max-w-sm mx-auto">
+            <div className="bg-white shadow-lg rounded-lg px-8 py-10">
+                <div className="mb-8">
+                <h2 className="text-2xl font-bold text-center text-gray-800">
+                    Reset your password
+                </h2>
+                <p className="text-center text-gray-600 mt-2 text-sm">
+                    Enter your new password
+                </p>
                 </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                New Password
-                            </label>
-                            <input
-                                id="password"
-                                type="password"
-                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Enter your new password"
-                                {...register('password')}
-                            />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                Repeat New Password
-                            </label>
-                            <input
-                                id="confirmPassword"
-                                type="password"
-                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Repeat your new password"
-                                {...register('confirmPassword')}
-                            />
-                            {errors.confirmPassword && (
-                                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div className="text-red-600 text-sm text-center">{error}</div>
-                    )}
-
+                
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-4">
                     <div>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                        >
-                            {isLoading ? 'Resetting...' : 'Reset Password'}
-                        </button>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                        New Password
+                    </label>
+                    <input
+                        id="password"
+                        type="password"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Enter your new password"
+                        {...register('password')}
+                    />
+                    {errors.password && (
+                        <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>
+                    )}
                     </div>
+                    
+                    <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                        Repeat New Password
+                    </label>
+                    <input
+                        id="confirmPassword"
+                        type="password"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Repeat your new password"
+                        {...register('confirmPassword')}
+                    />
+                    {errors.confirmPassword && (
+                        <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                    )}
+                    </div>
+                </div>
 
-                    <div className="text-center">
-                        <a href="/login" className="text-indigo-600 hover:text-indigo-500 text-sm">
-                            Back to login
-                        </a>
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center">
+                    {error}
                     </div>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isLoading ? 'Resetting...' : 'Reset Password'}
+                </button>
+
+                <div className="text-center pt-4">
+                    <a href="/login" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200">
+                    Back to login
+                    </a>
+                </div>
                 </form>
+            </div>
             </div>
         </div>
     );
