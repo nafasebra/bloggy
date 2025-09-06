@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Bloggy - Modern Blog Platform",
-  description: "A modern blog platform for sharing stories and connecting with readers",
+  description:
+    "A modern blog platform for sharing stories and connecting with readers",
 };
 
 export default function RootLayout({
@@ -29,9 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900`}
       >
         <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   );

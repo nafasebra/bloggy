@@ -1,6 +1,7 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import UserPostCard from '@/components/pages/user/user-post-card';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import UserPostCard from "@/components/pages/user/user-post-card";
+import FollowButton from "@/components/pages/user/follow-button";
 
 // Mock user data
 const users = [
@@ -16,7 +17,7 @@ const users = [
     followers: 1200,
     following: 350,
     category: "Technology",
-    joinDate: "2023-03-15"
+    joinDate: "2023-03-15",
   },
   {
     id: 2,
@@ -30,7 +31,7 @@ const users = [
     followers: 890,
     following: 120,
     category: "Lifestyle",
-    joinDate: "2023-06-22"
+    joinDate: "2023-06-22",
   },
   {
     id: 3,
@@ -44,8 +45,8 @@ const users = [
     followers: 2100,
     following: 450,
     category: "Food",
-    joinDate: "2023-01-10"
-  }
+    joinDate: "2023-01-10",
+  },
 ];
 
 // Mock user posts
@@ -54,44 +55,48 @@ const userPosts = {
     {
       id: 1,
       title: "The Future of Web Development in 2024",
-      excerpt: "Exploring the latest trends and technologies that are shaping the future of web development...",
+      excerpt:
+        "Exploring the latest trends and technologies that are shaping the future of web development...",
       date: "2024-01-15",
       readTime: "5 min read",
       category: "Technology",
       views: 1250,
-      likes: 89
+      likes: 89,
     },
     {
       id: 5,
       title: "Building Scalable APIs with Node.js",
-      excerpt: "A comprehensive guide to designing and implementing robust, scalable APIs...",
+      excerpt:
+        "A comprehensive guide to designing and implementing robust, scalable APIs...",
       date: "2024-01-11",
       readTime: "15 min read",
       category: "Technology",
       views: 890,
-      likes: 67
+      likes: 67,
     },
     {
       id: 7,
       title: "React Performance Optimization Techniques",
-      excerpt: "Learn the best practices for optimizing React applications for better performance...",
+      excerpt:
+        "Learn the best practices for optimizing React applications for better performance...",
       date: "2024-01-08",
       readTime: "12 min read",
       category: "Technology",
       views: 1100,
-      likes: 78
-    }
+      likes: 78,
+    },
   ],
   2: [
     {
       id: 2,
       title: "Mindful Living: A Beginner's Guide",
-      excerpt: "Discover simple practices to bring mindfulness into your daily routine...",
+      excerpt:
+        "Discover simple practices to bring mindfulness into your daily routine...",
       date: "2024-01-14",
       readTime: "8 min read",
       category: "Lifestyle",
       views: 950,
-      likes: 72
+      likes: 72,
     },
     {
       id: 8,
@@ -101,31 +106,33 @@ const userPosts = {
       readTime: "6 min read",
       category: "Lifestyle",
       views: 680,
-      likes: 45
-    }
+      likes: 45,
+    },
   ],
   3: [
     {
       id: 3,
       title: "Sustainable Cooking: Recipes for a Better Planet",
-      excerpt: "Learn how to cook delicious meals while reducing your environmental impact...",
+      excerpt:
+        "Learn how to cook delicious meals while reducing your environmental impact...",
       date: "2024-01-13",
       readTime: "12 min read",
       category: "Food",
       views: 1400,
-      likes: 95
+      likes: 95,
     },
     {
       id: 9,
       title: "Zero-Waste Kitchen: Tips and Tricks",
-      excerpt: "Transform your kitchen into a zero-waste haven with these practical tips...",
+      excerpt:
+        "Transform your kitchen into a zero-waste haven with these practical tips...",
       date: "2024-01-02",
       readTime: "10 min read",
       category: "Food",
       views: 1200,
-      likes: 88
-    }
-  ]
+      likes: 88,
+    },
+  ],
 };
 
 interface UserPageProps {
@@ -135,8 +142,8 @@ interface UserPageProps {
 }
 
 export default function UserPage({ params }: UserPageProps) {
-  const user = users.find(u => u.id === parseInt(params.id));
-  
+  const user = users.find((u) => u.id === parseInt(params.id));
+
   if (!user) {
     notFound();
   }
@@ -155,7 +162,7 @@ export default function UserPage({ params }: UserPageProps) {
                 {user.avatar}
               </span>
             </div>
-            
+
             {/* Profile Info */}
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -164,25 +171,56 @@ export default function UserPage({ params }: UserPageProps) {
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
                 {user.bio}
               </p>
-              
+
               <div className="flex flex-wrap items-center space-x-6 text-sm text-gray-500 dark:text-gray-400 mb-4">
                 {user.location && (
                   <div className="flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                     <span>{user.location}</span>
                   </div>
                 )}
                 <div className="flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
                   </svg>
-                  <span>Joined {new Date(user.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</span>
+                  <span>
+                    Joined{" "}
+                    {new Date(user.joinDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                    })}
+                  </span>
                 </div>
               </div>
-              
+
               {/* Social Links */}
               <div className="flex items-center space-x-4">
                 {user.website && (
@@ -197,7 +235,7 @@ export default function UserPage({ params }: UserPageProps) {
                 )}
                 {user.twitter && (
                   <a
-                    href={`https://twitter.com/${user.twitter.replace('@', '')}`}
+                    href={`https://twitter.com/${user.twitter.replace("@", "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
@@ -208,21 +246,35 @@ export default function UserPage({ params }: UserPageProps) {
               </div>
             </div>
           </div>
-          
+
           {/* Stats */}
-          <div className="flex items-center space-x-8 mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap items-center space-x-8 mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{user.postsCount}</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Posts</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {user.postsCount}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Posts
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{user.followers}</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Followers</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {user.followers}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Followers
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{user.following}</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Following</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {user.following}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Following
+              </div>
             </div>
+            {/* Follow/Following Button */}
+            <FollowButton userId={"user"} initialFollowing={false} />
           </div>
         </div>
       </div>
@@ -234,7 +286,7 @@ export default function UserPage({ params }: UserPageProps) {
             Posts by {user.name}
           </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            {posts.length} article{posts.length !== 1 ? 's' : ''} published
+            {posts.length} article{posts.length !== 1 ? "s" : ""} published
           </p>
         </div>
 
@@ -247,8 +299,18 @@ export default function UserPage({ params }: UserPageProps) {
         ) : (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -262,4 +324,4 @@ export default function UserPage({ params }: UserPageProps) {
       </div>
     </div>
   );
-} 
+}

@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import CommentSection from '@/components/pages/blog/comment-section';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import CommentSection from "@/components/pages/blog/comment-section";
 
 // Mock data for blog posts
 const blogPosts = [
@@ -46,7 +46,8 @@ const blogPosts = [
     readTime: "5 min read",
     category: "Technology",
     tags: ["Web Development", "AI", "Frameworks", "Performance"],
-    excerpt: "Exploring the latest trends and technologies that are shaping the future of web development, from AI-powered tools to new frameworks and methodologies."
+    excerpt:
+      "Exploring the latest trends and technologies that are shaping the future of web development, from AI-powered tools to new frameworks and methodologies.",
   },
   {
     id: 2,
@@ -91,8 +92,9 @@ const blogPosts = [
     readTime: "8 min read",
     category: "Lifestyle",
     tags: ["Mindfulness", "Meditation", "Wellness", "Mental Health"],
-    excerpt: "Discover simple practices to bring mindfulness into your daily routine and improve your well-being through meditation and conscious living."
-  }
+    excerpt:
+      "Discover simple practices to bring mindfulness into your daily routine and improve your well-being through meditation and conscious living.",
+  },
 ];
 
 interface PostPageProps {
@@ -102,8 +104,8 @@ interface PostPageProps {
 }
 
 export default function PostPage({ params }: PostPageProps) {
-  const post = blogPosts.find(p => p.id === parseInt(params.id));
-  
+  const post = blogPosts.find((p) => p.id === parseInt(params.id));
+
   if (!post) {
     notFound();
   }
@@ -114,17 +116,27 @@ export default function PostPage({ params }: PostPageProps) {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-6">
-            <Link 
+            <Link
               href="/blog"
               className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               Back to Blog
             </Link>
           </div>
-          
+
           <div className="flex items-center space-x-2 mb-4">
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
               {post.category}
@@ -133,15 +145,15 @@ export default function PostPage({ params }: PostPageProps) {
               {post.readTime}
             </span>
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             {post.title}
           </h1>
-          
+
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             {post.excerpt}
           </p>
-          
+
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-white text-lg font-medium">
@@ -149,17 +161,17 @@ export default function PostPage({ params }: PostPageProps) {
               </span>
             </div>
             <div>
-              <Link 
+              <Link
                 href={`/user/${post.authorId}`}
                 className="text-lg font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
               >
                 {post.author}
               </Link>
               <p className="text-gray-500 dark:text-gray-400">
-                {new Date(post.date).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
+                {new Date(post.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </p>
             </div>
@@ -170,14 +182,16 @@ export default function PostPage({ params }: PostPageProps) {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
-          <div 
+          <div
             className="prose"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
-          
+
           {/* Tags */}
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Tags:</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+              Tags:
+            </h3>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag, index) => (
                 <span
@@ -196,4 +210,4 @@ export default function PostPage({ params }: PostPageProps) {
       </div>
     </div>
   );
-} 
+}

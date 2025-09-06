@@ -78,7 +78,6 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         Comments ({comments.length})
       </h3>
 
-
       {/** required login panel to comment */}
       <div className="flex flex-col gap-2">
         <p>Please login to comment</p>

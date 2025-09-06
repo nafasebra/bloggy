@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 interface BlogPost {
   id: number;
@@ -28,17 +28,15 @@ export default function BlogCard({ post }: BlogCardProps) {
             {post.readTime}
           </span>
         </div>
-        
+
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-          <Link href={`/post/${post.id}`}>
-            {post.title}
-          </Link>
+          <Link href={`/post/${post.id}`}>{post.title}</Link>
         </h3>
-        
+
         <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
           {post.excerpt}
         </p>
-        
+
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
           {post.tags.slice(0, 3).map((tag, index) => (
@@ -55,7 +53,7 @@ export default function BlogCard({ post }: BlogCardProps) {
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -64,22 +62,22 @@ export default function BlogCard({ post }: BlogCardProps) {
               </span>
             </div>
             <div>
-              <Link 
+              <Link
                 href={`/user/${post.authorId}`}
                 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {post.author}
               </Link>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(post.date).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'short', 
-                  day: 'numeric' 
+                {new Date(post.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
                 })}
               </p>
             </div>
           </div>
-          
+
           <Link
             href={`/post/${post.id}`}
             className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm group-hover:translate-x-1 transition-transform"
@@ -90,4 +88,4 @@ export default function BlogCard({ post }: BlogCardProps) {
       </div>
     </article>
   );
-} 
+}

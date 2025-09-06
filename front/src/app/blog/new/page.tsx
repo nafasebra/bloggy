@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState } from "react";
+import Link from "next/link";
 
 interface BlogPostForm {
   title: string;
@@ -22,40 +22,44 @@ const categories = [
   "Creative",
   "Education",
   "Entertainment",
-  "Sports"
+  "Sports",
 ];
 
 export default function NewBlogPost() {
   const [formData, setFormData] = useState<BlogPostForm>({
-    title: '',
-    excerpt: '',
-    content: '',
-    category: '',
-    tags: '',
-    readTime: ''
+    title: "",
+    excerpt: "",
+    content: "",
+    category: "",
+    tags: "",
+    readTime: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     setIsSubmitting(false);
     // Here you would typically send the data to your backend
-    console.log('Blog post data:', formData);
+    console.log("Blog post data:", formData);
   };
 
   const calculateReadTime = (content: string) => {
@@ -67,10 +71,10 @@ export default function NewBlogPost() {
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const content = e.target.value;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       content,
-      readTime: calculateReadTime(content).toString()
+      readTime: calculateReadTime(content).toString(),
     }));
   };
 
@@ -107,8 +111,8 @@ export default function NewBlogPost() {
                 onClick={() => setIsPreview(false)}
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   !isPreview
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                 }`}
               >
                 Write
@@ -117,8 +121,8 @@ export default function NewBlogPost() {
                 onClick={() => setIsPreview(true)}
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   isPreview
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                 }`}
               >
                 Preview
@@ -130,7 +134,10 @@ export default function NewBlogPost() {
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {/* Title */}
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Title *
                 </label>
                 <input
@@ -147,7 +154,10 @@ export default function NewBlogPost() {
 
               {/* Excerpt */}
               <div>
-                <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="excerpt"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Excerpt *
                 </label>
                 <textarea
@@ -165,7 +175,10 @@ export default function NewBlogPost() {
               {/* Category and Read Time */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Category *
                   </label>
                   <select
@@ -186,7 +199,10 @@ export default function NewBlogPost() {
                 </div>
 
                 <div>
-                  <label htmlFor="readTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="readTime"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Read Time (minutes)
                   </label>
                   <input
@@ -204,7 +220,10 @@ export default function NewBlogPost() {
 
               {/* Tags */}
               <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="tags"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Tags
                 </label>
                 <input
@@ -217,13 +236,17 @@ export default function NewBlogPost() {
                   placeholder="Enter tags separated by commas..."
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Separate tags with commas (e.g., "Web Development, AI, Frameworks")
+                  Separate tags with commas (e.g., "Web Development, AI,
+                  Frameworks")
                 </p>
               </div>
 
               {/* Content */}
               <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="content"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Content *
                 </label>
                 <textarea
@@ -260,7 +283,7 @@ export default function NewBlogPost() {
                   disabled={isSubmitting}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {isSubmitting ? 'Publishing...' : 'Publish Post'}
+                  {isSubmitting ? "Publishing..." : "Publish Post"}
                 </button>
               </div>
             </form>
@@ -269,13 +292,13 @@ export default function NewBlogPost() {
             <div className="p-6">
               <div className="prose prose-lg max-w-none dark:prose-invert">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  {formData.title || 'Your Post Title'}
+                  {formData.title || "Your Post Title"}
                 </h1>
-                
+
                 <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-6">
-                  <span>{formData.category || 'Category'}</span>
+                  <span>{formData.category || "Category"}</span>
                   <span>•</span>
-                  <span>{formData.readTime || '0'} min read</span>
+                  <span>{formData.readTime || "0"} min read</span>
                   <span>•</span>
                   <span>{new Date().toLocaleDateString()}</span>
                 </div>
@@ -290,7 +313,7 @@ export default function NewBlogPost() {
 
                 {formData.tags && (
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {formData.tags.split(',').map((tag, index) => (
+                    {formData.tags.split(",").map((tag, index) => (
                       <span
                         key={index}
                         className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
@@ -302,7 +325,7 @@ export default function NewBlogPost() {
                 )}
 
                 <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                  {formData.content || 'Your content will appear here...'}
+                  {formData.content || "Your content will appear here..."}
                 </div>
               </div>
 
@@ -320,4 +343,4 @@ export default function NewBlogPost() {
       </div>
     </div>
   );
-} 
+}
