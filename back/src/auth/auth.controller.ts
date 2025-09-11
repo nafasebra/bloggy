@@ -1,6 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { Post, Body, HttpStatus } from '@nestjs/common';
-import { RegisterDto, LoginDto, AuthResponseDto } from './dto';
+import { RegisterDto, LoginDto, AuthResponseDto, RefreshDto } from './dto';
 import { AuthService } from './auth.service';
 import {
   ApiBody,
@@ -13,6 +13,7 @@ import {
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { ErrorResponseDto } from '../users/dto/error-response.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -47,8 +48,12 @@ export class AuthController {
     description: 'Internal server error',
     type: ErrorResponseDto,
   })
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto).then(user => ({
+      status: 'success',
+      message: 'User registered successfully',
+      user,
+    }));
   }
 
   @Post('login')
@@ -79,8 +84,42 @@ export class AuthController {
     description: 'Internal server error',
     type: ErrorResponseDto,
   })
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto) {
+    const result = await this.authService.login(loginDto);
+    return {
+      status: 'success',
+      message: 'User logged in successfully',
+      ...result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('refresh')
+  @ApiOperation({
+    summary: 'Refresh access token',
+    description: 'Refreshes the access token using a valid refresh token.',
+    tags: ['Authentication'],
+  })
+  @ApiBody({
+    type: RefreshDto,
+    description: 'Refresh token data',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tokens refreshed successfully',
+    type: AuthResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid refresh token',
+    type: ErrorResponseDto,
+  })
+  async refresh(@Body() refreshDto: RefreshDto) {
+    const result = await this.authService.refresh(refreshDto.refresh_token);
+    return {
+      status: 'success',
+      message: 'Tokens refreshed successfully',
+      ...result,
+    };
   }
 
   // TODO: change password

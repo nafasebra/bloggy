@@ -6,16 +6,19 @@ import {
   Param,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './schemas/post.schema';
 import { CreatePostDtoType, UpdatePostDtoType } from './dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async cratePost(
     @Body() createPostDto: CreatePostDtoType
   ): Promise<PostEntity> {
@@ -33,6 +36,7 @@ export class PostsController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   async updatePost(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDtoType
@@ -41,6 +45,7 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async deletePost(@Param('id') id: string): Promise<void> {
     return this.postsService.delete(id);
   }
