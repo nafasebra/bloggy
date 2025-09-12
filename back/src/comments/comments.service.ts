@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment } from './schemas/comment.schema';
 import {
-  CreateCommentDtoType,
-  ReplyCommentDtoType,
-  LikeCommentDtoType,
+  CreateCommentDto,
+  ReplyCommentDto,
+  LikeCommentDto,
 } from './dto';
 
 @Injectable()
@@ -22,17 +22,17 @@ export class CommentsService {
     return comments;
   }
 
-  async create(comment: CreateCommentDtoType): Promise<Comment> {
+  async create(comment: CreateCommentDto): Promise<Comment> {
     const newComment = new this.commentModel(comment);
     return newComment.save();
   }
 
-  async reply(comment: ReplyCommentDtoType): Promise<Comment> {
+  async reply(comment: ReplyCommentDto): Promise<Comment> {
     const newComment = new this.commentModel(comment);
     return newComment.save();
   }
 
-  async like(comment: LikeCommentDtoType): Promise<Comment> {
+  async like(comment: LikeCommentDto): Promise<Comment> {
     const newComment = new this.commentModel(comment);
     return newComment.save();
   }

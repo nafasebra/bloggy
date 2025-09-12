@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './schemas/post.schema';
-import { CreatePostDtoType, UpdatePostDtoType } from './dto';
+import { CreatePostDto, UpdatePostDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
@@ -34,12 +34,12 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new post' })
-  @ApiBody({ type: CreatePostDtoType })
+  @ApiBody({ type: CreatePostDto })
   @ApiCreatedResponse({ description: 'The post has been created.', type: PostEntity })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBadRequestResponse({ description: 'Invalid input' })
   async cratePost(
-    @Body() createPostDto: CreatePostDtoType
+    @Body() createPostDto: CreatePostDto
   ): Promise<PostEntity> {
     return this.postsService.create(createPostDto);
   }
@@ -65,13 +65,13 @@ export class PostsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a post' })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
-  @ApiBody({ type: UpdatePostDtoType })
+  @ApiBody({ type: UpdatePostDto  })
   @ApiOkResponse({ description: 'The updated post', type: PostEntity })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Post not found' })
   async updatePost(
     @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDtoType
+    @Body() updatePostDto: UpdatePostDto
   ): Promise<PostEntity> {
     return this.postsService.update(id, updatePostDto);
   }

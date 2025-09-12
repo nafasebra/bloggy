@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
-import { CreateCommentDtoType, ReplyCommentDtoType, LikeCommentDtoType } from './dto';
+import { CreateCommentDto, ReplyCommentDto, LikeCommentDto } from './dto';
 import { CommentsService } from './comments.service';
 import { Comment } from './schemas/comment.schema';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -22,10 +22,10 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new comment' })
-  @ApiBody({ type: CreateCommentDtoType })
+  @ApiBody({ type: CreateCommentDto })
   @ApiResponse({ status: 201, description: 'Comment created', type: Comment })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async createComment(@Body() comment: CreateCommentDtoType): Promise<Comment> {
+  async createComment(@Body() comment: CreateCommentDto): Promise<Comment> {
     return this.commentsService.create(comment);
   }
 
@@ -33,10 +33,10 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reply to a comment' })
-  @ApiBody({ type: ReplyCommentDtoType })
+  @ApiBody({ type: ReplyCommentDto })
   @ApiResponse({ status: 201, description: 'Reply created', type: Comment })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async replyComment(@Body() comment: ReplyCommentDtoType): Promise<Comment> {
+  async replyComment(@Body() comment: ReplyCommentDto): Promise<Comment> {
     return this.commentsService.reply(comment);
   }
 
@@ -44,10 +44,10 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Like or unlike a comment' })
-  @ApiBody({ type: LikeCommentDtoType })
+  @ApiBody({ type: LikeCommentDto })
   @ApiResponse({ status: 200, description: 'Comment like toggled', type: Comment })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async likeComment(@Body() comment: LikeCommentDtoType): Promise<Comment> {
+  async likeComment(@Body() comment: LikeCommentDto): Promise<Comment> {
     return this.commentsService.like(comment);
   }
 }
