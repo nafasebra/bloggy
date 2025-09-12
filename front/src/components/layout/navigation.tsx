@@ -9,6 +9,8 @@ export default function Navigation() {
   // Simulate user authentication state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // TODO: Implement user authentication logic
+
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/blog", label: "Blog" },

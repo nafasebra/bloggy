@@ -5,15 +5,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 
-const signinSchema = z.object({
+const signupSchema = z.object({
+  username: z.string().min(2, "Username must be at least 2 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email format").min(1, "Email is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type SigninFormData = z.infer<typeof signinSchema>;
+type signupFormData = z.infer<typeof signupSchema>;
 
-export default function SigninPage() {
+export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -22,16 +25,16 @@ export default function SigninPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SigninFormData>({
-    resolver: zodResolver(signinSchema),
+  } = useForm<signupFormData>({
+    resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = async (data: SigninFormData) => {
+  const onSubmit = async (data: signupFormData) => {
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch("/api/auth/signin", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +48,7 @@ export default function SigninPage() {
         setError("Invalid credentials");
       }
     } catch (err) {
-      setError("Signin failed. Please try again.");
+      setError("Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -60,12 +63,53 @@ export default function SigninPage() {
               Welcome Back
             </h2>
             <p className="text-center text-gray-600 mt-2 text-sm">
-              Sign in to your account
+              Sign up for a new account
             </p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your username"
+                  {...register("username")}
+                />
+                {errors.username && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.username.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your name"
+                  {...register("name")}
+                />
+                {errors.name && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
               <div>
                 <label
                   htmlFor="email"
@@ -120,16 +164,16 @@ export default function SigninPage() {
               disabled={isLoading}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Signing up..." : "Sign up"}
             </button>
 
             <div className="text-center pt-4">
-              <a
-                href="/register"
+              <Link
+                href="/login"
                 className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
               >
-                Don't have an account? Sign up
-              </a>
+                Do you have an account? Log in
+              </Link>
             </div>
           </form>
         </div>
