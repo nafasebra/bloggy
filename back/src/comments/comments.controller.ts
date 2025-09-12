@@ -19,15 +19,15 @@ export class CommentsController {
     return this.commentsService.findByPostId(postId);
   }
 
-  @Post()
+  @Post(":postId")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new comment' })
   @ApiBody({ type: CreateCommentDto })
   @ApiResponse({ status: 201, description: 'Comment created', type: SingleCommentResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' }) 
-  async createComment(@Body() comment: CreateCommentDto): Promise<Comment> {
-    return this.commentsService.create(comment);
+  async createComment(@Param('postId') postId: string, @Body() comment: CreateCommentDto): Promise<Comment> {
+    return this.commentsService.create(postId, comment);
   }
 
   @Put('reply/:postId')
