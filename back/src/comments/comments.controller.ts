@@ -1,9 +1,10 @@
 import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
-import { CreateCommentDto, ReplyCommentDto, LikeCommentDto } from './dto';
+import { CreateCommentDto, ReplyCommentDto, LikeCommentDto, CommentResponseDto, CommentsResponseDto, SingleCommentResponseDto, ErrorResponseDto } from './dto';
 import { CommentsService } from './comments.service';
 import { Comment } from './schemas/comment.schema';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @ApiTags('comments')
 @Controller('comments')
@@ -13,7 +14,7 @@ export class CommentsController {
   @Get(':postId')
   @ApiOperation({ summary: 'Get comments for a post' })
   @ApiParam({ name: 'postId', description: 'ID of the post to get comments for' })
-  @ApiResponse({ status: 200, description: 'Comments for the post', type: [Comment] })
+  @ApiResponse({ status: 200, description: 'Comments for the post', type: CommentsResponseDto })
   async findCommentsByPostId(@Param('postId') postId: string): Promise<Comment[]> {
     return this.commentsService.findByPostId(postId);
   }
@@ -23,8 +24,8 @@ export class CommentsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new comment' })
   @ApiBody({ type: CreateCommentDto })
-  @ApiResponse({ status: 201, description: 'Comment created', type: Comment })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 201, description: 'Comment created', type: SingleCommentResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' }) 
   async createComment(@Body() comment: CreateCommentDto): Promise<Comment> {
     return this.commentsService.create(comment);
   }
@@ -34,8 +35,8 @@ export class CommentsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reply to a comment' })
   @ApiBody({ type: ReplyCommentDto })
-  @ApiResponse({ status: 201, description: 'Reply created', type: Comment })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 201, description: 'Reply created', type: SingleCommentResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' }) 
   async replyComment(@Body() comment: ReplyCommentDto): Promise<Comment> {
     return this.commentsService.reply(comment);
   }
@@ -45,8 +46,8 @@ export class CommentsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Like or unlike a comment' })
   @ApiBody({ type: LikeCommentDto })
-  @ApiResponse({ status: 200, description: 'Comment like toggled', type: Comment })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 200, description: 'Comment like toggled', type: SingleCommentResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async likeComment(@Body() comment: LikeCommentDto): Promise<Comment> {
     return this.commentsService.like(comment);
   }

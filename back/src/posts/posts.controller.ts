@@ -10,19 +10,16 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './schemas/post.schema';
-import { CreatePostDto, UpdatePostDto } from './dto';
+import { CreatePostDto, UpdatePostDto, PostResponseDto, PostsResponseDto, SinglePostResponseDto, ErrorResponseDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
   ApiBearerAuth,
   ApiOperation,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiNotFoundResponse,
-  ApiUnauthorizedResponse,
-  ApiBadRequestResponse,
+  ApiResponse,
   ApiBody,
   ApiParam,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 @ApiTags('posts')
@@ -35,9 +32,9 @@ export class PostsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new post' })
   @ApiBody({ type: CreatePostDto })
-  @ApiCreatedResponse({ description: 'The post has been created.', type: PostEntity })
+  @ApiResponse({ status: 201, description: 'The post has been created.', type: SinglePostResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiBadRequestResponse({ description: 'Invalid input' })
+  @ApiResponse({ status: 400, description: 'Invalid input', type: ErrorResponseDto })
   async cratePost(
     @Body() createPostDto: CreatePostDto
   ): Promise<PostEntity> {
@@ -46,7 +43,7 @@ export class PostsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
-  @ApiOkResponse({ description: 'List of posts', type: [PostEntity] })
+  @ApiResponse({ status: 200, description: 'List of posts', type: PostsResponseDto })
   async findAllPosts(): Promise<PostEntity[]> {
     return this.postsService.findAll();
   }
@@ -54,8 +51,8 @@ export class PostsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a post by id' })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
-  @ApiOkResponse({ description: 'The post', type: PostEntity })
-  @ApiNotFoundResponse({ description: 'Post not found' })
+  @ApiResponse({ status: 200, description: 'The post', type: SinglePostResponseDto })
+  @ApiResponse({ status: 404, description: 'Post not found', type: ErrorResponseDto })
   async findPostById(@Param('id') id: string): Promise<PostEntity> {
     return this.postsService.findById(id);
   }
@@ -66,9 +63,9 @@ export class PostsController {
   @ApiOperation({ summary: 'Update a post' })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
   @ApiBody({ type: UpdatePostDto  })
-  @ApiOkResponse({ description: 'The updated post', type: PostEntity })
+  @ApiResponse({ status: 200, description: 'The updated post', type: SinglePostResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiNotFoundResponse({ description: 'Post not found' })
+  @ApiResponse({ status: 404, description: 'Post not found', type: ErrorResponseDto })
   async updatePost(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto
@@ -81,9 +78,9 @@ export class PostsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a post' })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
-  @ApiOkResponse({ description: 'Deleted successfully' })
+  @ApiResponse({ status: 200, description: 'Deleted successfully' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiNotFoundResponse({ description: 'Post not found' })
+  @ApiResponse({ status: 404, description: 'Post not found', type: ErrorResponseDto })
   async deletePost(@Param('id') id: string): Promise<void> {
     return this.postsService.delete(id);
   }
@@ -91,7 +88,7 @@ export class PostsController {
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get all posts by user id' })
   @ApiParam({ name: 'userId', type: 'string', description: 'User id' })
-  @ApiOkResponse({ description: 'List of posts for the user', type: [PostEntity] })
+  @ApiResponse({ status: 200, description: 'List of posts for the user', type: PostsResponseDto })
   async findAllPostsByUserId(
     @Param('userId') userId: string
   ): Promise<PostEntity[]> {

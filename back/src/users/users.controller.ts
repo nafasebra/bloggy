@@ -7,12 +7,12 @@ import {
   ApiTags,
   ApiParam,
 } from '@nestjs/swagger';
-import { UpdateUserDto, UserResponseDto, ErrorResponseDto } from './dto';
+import { UpdateUserDto, UserResponseDto, SingleUserResponseDto, UsersResponseDto, ErrorResponseDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -21,7 +21,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'User found successfully',
-    type: UserResponseDto,
+    type: SingleUserResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -37,13 +37,15 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user by id' })
   @ApiResponse({
     status: 200,
     description: 'User updated successfully',
-    type: UserResponseDto,
+    type: SingleUserResponseDto,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiResponse({
     status: 400,
     description: 'Bad request - validation error',
@@ -64,13 +66,15 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user by id' })
   @ApiResponse({
     status: 200,
     description: 'User deleted successfully',
-    type: UserResponseDto,
+    type: SingleUserResponseDto,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiResponse({
     status: 404,
     description: 'User not found',
