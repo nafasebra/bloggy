@@ -27,13 +27,13 @@ export class CommentsService {
     return newComment.save();
   }
 
-  async reply(comment: ReplyCommentDto): Promise<Comment> {
-    const newComment = new this.commentModel(comment);
+  async reply(postId: string, comment: ReplyCommentDto): Promise<Comment> {
+    const newComment = new this.commentModel({ ...comment, postId });
     return newComment.save();
   }
 
-  async like(comment: LikeCommentDto): Promise<Comment> {
-    const newComment = new this.commentModel(comment);
+  async like(postId: string, comment: LikeCommentDto): Promise<Comment> {
+    const newComment = new this.commentModel({ ...comment, postId });
     return newComment.save();
   }
 }

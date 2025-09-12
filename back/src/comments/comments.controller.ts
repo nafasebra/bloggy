@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param, Put } from '@nestjs/common';
 import { CreateCommentDto, ReplyCommentDto, LikeCommentDto, CommentResponseDto, CommentsResponseDto, SingleCommentResponseDto, ErrorResponseDto } from './dto';
 import { CommentsService } from './comments.service';
 import { Comment } from './schemas/comment.schema';
@@ -30,25 +30,25 @@ export class CommentsController {
     return this.commentsService.create(comment);
   }
 
-  @Post('reply')
+  @Put('reply/:postId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reply to a comment' })
   @ApiBody({ type: ReplyCommentDto })
   @ApiResponse({ status: 201, description: 'Reply created', type: SingleCommentResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' }) 
-  async replyComment(@Body() comment: ReplyCommentDto): Promise<Comment> {
-    return this.commentsService.reply(comment);
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async replyComment(@Param('postId') postId: string, @Body() comment: ReplyCommentDto): Promise<Comment> {
+    return this.commentsService.reply(postId, comment);
   }
 
-  @Post('like')
+  @Put('like/:postId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Like or unlike a comment' })
   @ApiBody({ type: LikeCommentDto })
   @ApiResponse({ status: 200, description: 'Comment like toggled', type: SingleCommentResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async likeComment(@Body() comment: LikeCommentDto): Promise<Comment> {
-    return this.commentsService.like(comment);
+  async likeComment(@Param('postId') postId: string, @Body() comment: LikeCommentDto): Promise<Comment> {
+    return this.commentsService.like(postId, comment);
   }
 }
