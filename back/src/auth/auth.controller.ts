@@ -1,5 +1,6 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, UseGuards, Res } from '@nestjs/common';
 import { Post, Body, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { RegisterDto, LoginDto, AuthResponseDto, RefreshDto } from './dto';
 import { AuthService } from './auth.service';
 import {
@@ -117,6 +118,37 @@ export class AuthController {
       status: 'success',
       message: 'Tokens refreshed successfully',
       ...result,
+    };
+  }
+
+  @Post('logout')
+  @ApiOperation({
+    summary: 'Logout a user',
+    description: 'Logs out a user by clearing the refresh token cookie.',
+    tags: ['Authentication'],
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User logged out successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string', example: 'success' },
+        message: { type: 'string', example: 'User logged out successfully' },
+      },
+    },
+  })
+  async logout(@Res({ passthrough: true }) res: Response) {
+    // Clear the http-only refresh_token cookie
+    res.clearCookie('refresh_token', { 
+      httpOnly: true, 
+      secure: true, 
+      sameSite: 'strict' 
+    });
+    
+    return {
+      status: 'success',
+      message: 'User logged out successfully',
     };
   }
 
