@@ -63,10 +63,8 @@ export class AuthService {
     }
     const newPayload = { sub: user._id, username: user.username, email: user.email };
     const access_token = this.jwtService.sign(newPayload, { expiresIn: '1h' });
-    const refresh_token = this.jwtService.sign(newPayload, { expiresIn: '7d' });
     return {
       access_token,
-      refresh_token,
     };
   }
 }

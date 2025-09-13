@@ -13,7 +13,6 @@ import {
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { ErrorResponseDto } from '../users/dto/error-response.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -93,7 +92,6 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('refresh')
   @ApiOperation({
     summary: 'Refresh access token',
