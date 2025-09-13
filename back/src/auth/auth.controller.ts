@@ -84,12 +84,20 @@ export class AuthController {
     description: 'Internal server error',
     type: ErrorResponseDto,
   })
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(loginDto);
+
+    // Set http-only cookie with refresh_token
+    res.cookie('refresh_token', result.refresh_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    
     return {
       status: 'success',
       message: 'User logged in successfully',
-      ...result,
+      access_token: result.access_token,
     };
   }
 
