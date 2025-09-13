@@ -299,7 +299,9 @@ export default function UserPage({ params }: UserPageProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Change password</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <Link href={'/auth/change-password'}>Change Password</Link>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
