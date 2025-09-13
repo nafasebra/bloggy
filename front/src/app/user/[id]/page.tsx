@@ -5,6 +5,16 @@ import FollowButton from "@/components/pages/user/follow-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FollowerList from "@/components/pages/user/follower-list";
 import FollowingList from "@/components/pages/user/following-list";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button";
+import { DotSquare, Menu, MoreVertical } from "lucide-react";
 
 // Mock user data
 const users = [
@@ -281,6 +291,19 @@ export default function UserPage({ params }: UserPageProps) {
             </div>
             {/* Follow/Following Button */}
             <FollowButton userId={"user"} initialFollowing={false} />
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant={'ghost'}>
+                  <MoreVertical />
+                  <span>Menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Change password</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
