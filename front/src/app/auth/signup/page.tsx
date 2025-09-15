@@ -17,7 +17,6 @@ const signupSchema = z.object({
 type signupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -25,17 +24,16 @@ export default function SignupPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<signupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
   const onSubmit = async (data: signupFormData) => {
-    setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch("/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,14 +42,12 @@ export default function SignupPage() {
       });
 
       if (response.ok) {
-        router.push("/dashboard");
+        router.push("/");
       } else {
-        setError("Invalid credentials");
+        setError("The username or email is already taken");
       }
     } catch (err) {
       setError("Signup failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -180,10 +176,10 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={!isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Signing up..." : "Sign up"}
+              {isSubmitting ? "Signing up..." : "Sign up"}
             </button>
 
             <div className="text-center pt-4">

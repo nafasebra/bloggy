@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format").min(1, "Email is required"),
@@ -14,7 +15,6 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -22,17 +22,16 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,14 +40,12 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        router.push("/dashboard");
+        router.push("/");
       } else {
-        setError("Invalid credentials");
+        setError("The Email or Password is incorrect");
       }
     } catch (err) {
       setError("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -136,19 +133,19 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={!isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
 
             <div className="text-center pt-4">
-              <a
+              <Link
                 href="/register"
                 className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
               >
                 Don't have an account? Sign up
-              </a>
+              </Link>
             </div>
           </form>
         </div>
