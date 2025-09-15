@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email format").min(1, "Email is required"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -37,12 +37,19 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
 
       if (response.ok) {
+        const result = await response.json();
+        // Assuming the backend returns { access_token: ... }
+        if (result.access_token) {
+          localStorage.setItem('access_token', result.access_token);
+        }
         router.push("/");
       } else {
-        setError("The Email or Password is incorrect");
+        const errorData = await response.json();
+        setError(errorData.error || "The Username or Password is incorrect");
       }
     } catch (err) {
       setError("Login failed. Please try again.");
@@ -66,21 +73,21 @@ export default function LoginPage() {
             <div className="space-y-4">
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="username"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Email address
+                  Username
                 </label>
                 <input
-                  id="email"
-                  type="email"
+                  id="username"
+                  type="text"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
-                  {...register("email")}
+                  placeholder="Enter your username"
+                  {...register("username")}
                 />
-                {errors.email && (
+                {errors.username && (
                   <p className="mt-2 text-sm text-red-600">
-                    {errors.email.message}
+                    {errors.username.message}
                   </p>
                 )}
               </div>
@@ -133,7 +140,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={!isSubmitting}
+              disabled={isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Signing in..." : "Sign in"}

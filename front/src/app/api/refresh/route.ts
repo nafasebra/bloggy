@@ -7,6 +7,6 @@ export async function refresh() {
     if(!refreshToken) {
         throw new Error('No refresh token found');
     }
-    const { data } = await http.post('/refresh', { refreshToken }, { withCredentials: true });
+    const { data } = await http.post('/auth/refresh', { refreshToken }, { withCredentials: true });
     return data; // { access_token }
 }
