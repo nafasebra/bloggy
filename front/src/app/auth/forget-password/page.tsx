@@ -54,21 +54,21 @@ export default function ForgetPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-sm mx-auto">
-          <div className="bg-white shadow-lg rounded-lg px-8 py-10">
+          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 py-10">
             <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Check your email
               </h2>
-              <p className="text-gray-600 mt-2 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                 We've sent a password reset link to your email address.
               </p>
             </div>
             <div className="text-center pt-4">
               <a
                 href="/login"
-                className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
+                className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
                 Back to login
               </a>
@@ -80,14 +80,14 @@ export default function ForgetPasswordPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-sm mx-auto">
-        <div className="bg-white shadow-lg rounded-lg px-8 py-10">
+        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 py-10">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center text-gray-800">
+            <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
               Forgot your password?
             </h2>
-            <p className="text-center text-gray-600 mt-2 text-sm">
+            <p className="text-center text-gray-600 dark:text-gray-300 mt-2 text-sm">
               Enter your email address and we'll send you a link to reset your
               password.
             </p>
@@ -98,14 +98,14 @@ export default function ForgetPasswordPage() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Email address
                 </label>
                 <input
                   id="email"
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your email address"
                   {...register("email")}
                 />
