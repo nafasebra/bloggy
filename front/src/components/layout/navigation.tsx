@@ -93,7 +93,7 @@ export default function Navigation() {
                     Login
                   </button>
                   <Link
-                    href="/signup"
+                    href="/auth/signup"
                     className="px-3 py-2 rounded-md text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-colors"
                   >
                     Sign Up

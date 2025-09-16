@@ -67,7 +67,7 @@ export default function ForgetPasswordPage() {
             </div>
             <div className="text-center pt-4">
               <a
-                href="/login"
+                href="/auth/login"
                 className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
                 Back to login
@@ -133,7 +133,7 @@ export default function ForgetPasswordPage() {
 
             <div className="text-center pt-4">
               <a
-                href="/login"
+                href="/auth/login"
                 className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
               >
                 Back to login

@@ -3,10 +3,8 @@ export async function POST(request: Request) {
     const { username, password } = await request.json();
 
     console.log(username, password)
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030'; // assuming backend port
-
-    const response = await fetch(`${apiUrl}/auth/login`, {
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

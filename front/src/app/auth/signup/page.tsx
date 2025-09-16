@@ -33,7 +33,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/signup", {
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export default function SignupPage() {
       });
 
       if (response.ok) {
-        router.push("/");
+        router.push("/auth/login");
       } else {
         setError("The username or email is already taken");
       }
@@ -176,7 +176,7 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={!isSubmitting}
+              disabled={isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Signing up..." : "Sign up"}
@@ -184,7 +184,7 @@ export default function SignupPage() {
 
             <div className="text-center pt-4">
               <Link
-                href="/login"
+                href="/auth/login"
                 className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
                 Do you have an account? Log in
