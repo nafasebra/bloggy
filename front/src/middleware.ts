@@ -1,50 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// /home/nafas/Projects/bloggy/front/src/middleware.ts
-
+// user:
+// is logged in -> uses all pages rather than login, signup and forget password
+// is not logged in -> access to all pages rather than change-password
 export async function middleware(request: NextRequest) {
-    // const { pathname } = request.nextUrl;
+    const { pathname } = request.nextUrl;
 
-    // // Skip middleware for public routes
-    // if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/api/auth')) {
-    //     return NextResponse.next();
-    // }
+    // Check for refresh_token cookie to determine if user is logged in
+    const refreshToken = request.cookies.get('refresh_token')?.value;
+    const isLoggedIn = !!refreshToken;
 
-    // // Check for access token in httpOnly cookie
-    // const accessToken = request.cookies.get('accessToken')?.value;
-    // const refreshToken = request.cookies.get('refreshToken')?.value;
+    // Routes that logged-in users should be redirected away from
+    const authRoutesForLoggedIn = ['/auth/login', '/auth/signup', '/auth/forget-password'];
 
-    // if (!accessToken) {
-    //     if (!refreshToken) {
-    //         // No tokens, redirect to login
-    //         return NextResponse.redirect(new URL('/login', request.url));
-    //     }
+    // Routes that non-logged-in users should be redirected away from
+    const protectedAuthRoutes = ['/auth/change-password'];
 
-    //     // Attempt to refresh token
-    //     try {
-    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({ refreshToken }),
-    //         });
+    // Public routes that don't require authentication (for non-logged-in users)
+    const publicRoutes = ['/', '/about'];
 
-    //         if (response.ok) {
-    //             const data = await response.json();
-    //             // Set new tokens in cookies
-    //             const res = NextResponse.next();
-    //             res.cookies.set('accessToken', data.accessToken, { httpOnly: true, secure: true, sameSite: 'strict' });
-    //             res.cookies.set('refreshToken', data.refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
-    //             return res;
-    //         }
-    //     } catch (error) {
-    //         console.error('Token refresh failed:', error);
-    //     }
+    // If user is logged in and trying to access auth routes, redirect to home
+    if (isLoggedIn && authRoutesForLoggedIn.includes(pathname)) {
+        return NextResponse.redirect(new URL('/', request.url));
+    }
 
-    //     // Refresh failed, redirect to login
-    //     return NextResponse.redirect(new URL('/login', request.url));
-    // }
+    // If user is not logged in and trying to access protected auth routes, redirect to login
+    if (!isLoggedIn && protectedAuthRoutes.includes(pathname)) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
 
-    // User is authenticated, proceed
+    // Allow access to API routes
+    if (pathname.startsWith('/api/')) {
+        return NextResponse.next();
+    }
+
+    // For non-logged-in users, allow access to public routes
+    if (!isLoggedIn && publicRoutes.includes(pathname)) {
+        return NextResponse.next();
+    }
+
+    // For other routes, if not logged in, redirect to login
+    if (!isLoggedIn) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+
+    // User is logged in, proceed to any other route
     return NextResponse.next();
 }
 
