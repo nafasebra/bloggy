@@ -1,3 +1,5 @@
+'use client'
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { setAccessToken } from '@/lib/http';
 
@@ -41,7 +43,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 // Handle refresh failure, e.g., logout
                 setAccessTokenState(null);
                 setAccessToken(null);
-                console.error('Refresh failed');
             }
         } catch (error) {
             setAccessTokenState(null);
