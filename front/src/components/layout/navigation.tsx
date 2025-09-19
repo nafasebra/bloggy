@@ -13,13 +13,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/contexts/auth-provider";
 
 export default function Navigation() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // TODO: Implement user authentication logic
+  const { accessToken } = useAuth();
 
   const changeMenuState = useCallback((state: boolean) => {
     setIsMenuOpen(state);
@@ -62,19 +61,18 @@ export default function Navigation() {
                 </Link>
               ))}
               <ThemeButton />
-              {!isLoggedIn ? (
+              {!accessToken ? (
                 <>
-                  <Button onClick={() => setIsLoggedIn(true)}>Login</Button>
+                  <Link href="/auth/login">
+                    <Button>Login</Button>
+                  </Link>
                   <Link href="/auth/signup">
                     <Button variant={"outline"}>Sign Up</Button>
                   </Link>
                 </>
               ) : (
-                <Link
-                  href="/user/1"
-                  className="px-3 py-2 rounded-md text-sm font-medium bg-purple-500 text-white hover:bg-purple-600 transition-colors"
-                >
-                  My Account
+                <Link href="/user/1">
+                  <Button>My Account</Button>
                 </Link>
               )}
             </div>
@@ -113,17 +111,18 @@ export default function Navigation() {
                     </Link>
                   ))}
                   <div className="flex flex-col space-y-3 pt-4">
-                    {!isLoggedIn ? (
+                    {!accessToken ? (
                       <>
-                        <Button
-                          onClick={() => {
-                            setIsLoggedIn(true);
-                            setIsMenuOpen(false);
-                          }}
-                          className="w-full"
-                        >
-                          Login
-                        </Button>
+                        <Link href="/auth/login">
+                          <Button
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                            }}
+                            className="w-full"
+                          >
+                            Login
+                          </Button>
+                        </Link>
                         <Link
                           href="/auth/signup"
                           onClick={() => setIsMenuOpen(false)}

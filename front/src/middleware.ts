@@ -34,6 +34,11 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // For non-logged-in users, allow access to auth routes
+    if (!isLoggedIn && authRoutesForLoggedIn.includes(pathname)) {
+        return NextResponse.next();
+    }
+
     // For non-logged-in users, allow access to public routes
     if (!isLoggedIn && publicRoutes.includes(pathname)) {
         return NextResponse.next();

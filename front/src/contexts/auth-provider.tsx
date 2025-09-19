@@ -6,6 +6,7 @@ import { setAccessToken } from '@/lib/http';
 interface AuthContextType {
     accessToken: string | null;
     refreshToken: () => Promise<void>;
+    setAccessToken: (token: string | null) => void;
     logout: () => void;
 }
 
@@ -25,6 +26,12 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [accessToken, setAccessTokenState] = useState<string | null>(null);
+
+    const setAccessToken = (token: string | null) => {
+        if (!accessToken) {
+            setAccessTokenState(token);
+        }
+    };
 
     const refreshToken = async () => {
         try {
@@ -70,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ accessToken, refreshToken, logout }}>
+        <AuthContext.Provider value={{ accessToken, refreshToken, setAccessToken, logout }}>
             {children}
         </AuthContext.Provider>
     );

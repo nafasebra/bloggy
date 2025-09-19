@@ -6,6 +6,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useAuth } from "@/contexts/auth-provider";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { setAccessToken } = useAuth();
 
   const {
     register,
@@ -42,11 +44,10 @@ export default function LoginPage() {
 
       if (response.ok) {
         const result = await response.json();
-        // Assuming the backend returns { access_token: ... }
         if (result.access_token) {
-          localStorage.setItem('access_token', result.access_token);
+          setAccessToken(result.access_token);
+          router.push("/");
         }
-        router.push("/");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "The Username or Password is incorrect");
