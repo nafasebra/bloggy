@@ -14,6 +14,7 @@ import {
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { ErrorResponseDto } from '../users/dto/error-response.dto';
+import { ChangePasswordDto } from './dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -160,7 +161,31 @@ export class AuthController {
     };
   }
 
-  // TODO: change password
+  @Post('change-password')
+  @ApiOperation({
+    summary: 'Change user password',
+    description: 'Allows a user to change their password.',
+    tags: ['Authentication'],
+  })
+  @ApiBody({
+    type: ChangePasswordDto,
+    description: 'Change password data',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password changed successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid old password',
+    type: ErrorResponseDto,
+  })
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    await this.authService.changePassword(changePasswordDto);
+    return {
+      status: 'success',
+      message: 'Password changed successfully',
+    };
+  }
 
   // TODO forget password
 }

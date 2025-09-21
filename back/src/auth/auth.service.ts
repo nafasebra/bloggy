@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { ChangePasswordDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -66,5 +67,20 @@ export class AuthService {
     return {
       access_token,
     };
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    const user = await this.userModel.findById(changePasswordDto.userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    } 
+
+    const isOldPasswordValid = await bcrypt.compare(changePasswordDto.old_password, user.password);
+    if (!isOldPasswordValid) {
+      throw new UnauthorizedException('Invalid old password');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(changePasswordDto.new_password, 10);
+    await this.userModel.findByIdAndUpdate(changePasswordDto.userId, { password: hashedNewPassword });
   }
 }
