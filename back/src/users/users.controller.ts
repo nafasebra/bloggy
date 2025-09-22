@@ -16,6 +16,18 @@ import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // get all users
+  @Get()
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({
+    status: 200,
+    description: 'Users found successfully',
+    type: UsersResponseDto,
+  })
+  findAll() {
+    return this.usersService.findAll();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by id' })
   @ApiResponse({
