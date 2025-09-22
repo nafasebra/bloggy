@@ -1,4 +1,7 @@
+"use server"
+
 import Link from "next/link";
+import http from "@/lib/http";
 
 // Mock data for latest users
 const latestUsers = [
@@ -40,7 +43,20 @@ const latestUsers = [
   },
 ];
 
-export default function LatestUsers() {
+// async function getLatestUsers() {
+//   try {
+//     const response = await http.get(`/user`);
+//     return response.data;
+//   } catch (error) {
+//     throw new Error("Failed to fetch latest users");
+//   }
+// }
+
+export default async function LatestUsers() {
+  // const latestUsers = await getLatestUsers();
+
+  // console.log(latestUsers);
+
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

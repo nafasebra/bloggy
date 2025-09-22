@@ -1,7 +1,10 @@
+"use server"
+
 import Link from "next/link";
+import http from "@/lib/http";
 
 // Mock data for latest posts
-const latestPosts = [
+const mockLatestPosts = [
   {
     id: 1,
     title: "The Future of Web Development in 2024",
@@ -37,7 +40,20 @@ const latestPosts = [
   },
 ];
 
-export default function LatestPosts() {
+async function getLatestPosts() {
+  try {
+    const response = await http.get(`/posts`);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch latest posts");
+  }
+}
+
+export default async function LatestPosts() {
+  const latestPosts = await getLatestPosts();
+
+  console.log(latestPosts)
+
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,7 +67,7 @@ export default function LatestPosts() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {latestPosts.map((post) => (
+          {mockLatestPosts.map((post: any) => (
             <article
               key={post.id}
               className="bg-white dark:bg-gray-700 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 dark:border-gray-600"
