@@ -4,7 +4,7 @@ import Link from "next/link";
 import http from "@/lib/http";
 
 // Mock data for latest users
-const latestUsers = [
+const mockLatestUsers = [
   {
     id: 1,
     name: "Sarah Johnson",
@@ -43,19 +43,19 @@ const latestUsers = [
   },
 ];
 
-// async function getLatestUsers() {
-//   try {
-//     const response = await http.get(`/user`);
-//     return response.data;
-//   } catch (error) {
-//     throw new Error("Failed to fetch latest users");
-//   }
-// }
+async function getLatestUsers() {
+  try {
+    const response = await http.get(`/users`);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch latest users");
+  }
+}
 
 export default async function LatestUsers() {
-  // const latestUsers = await getLatestUsers();
+  const latestUsers = await getLatestUsers();
 
-  // console.log(latestUsers);
+  console.log(latestUsers);
 
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
@@ -70,7 +70,7 @@ export default async function LatestUsers() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {latestUsers.map((user) => (
+          {mockLatestUsers.map((user) => (
             <div
               key={user.id}
               className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300"
