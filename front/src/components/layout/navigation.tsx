@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "../ui/button";
 import ThemeButton from "../shared/theme-button";
+import NotificationButton from "../shared/notification-button";
 import { Menu } from "lucide-react";
 import {
   Sheet,
@@ -60,6 +61,7 @@ export default function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              <NotificationButton />
               <ThemeButton />
               {!accessToken ? (
                 <>
