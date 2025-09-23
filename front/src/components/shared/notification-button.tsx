@@ -109,7 +109,7 @@ function NotificationButton() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-h-96">
+      <DropdownMenuContent align="end" className="w-80">
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Notifications
@@ -126,7 +126,7 @@ function NotificationButton() {
           )}
         </div>
 
-        <div className="max-h-80 overflow-y-auto">
+        <div className="h-80 overflow-y-auto hide-scrollbar">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
