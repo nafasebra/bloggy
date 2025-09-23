@@ -180,18 +180,6 @@ function NotificationButton() {
             ))
           )}
         </div>
-
-        {notifications.length > 0 && (
-          <div className="p-2 border-t border-gray-200 dark:border-gray-700">
-            <Button
-              variant="ghost"
-              className="w-full text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              onClick={() => window.location.href = "/notifications"}
-            >
-              View all notifications
-            </Button>
-          </div>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

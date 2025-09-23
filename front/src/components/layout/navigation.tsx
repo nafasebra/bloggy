@@ -61,7 +61,9 @@ export default function Navigation() {
                   {item.label}
                 </Link>
               ))}
-              <NotificationButton />
+              {
+                accessToken && <NotificationButton />
+              }
               <ThemeButton />
               {!accessToken ? (
                 <>
@@ -81,6 +83,9 @@ export default function Navigation() {
           </div>
 
           <div className="md:hidden flex items-center gap-3">
+            {
+              accessToken && <NotificationButton />
+            }
             <ThemeButton />
             <Sheet open={isMenuOpen} onOpenChange={changeMenuState}>
               <SheetTrigger asChild>
