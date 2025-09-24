@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "../ui/button";
 import ThemeButton from "../shared/theme-button";
@@ -17,19 +16,12 @@ import {
 import { useAuth } from "@/contexts/auth-provider";
 
 export default function Navigation() {
-  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { accessToken } = useAuth();
 
   const changeMenuState = useCallback((state: boolean) => {
     setIsMenuOpen(state);
   }, []);
-
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/blog", label: "Blog" },
-    { href: "/about", label: "About" },
-  ];
 
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
@@ -48,19 +40,6 @@ export default function Navigation() {
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === item.href
-                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                      : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
               {
                 accessToken && <NotificationButton />
               }
@@ -103,20 +82,6 @@ export default function Navigation() {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="px-4 flex flex-col gap-3 mt-4">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`px-4 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
-                        pathname === item.href
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 shadow-sm"
-                          : "text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-blue-400 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
                   <div className="flex flex-col space-y-3 pt-4">
                     {!accessToken ? (
                       <>
