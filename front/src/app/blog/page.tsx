@@ -16,17 +16,25 @@ const categories = [
   'Creative',
 ];
 
-async function getAllPosts() {
+async function getAllPosts(query: string) {
   try {
-    const response = await http.get(`/posts`);
+    const response = await http.get(`/posts`, {
+      params: {
+        q: query 
+      }
+    });
     return response.data;
   } catch (error) {
     throw new Error('Failed to fetch all posts');
   }
 }
 
-export default async function BlogPage() {
-  const postData = await getAllPosts();
+export default async function BlogPage({
+  searchParams
+}: {
+  searchParams: { q: string }
+}) {
+  const postData = await getAllPosts(searchParams.q);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -71,7 +79,6 @@ export default async function BlogPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             <SearchBar
-              placeholder="Search title, tag or authors..."
             />
 
             <div className="flex flex-wrap gap-2">
