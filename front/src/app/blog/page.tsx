@@ -153,7 +153,7 @@ export default function BlogPage() {
             <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}
-              placeholder="Search articles..."
+              placeholder="Search title, tag or authors..."
             />
 
             <div className="flex flex-wrap gap-2">

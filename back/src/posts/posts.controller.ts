@@ -7,6 +7,7 @@ import {
   Put,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './schemas/post.schema';
@@ -39,6 +40,14 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto
   ): Promise<PostEntity> {
     return this.postsService.create(createPostDto);
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Search posts by title, tag and author' })
+  @ApiResponse({ status: 200, description: 'List of matching posts', type: PostsResponseDto })
+  async searchPosts(@Query('query') query: string): Promise<PostEntity[]> {
+    console.log(query)
+    return this.postsService.findBySearch(query);
   }
 
   @Get()

@@ -19,6 +19,19 @@ export class PostsService {
     return this.postModel.find().exec();
   }
 
+  async findBySearch(query: string): Promise<Post[]> {
+    console.log(query)
+    return this.postModel
+      .find({
+      $or: [
+        { title: { $regex: String(query), $options: 'i' } },
+        // { tags: { $regex: String(query), $options: 'i' } },
+        // { author: { $regex: String(query), $options: 'i' } },
+      ]
+      })
+      .exec();
+  }
+
   async findById(id: string): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {
