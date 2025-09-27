@@ -24,6 +24,12 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 - **Responsive Design**: Works perfectly on all devices
 - **Dark Mode**: Elegant dark/light theme support
 
+### 🔧 Admin Dashboard
+- **Dashboard Overview**: View key statistics and metrics
+- **Post Management**: Create, edit, and delete blog posts
+- **User Management**: Manage user accounts and roles
+- **Content Moderation**: Moderate comments and user content
+
 ### 🔍 Discovery & Search
 - **Advanced Search**: Search posts by title, content, and tags
 - **Category Filtering**: Browse posts by category
@@ -232,6 +238,12 @@ DELETE /comments/:id       # Delete comment
 - Real-time comment updates
 - Comment moderation tools
 
+### Admin Dashboard
+- Statistics dashboard with real-time metrics
+- Comprehensive post management interface
+- User administration and role management
+- Content moderation and oversight tools
+
 ## 🔧 Configuration
 
 ### Database Setup
@@ -332,11 +344,11 @@ If you have any questions or need help:
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/bloggy&type=Date)](https://star-history.com/#yourusername/bloggy&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=nafasebra/bloggy&type=Date)](https://star-history.com/#nafasebra/bloggy&Date)
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ by <a href="https://github.com/yourusername">Your Name</a></p>
+  <p>Made with ❤️ by <a href="https://github.com/nafasebra">Nafas Ebrahimi</a></p>
   <p>If this project helps you, please give it a ⭐️</p>
-</div> 
+</div>
