@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState } from "react";
+import Link from 'next/link';
+import { useState } from 'react';
 
 interface Comment {
   id: number;
@@ -19,34 +19,34 @@ interface CommentSectionProps {
 const mockComments: Comment[] = [
   {
     id: 1,
-    author: "John Doe",
+    author: 'John Doe',
     content:
       "This is a fantastic article! I've been following these trends and it's great to see them all summarized in one place.",
-    date: "2024-01-15T10:30:00Z",
-    avatar: "JD",
+    date: '2024-01-15T10:30:00Z',
+    avatar: 'JD',
   },
   {
     id: 2,
-    author: "Jane Smith",
+    author: 'Jane Smith',
     content:
-      "I particularly enjoyed the section about AI-powered development tools. GitHub Copilot has been a game-changer for my workflow.",
-    date: "2024-01-15T14:20:00Z",
-    avatar: "JS",
+      'I particularly enjoyed the section about AI-powered development tools. GitHub Copilot has been a game-changer for my workflow.',
+    date: '2024-01-15T14:20:00Z',
+    avatar: 'JS',
   },
   {
     id: 3,
-    author: "Mike Johnson",
+    author: 'Mike Johnson',
     content:
       "Great insights! I'm excited to see how these technologies evolve throughout the year.",
-    date: "2024-01-16T09:15:00Z",
-    avatar: "MJ",
+    date: '2024-01-16T09:15:00Z',
+    avatar: 'MJ',
   },
 ];
 
 export default function CommentSection({ postId }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(mockComments);
-  const [newComment, setNewComment] = useState("");
-  const [authorName, setAuthorName] = useState("");
+  const [newComment, setNewComment] = useState('');
+  const [authorName, setAuthorName] = useState('');
 
   console.log(postId);
 
@@ -61,15 +61,15 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       content: newComment,
       date: new Date().toISOString(),
       avatar: authorName
-        .split(" ")
+        .split(' ')
         .map((n) => n[0])
-        .join("")
+        .join('')
         .toUpperCase(),
     };
 
     setComments([comment, ...comments]);
-    setNewComment("");
-    setAuthorName("");
+    setNewComment('');
+    setAuthorName('');
   };
 
   return (
@@ -135,12 +135,12 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                   {comment.author}
                 </h4>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(comment.date).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
+                  {new Date(comment.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </span>
               </div>

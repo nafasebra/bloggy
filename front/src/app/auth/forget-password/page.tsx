@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const forgetPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().email('Please enter a valid email address'),
 });
 
 type ForgetPasswordFormData = z.infer<typeof forgetPasswordSchema>;
 
 export default function ForgetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
@@ -28,14 +28,14 @@ export default function ForgetPasswordPage() {
 
   const onSubmit = async (data: ForgetPasswordFormData) => {
     setIsLoading(true);
-    setError("");
+    setError('');
     setSuccess(false);
 
     try {
-      const response = await fetch("/api/auth/forget-password", {
-        method: "POST",
+      const response = await fetch('/api/auth/forget-password', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
@@ -43,10 +43,10 @@ export default function ForgetPasswordPage() {
       if (response.ok) {
         setSuccess(true);
       } else {
-        setError("Failed to send reset email");
+        setError('Failed to send reset email');
       }
     } catch (err) {
-      setError("Request failed. Please try again.");
+      setError('Request failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +107,7 @@ export default function ForgetPasswordPage() {
                   type="email"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your email address"
-                  {...register("email")}
+                  {...register('email')}
                 />
                 {errors.email && (
                   <p className="mt-2 text-sm text-red-600">
@@ -128,7 +128,7 @@ export default function ForgetPasswordPage() {
               disabled={isLoading}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Sending..." : "Send reset link"}
+              {isLoading ? 'Sending...' : 'Send reset link'}
             </button>
 
             <div className="text-center pt-4">

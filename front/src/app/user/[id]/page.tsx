@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import UserPostCard from "@/components/pages/user/user-post-card";
-import FollowButton from "@/components/pages/user/follow-button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FollowerList from "@/components/pages/user/follower-list";
-import FollowingList from "@/components/pages/user/following-list";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import UserPostCard from '@/components/pages/user/user-post-card';
+import FollowButton from '@/components/pages/user/follow-button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import FollowerList from '@/components/pages/user/follower-list';
+import FollowingList from '@/components/pages/user/following-list';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,53 +12,53 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button";
-import { DotSquare, Menu, MoreVertical } from "lucide-react";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { DotSquare, Menu, MoreVertical } from 'lucide-react';
 
 // Mock user data
 const users = [
   {
     id: 1,
-    name: "Sarah Johnson",
+    name: 'Sarah Johnson',
     bio: "Tech enthusiast and web developer passionate about creating meaningful digital experiences. I love exploring new technologies and sharing my knowledge with the community. When I'm not coding, you can find me hiking in the mountains or reading sci-fi novels.",
-    avatar: "SJ",
-    location: "San Francisco, CA",
-    website: "https://sarahjohnson.dev",
-    twitter: "@sarahjohnson",
+    avatar: 'SJ',
+    location: 'San Francisco, CA',
+    website: 'https://sarahjohnson.dev',
+    twitter: '@sarahjohnson',
     postsCount: 24,
     followers: 1200,
     following: 350,
-    category: "Technology",
-    joinDate: "2023-03-15",
+    category: 'Technology',
+    joinDate: '2023-03-15',
   },
   {
     id: 2,
-    name: "Michael Chen",
-    bio: "Mindfulness coach helping people find balance in their busy lives through simple practices. I believe that everyone deserves to live a life of peace and purpose. My approach combines ancient wisdom with modern psychology.",
-    avatar: "MC",
-    location: "Portland, OR",
-    website: "https://mindfulmichael.com",
-    twitter: "@mindfulmichael",
+    name: 'Michael Chen',
+    bio: 'Mindfulness coach helping people find balance in their busy lives through simple practices. I believe that everyone deserves to live a life of peace and purpose. My approach combines ancient wisdom with modern psychology.',
+    avatar: 'MC',
+    location: 'Portland, OR',
+    website: 'https://mindfulmichael.com',
+    twitter: '@mindfulmichael',
     postsCount: 18,
     followers: 890,
     following: 120,
-    category: "Lifestyle",
-    joinDate: "2023-06-22",
+    category: 'Lifestyle',
+    joinDate: '2023-06-22',
   },
   {
     id: 3,
-    name: "Emma Davis",
-    bio: "Food blogger and sustainability advocate sharing recipes that are good for you and the planet. I believe that cooking should be both delicious and environmentally conscious. Join me on a journey to sustainable eating!",
-    avatar: "ED",
-    location: "Austin, TX",
-    website: "https://sustainablekitchen.com",
-    twitter: "@sustainableemma",
+    name: 'Emma Davis',
+    bio: 'Food blogger and sustainability advocate sharing recipes that are good for you and the planet. I believe that cooking should be both delicious and environmentally conscious. Join me on a journey to sustainable eating!',
+    avatar: 'ED',
+    location: 'Austin, TX',
+    website: 'https://sustainablekitchen.com',
+    twitter: '@sustainableemma',
     postsCount: 32,
     followers: 2100,
     following: 450,
-    category: "Food",
-    joinDate: "2023-01-10",
+    category: 'Food',
+    joinDate: '2023-01-10',
   },
 ];
 
@@ -67,34 +67,34 @@ const userPosts = {
   1: [
     {
       id: 1,
-      title: "The Future of Web Development in 2024",
+      title: 'The Future of Web Development in 2024',
       excerpt:
-        "Exploring the latest trends and technologies that are shaping the future of web development...",
-      date: "2024-01-15",
-      readTime: "5 min read",
-      category: "Technology",
+        'Exploring the latest trends and technologies that are shaping the future of web development...',
+      date: '2024-01-15',
+      readTime: '5 min read',
+      category: 'Technology',
       views: 1250,
       likes: 89,
     },
     {
       id: 5,
-      title: "Building Scalable APIs with Node.js",
+      title: 'Building Scalable APIs with Node.js',
       excerpt:
-        "A comprehensive guide to designing and implementing robust, scalable APIs...",
-      date: "2024-01-11",
-      readTime: "15 min read",
-      category: "Technology",
+        'A comprehensive guide to designing and implementing robust, scalable APIs...',
+      date: '2024-01-11',
+      readTime: '15 min read',
+      category: 'Technology',
       views: 890,
       likes: 67,
     },
     {
       id: 7,
-      title: "React Performance Optimization Techniques",
+      title: 'React Performance Optimization Techniques',
       excerpt:
-        "Learn the best practices for optimizing React applications for better performance...",
-      date: "2024-01-08",
-      readTime: "12 min read",
-      category: "Technology",
+        'Learn the best practices for optimizing React applications for better performance...',
+      date: '2024-01-08',
+      readTime: '12 min read',
+      category: 'Technology',
       views: 1100,
       likes: 78,
     },
@@ -104,20 +104,20 @@ const userPosts = {
       id: 2,
       title: "Mindful Living: A Beginner's Guide",
       excerpt:
-        "Discover simple practices to bring mindfulness into your daily routine...",
-      date: "2024-01-14",
-      readTime: "8 min read",
-      category: "Lifestyle",
+        'Discover simple practices to bring mindfulness into your daily routine...',
+      date: '2024-01-14',
+      readTime: '8 min read',
+      category: 'Lifestyle',
       views: 950,
       likes: 72,
     },
     {
       id: 8,
-      title: "Morning Routines for Better Mental Health",
-      excerpt: "Start your day right with these proven morning practices...",
-      date: "2024-01-05",
-      readTime: "6 min read",
-      category: "Lifestyle",
+      title: 'Morning Routines for Better Mental Health',
+      excerpt: 'Start your day right with these proven morning practices...',
+      date: '2024-01-05',
+      readTime: '6 min read',
+      category: 'Lifestyle',
       views: 680,
       likes: 45,
     },
@@ -125,23 +125,23 @@ const userPosts = {
   3: [
     {
       id: 3,
-      title: "Sustainable Cooking: Recipes for a Better Planet",
+      title: 'Sustainable Cooking: Recipes for a Better Planet',
       excerpt:
-        "Learn how to cook delicious meals while reducing your environmental impact...",
-      date: "2024-01-13",
-      readTime: "12 min read",
-      category: "Food",
+        'Learn how to cook delicious meals while reducing your environmental impact...',
+      date: '2024-01-13',
+      readTime: '12 min read',
+      category: 'Food',
       views: 1400,
       likes: 95,
     },
     {
       id: 9,
-      title: "Zero-Waste Kitchen: Tips and Tricks",
+      title: 'Zero-Waste Kitchen: Tips and Tricks',
       excerpt:
-        "Transform your kitchen into a zero-waste haven with these practical tips...",
-      date: "2024-01-02",
-      readTime: "10 min read",
-      category: "Food",
+        'Transform your kitchen into a zero-waste haven with these practical tips...',
+      date: '2024-01-02',
+      readTime: '10 min read',
+      category: 'Food',
       views: 1200,
       likes: 88,
     },
@@ -225,10 +225,10 @@ export default function UserPage({ params }: UserPageProps) {
                     />
                   </svg>
                   <span>
-                    Joined{" "}
-                    {new Date(user.joinDate).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
+                    Joined{' '}
+                    {new Date(user.joinDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
                     })}
                   </span>
                 </div>
@@ -249,8 +249,8 @@ export default function UserPage({ params }: UserPageProps) {
                 {user.twitter && (
                   <a
                     href={`https://twitter.com/${user.twitter.replace(
-                      "@",
-                      ""
+                      '@',
+                      ''
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -290,7 +290,7 @@ export default function UserPage({ params }: UserPageProps) {
               </div>
             </div>
             {/* Follow/Following Button */}
-            <FollowButton userId={"user"} initialFollowing={false} />
+            <FollowButton userId={'user'} initialFollowing={false} />
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant={'ghost'}>
@@ -325,7 +325,7 @@ export default function UserPage({ params }: UserPageProps) {
                   Posts by {user.name}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                  {posts.length} article{posts.length !== 1 ? "s" : ""}{" "}
+                  {posts.length} article{posts.length !== 1 ? 's' : ''}{' '}
                   published
                 </p>
               </div>

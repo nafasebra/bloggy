@@ -2,15 +2,18 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
-    console.log(username, password)
-    
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
+    console.log(username, password);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      }
+    );
 
     const data = await response.json();
 
@@ -29,6 +32,9 @@ export async function POST(request: Request) {
 
     return res;
   } catch (error: any) {
-    return Response.json({ error: 'Login failed: ' + error.message }, { status: 500 });
+    return Response.json(
+      { error: 'Login failed: ' + error.message },
+      { status: 500 }
+    );
   }
 }

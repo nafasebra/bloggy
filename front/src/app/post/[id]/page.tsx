@@ -1,12 +1,12 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import CommentSection from "@/components/pages/blog/comment-section";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import CommentSection from '@/components/pages/blog/comment-section';
 
 // Mock data for blog posts
 const blogPosts = [
   {
     id: 1,
-    title: "The Future of Web Development in 2024",
+    title: 'The Future of Web Development in 2024',
     content: `
       <p>The landscape of web development is constantly evolving, and 2024 promises to bring some of the most exciting changes yet. From AI-powered development tools to new frameworks and methodologies, developers are witnessing a paradigm shift in how we build for the web.</p>
       
@@ -40,14 +40,14 @@ const blogPosts = [
       <h2>Conclusion</h2>
       <p>As we move through 2024, web developers need to stay adaptable and continuously learn. The tools and technologies we use today might be obsolete tomorrow, but the fundamental principles of good web development remain the same: create fast, accessible, and user-friendly experiences.</p>
     `,
-    author: "Sarah Johnson",
+    author: 'Sarah Johnson',
     authorId: 1,
-    date: "2024-01-15",
-    readTime: "5 min read",
-    category: "Technology",
-    tags: ["Web Development", "AI", "Frameworks", "Performance"],
+    date: '2024-01-15',
+    readTime: '5 min read',
+    category: 'Technology',
+    tags: ['Web Development', 'AI', 'Frameworks', 'Performance'],
     excerpt:
-      "Exploring the latest trends and technologies that are shaping the future of web development, from AI-powered tools to new frameworks and methodologies.",
+      'Exploring the latest trends and technologies that are shaping the future of web development, from AI-powered tools to new frameworks and methodologies.',
   },
   {
     id: 2,
@@ -86,14 +86,14 @@ const blogPosts = [
       <h2>Conclusion</h2>
       <p>Mindfulness is a journey, not a destination. Be patient with yourself and remember that every moment of awareness is a step in the right direction.</p>
     `,
-    author: "Michael Chen",
+    author: 'Michael Chen',
     authorId: 2,
-    date: "2024-01-14",
-    readTime: "8 min read",
-    category: "Lifestyle",
-    tags: ["Mindfulness", "Meditation", "Wellness", "Mental Health"],
+    date: '2024-01-14',
+    readTime: '8 min read',
+    category: 'Lifestyle',
+    tags: ['Mindfulness', 'Meditation', 'Wellness', 'Mental Health'],
     excerpt:
-      "Discover simple practices to bring mindfulness into your daily routine and improve your well-being through meditation and conscious living.",
+      'Discover simple practices to bring mindfulness into your daily routine and improve your well-being through meditation and conscious living.',
   },
 ];
 
@@ -168,10 +168,10 @@ export default function PostPage({ params }: PostPageProps) {
                 {post.author}
               </Link>
               <p className="text-gray-500 dark:text-gray-400">
-                {new Date(post.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                {new Date(post.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </p>
             </div>

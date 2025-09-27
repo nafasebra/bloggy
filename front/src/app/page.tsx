@@ -1,7 +1,7 @@
-import Hero from "@/components/pages/home/hero";
-import LatestPosts from "@/components/pages/home/latest-posts";
-import AboutBlog from "@/components/pages/home/about-blog";
-import LatestUsers from "@/components/pages/home/latest-users";
+import Hero from '@/components/pages/home/hero';
+import LatestPosts from '@/components/pages/home/latest-posts';
+import AboutBlog from '@/components/pages/home/about-blog';
+import LatestUsers from '@/components/pages/home/latest-users';
 
 export default function Home() {
   return (

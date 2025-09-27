@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 interface SearchBarProps {
   value: string;
@@ -9,7 +9,7 @@ interface SearchBarProps {
 export default function SearchBar({
   value,
   onChange,
-  placeholder = "Search...",
+  placeholder = 'Search...',
 }: SearchBarProps) {
   return (
     <div className="relative w-full max-w-md">
@@ -37,7 +37,7 @@ export default function SearchBar({
       />
       {value && (
         <button
-          onClick={() => onChange("")}
+          onClick={() => onChange('')}
           className="absolute inset-y-0 right-0 pr-3 flex items-center"
         >
           <svg

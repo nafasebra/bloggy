@@ -1,42 +1,42 @@
-"use server"
+'use server';
 
-import Link from "next/link";
-import http from "@/lib/http";
+import Link from 'next/link';
+import http from '@/lib/http';
 
 // Mock data for latest posts
 const mockLatestPosts = [
   {
     id: 1,
-    title: "The Future of Web Development in 2024",
+    title: 'The Future of Web Development in 2024',
     excerpt:
-      "Exploring the latest trends and technologies that are shaping the future of web development...",
-    author: "Sarah Johnson",
+      'Exploring the latest trends and technologies that are shaping the future of web development...',
+    author: 'Sarah Johnson',
     authorId: 1,
-    date: "2024-01-15",
-    readTime: "5 min read",
-    category: "Technology",
+    date: '2024-01-15',
+    readTime: '5 min read',
+    category: 'Technology',
   },
   {
     id: 2,
     title: "Mindful Living: A Beginner's Guide",
     excerpt:
-      "Discover simple practices to bring mindfulness into your daily routine and improve your well-being...",
-    author: "Michael Chen",
+      'Discover simple practices to bring mindfulness into your daily routine and improve your well-being...',
+    author: 'Michael Chen',
     authorId: 2,
-    date: "2024-01-14",
-    readTime: "8 min read",
-    category: "Lifestyle",
+    date: '2024-01-14',
+    readTime: '8 min read',
+    category: 'Lifestyle',
   },
   {
     id: 3,
-    title: "Sustainable Cooking: Recipes for a Better Planet",
+    title: 'Sustainable Cooking: Recipes for a Better Planet',
     excerpt:
-      "Learn how to cook delicious meals while reducing your environmental impact...",
-    author: "Emma Davis",
+      'Learn how to cook delicious meals while reducing your environmental impact...',
+    author: 'Emma Davis',
     authorId: 3,
-    date: "2024-01-13",
-    readTime: "12 min read",
-    category: "Food",
+    date: '2024-01-13',
+    readTime: '12 min read',
+    category: 'Food',
   },
 ];
 
@@ -45,14 +45,14 @@ async function getLatestPosts() {
     const response = await http.get(`/posts`);
     return response.data;
   } catch (error) {
-    throw new Error("Failed to fetch latest posts");
+    throw new Error('Failed to fetch latest posts');
   }
 }
 
 export default async function LatestPosts() {
   const latestPosts = await getLatestPosts();
 
-  console.log(latestPosts)
+  console.log(latestPosts);
 
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
@@ -110,10 +110,10 @@ export default async function LatestPosts() {
                         {post.author}
                       </Link>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(post.date).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
+                        {new Date(post.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
                         })}
                       </p>
                     </div>

@@ -5,17 +5,23 @@ export async function POST(request: NextRequest) {
   const refreshToken = cookieStore.get('refresh_token')?.value;
 
   if (!refreshToken) {
-    return NextResponse.json({ error: 'No refresh token found' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'No refresh token found' },
+      { status: 401 }
+    );
   }
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      }
+    );
 
     const data = await response.json();
 
@@ -25,6 +31,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(data, { status: response.status });
     }
   } catch (error: any) {
-    return NextResponse.json({ error: 'Refresh failed: ' + error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Refresh failed: ' + error.message },
+      { status: 500 }
+    );
   }
 }

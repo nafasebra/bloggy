@@ -1,45 +1,45 @@
-"use server"
+'use server';
 
-import Link from "next/link";
-import http from "@/lib/http";
+import Link from 'next/link';
+import http from '@/lib/http';
 
 // Mock data for latest users
 const mockLatestUsers = [
   {
     id: 1,
-    name: "Sarah Johnson",
-    bio: "Tech enthusiast and web developer passionate about creating meaningful digital experiences.",
-    avatar: "SJ",
+    name: 'Sarah Johnson',
+    bio: 'Tech enthusiast and web developer passionate about creating meaningful digital experiences.',
+    avatar: 'SJ',
     postsCount: 24,
     followers: 1200,
-    category: "Technology",
+    category: 'Technology',
   },
   {
     id: 2,
-    name: "Michael Chen",
-    bio: "Mindfulness coach helping people find balance in their busy lives through simple practices.",
-    avatar: "MC",
+    name: 'Michael Chen',
+    bio: 'Mindfulness coach helping people find balance in their busy lives through simple practices.',
+    avatar: 'MC',
     postsCount: 18,
     followers: 890,
-    category: "Lifestyle",
+    category: 'Lifestyle',
   },
   {
     id: 3,
-    name: "Emma Davis",
-    bio: "Food blogger and sustainability advocate sharing recipes that are good for you and the planet.",
-    avatar: "ED",
+    name: 'Emma Davis',
+    bio: 'Food blogger and sustainability advocate sharing recipes that are good for you and the planet.',
+    avatar: 'ED',
     postsCount: 32,
     followers: 2100,
-    category: "Food",
+    category: 'Food',
   },
   {
     id: 4,
-    name: "Alex Rodriguez",
+    name: 'Alex Rodriguez',
     bio: "Travel photographer capturing the world's most beautiful moments and sharing stories from the road.",
-    avatar: "AR",
+    avatar: 'AR',
     postsCount: 15,
     followers: 750,
-    category: "Travel",
+    category: 'Travel',
   },
 ];
 
@@ -48,7 +48,7 @@ async function getLatestUsers() {
     const response = await http.get(`/users`);
     return response.data;
   } catch (error) {
-    throw new Error("Failed to fetch latest users");
+    throw new Error('Failed to fetch latest users');
   }
 }
 

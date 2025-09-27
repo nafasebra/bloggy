@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useTheme } from "@/hooks/useTheme";
-import { Moon, Sun } from "lucide-react";
+import { useTheme } from '@/hooks/useTheme';
+import { Moon, Sun } from 'lucide-react';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();

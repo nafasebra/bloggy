@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -6,30 +6,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 // Mock data - replace with actual API call
 const users = [
   {
     id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-    joinedAt: "2023-01-15",
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'Admin',
+    joinedAt: '2023-01-15',
   },
   {
     id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "User",
-    joinedAt: "2023-02-20",
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    role: 'User',
+    joinedAt: '2023-02-20',
   },
   {
     id: 3,
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    role: "User",
-    joinedAt: "2023-03-10",
+    name: 'Bob Johnson',
+    email: 'bob@example.com',
+    role: 'User',
+    joinedAt: '2023-03-10',
   },
 ];
 
@@ -40,9 +40,7 @@ export default function UsersPage() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Users
         </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          Manage your users
-        </p>
+        <p className="text-gray-600 dark:text-gray-300">Manage your users</p>
       </div>
 
       <Card>
@@ -68,9 +66,9 @@ export default function UsersPage() {
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.role === "Admin"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        user.role === 'Admin'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                       }`}
                     >
                       {user.role}

@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { AuthProvider } from "@/contexts/auth-provider";
-import React from "react";
-import Footer from "./layout/footer";
-import Navigation from "./layout/navigation";
-import { usePathname } from "next/navigation";
+import { AuthProvider } from '@/contexts/auth-provider';
+import React from 'react';
+import Footer from './layout/footer';
+import Navigation from './layout/navigation';
+import { usePathname } from 'next/navigation';
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ interface WrapperProps {
 
 function Wrapper({ children }: WrapperProps) {
   const pathname = usePathname();
-  const isDashboard = pathname.startsWith("/dashboard");
+  const isDashboard = pathname.startsWith('/dashboard');
 
   return (
     <>

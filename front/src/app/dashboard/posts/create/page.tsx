@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export default function CreatePostPage() {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,10 +21,10 @@ export default function CreatePostPage() {
     // Mock API call - replace with actual API
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    console.log("Creating post:", { title, content });
+    console.log('Creating post:', { title, content });
 
     setIsLoading(false);
-    router.push("/dashboard/posts");
+    router.push('/dashboard/posts');
   };
 
   return (
@@ -69,7 +69,7 @@ export default function CreatePostPage() {
 
             <div className="flex space-x-4">
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Post"}
+                {isLoading ? 'Creating...' : 'Create Post'}
               </Button>
               <Button
                 type="button"

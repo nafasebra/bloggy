@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Bell, X, Check, ExternalLink } from "lucide-react";
+import React, { useState } from 'react';
+import { Bell, X, Check, ExternalLink } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface Notification {
   id: string;
@@ -16,53 +16,56 @@ interface Notification {
   message: string;
   timestamp: string;
   read: boolean;
-  type: "info" | "warning" | "success" | "error";
+  type: 'info' | 'warning' | 'success' | 'error';
   link?: string;
 }
 
 const sampleNotifications: Notification[] = [
   {
-    id: "1",
-    title: "Welcome to Bloggy!",
-    message: "Thank you for joining our platform. Start by creating your first post.",
-    timestamp: "2 minutes ago",
+    id: '1',
+    title: 'Welcome to Bloggy!',
+    message:
+      'Thank you for joining our platform. Start by creating your first post.',
+    timestamp: '2 minutes ago',
     read: false,
-    type: "success",
+    type: 'success',
   },
   {
-    id: "2",
-    title: "New Comment",
+    id: '2',
+    title: 'New Comment',
     message: "John Doe commented on your post 'Getting Started with React'",
-    timestamp: "1 hour ago",
+    timestamp: '1 hour ago',
     read: false,
-    type: "info",
-    link: "/blog/react-getting-started",
+    type: 'info',
+    link: '/blog/react-getting-started',
   },
   {
-    id: "3",
-    title: "Security Alert",
-    message: "Please verify your email address to secure your account.",
-    timestamp: "3 hours ago",
+    id: '3',
+    title: 'Security Alert',
+    message: 'Please verify your email address to secure your account.',
+    timestamp: '3 hours ago',
     read: true,
-    type: "warning",
-    link: "/settings/security",
+    type: 'warning',
+    link: '/settings/security',
   },
   {
-    id: "4",
-    title: "Post Published",
-    message: "Your article 'Advanced TypeScript Tips' has been published successfully.",
-    timestamp: "1 day ago",
+    id: '4',
+    title: 'Post Published',
+    message:
+      "Your article 'Advanced TypeScript Tips' has been published successfully.",
+    timestamp: '1 day ago',
     read: true,
-    type: "success",
-    link: "/blog/typescript-tips",
+    type: 'success',
+    link: '/blog/typescript-tips',
   },
 ];
 
 const typeColors = {
-  info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  success: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  error: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  info: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  warning:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  success: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  error: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 const typeIcons = {
@@ -73,7 +76,8 @@ const typeIcons = {
 };
 
 function NotificationButton() {
-  const [notifications, setNotifications] = useState<Notification[]>(sampleNotifications);
+  const [notifications, setNotifications] =
+    useState<Notification[]>(sampleNotifications);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id: string) => {
@@ -104,7 +108,7 @@ function NotificationButton() {
               variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs min-w-5"
             >
-              {unreadCount > 99 ? "99+" : unreadCount}
+              {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>
           )}
         </Button>
@@ -137,9 +141,7 @@ function NotificationButton() {
               <div
                 key={notification.id}
                 className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors ${
-                  !notification.read
-                    ? "bg-blue-50 dark:bg-blue-900/20"
-                    : ""
+                  !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                 }`}
                 onClick={() => {
                   markAsRead(notification.id);
@@ -149,14 +151,18 @@ function NotificationButton() {
                 }}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${typeColors[notification.type]}`}>
+                  <div
+                    className={`p-2 rounded-lg ${typeColors[notification.type]}`}
+                  >
                     {typeIcons[notification.type]}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <h4 className={`text-sm font-medium text-gray-900 dark:text-white ${
-                        !notification.read ? "font-semibold" : ""
-                      }`}>
+                      <h4
+                        className={`text-sm font-medium text-gray-900 dark:text-white ${
+                          !notification.read ? 'font-semibold' : ''
+                        }`}
+                      >
                         {notification.title}
                       </h4>
                       {!notification.read && (

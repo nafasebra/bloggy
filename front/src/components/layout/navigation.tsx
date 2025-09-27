@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useCallback, useState } from "react";
-import { Button } from "../ui/button";
-import ThemeButton from "../shared/theme-button";
-import NotificationButton from "../shared/notification-button";
-import { Menu } from "lucide-react";
+import Link from 'next/link';
+import { useCallback, useState } from 'react';
+import { Button } from '../ui/button';
+import ThemeButton from '../shared/theme-button';
+import NotificationButton from '../shared/notification-button';
+import { Menu } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { useAuth } from "@/contexts/auth-provider";
+} from '@/components/ui/sheet';
+import { useAuth } from '@/contexts/auth-provider';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,9 +40,7 @@ export default function Navigation() {
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
-              {
-                accessToken && <NotificationButton />
-              }
+              {accessToken && <NotificationButton />}
               <ThemeButton />
               {!accessToken ? (
                 <>
@@ -50,7 +48,7 @@ export default function Navigation() {
                     <Button>Login</Button>
                   </Link>
                   <Link href="/auth/signup">
-                    <Button variant={"outline"}>Sign Up</Button>
+                    <Button variant={'outline'}>Sign Up</Button>
                   </Link>
                 </>
               ) : (
@@ -62,13 +60,11 @@ export default function Navigation() {
           </div>
 
           <div className="md:hidden flex items-center gap-3">
-            {
-              accessToken && <NotificationButton />
-            }
+            {accessToken && <NotificationButton />}
             <ThemeButton />
             <Sheet open={isMenuOpen} onOpenChange={changeMenuState}>
               <SheetTrigger asChild>
-                <Button variant={"outline"}>
+                <Button variant={'outline'}>
                   <Menu />
                 </Button>
               </SheetTrigger>

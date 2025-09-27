@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 interface BlogPost {
   id: number;
@@ -69,10 +69,10 @@ export default function BlogCard({ post }: BlogCardProps) {
                 {post.author}
               </Link>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(post.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
+                {new Date(post.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
                 })}
               </p>
             </div>

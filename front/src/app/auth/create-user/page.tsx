@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 interface FormData {
   fullname: string;
@@ -15,7 +15,7 @@ interface FormData {
 
 export default function CreateUserPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const {
     register,
@@ -25,14 +25,14 @@ export default function CreateUserPage() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    setError("");
+    setError('');
 
     try {
       // Handle form submission here
       console.log(data);
       // API call would go here
     } catch (err) {
-      setError("Failed to create profile. Please try again.");
+      setError('Failed to create profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -56,9 +56,9 @@ export default function CreateUserPage() {
                         const target = e.currentTarget as HTMLElement;
                         const sibling =
                           target.nextElementSibling as HTMLElement;
-                        target.style.display = "none";
+                        target.style.display = 'none';
                         if (sibling) {
-                          sibling.style.display = "flex";
+                          sibling.style.display = 'flex';
                         }
                       }}
                     />
@@ -113,7 +113,7 @@ export default function CreateUserPage() {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    {...register("avatar")}
+                    {...register('avatar')}
                   />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
@@ -151,8 +151,8 @@ export default function CreateUserPage() {
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your full name"
-                    {...register("fullname", {
-                      required: "Full name is required",
+                    {...register('fullname', {
+                      required: 'Full name is required',
                     })}
                   />
                   {errors.fullname && (
@@ -174,7 +174,7 @@ export default function CreateUserPage() {
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Tell us about yourself"
-                    {...register("bio")}
+                    {...register('bio')}
                   />
                   {errors.bio && (
                     <p className="mt-2 text-sm text-red-600">
@@ -196,7 +196,7 @@ export default function CreateUserPage() {
                       type="text"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="Your location"
-                      {...register("location")}
+                      {...register('location')}
                     />
                     {errors.location && (
                       <p className="mt-2 text-sm text-red-600">
@@ -217,7 +217,7 @@ export default function CreateUserPage() {
                       type="text"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Technology"
-                      {...register("category")}
+                      {...register('category')}
                     />
                     {errors.category && (
                       <p className="mt-2 text-sm text-red-600">
@@ -239,7 +239,7 @@ export default function CreateUserPage() {
                     type="url"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="https://"
-                    {...register("website")}
+                    {...register('website')}
                   />
                   {errors.website && (
                     <p className="mt-2 text-sm text-red-600">
@@ -260,7 +260,7 @@ export default function CreateUserPage() {
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="@username"
-                    {...register("twitter")}
+                    {...register('twitter')}
                   />
                   {errors.twitter && (
                     <p className="mt-2 text-sm text-red-600">
@@ -281,7 +281,7 @@ export default function CreateUserPage() {
                 disabled={isLoading}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Creating Profile..." : "Create Profile"}
+                {isLoading ? 'Creating Profile...' : 'Create Profile'}
               </button>
             </form>
           </div>

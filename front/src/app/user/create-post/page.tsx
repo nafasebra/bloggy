@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 interface FormData {
   title: string;
@@ -13,7 +13,7 @@ interface FormData {
 
 export default function CreatePostPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const {
     register,
@@ -23,12 +23,15 @@ export default function CreatePostPage() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    setError("");
+    setError('');
 
     try {
       // Convert tags string to array
-      const tagsArray = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-      
+      const tagsArray = data.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
+
       const postData = {
         ...data,
         tags: tagsArray,
@@ -37,7 +40,7 @@ export default function CreatePostPage() {
       console.log(postData);
       // API call would go here
     } catch (err) {
-      setError("Failed to create post. Please try again.");
+      setError('Failed to create post. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -70,8 +73,8 @@ export default function CreatePostPage() {
                   type="text"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Enter your post title"
-                  {...register("title", {
-                    required: "Title is required",
+                  {...register('title', {
+                    required: 'Title is required',
                   })}
                 />
                 {errors.title && (
@@ -93,8 +96,8 @@ export default function CreatePostPage() {
                   rows={2}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Brief summary of your post"
-                  {...register("excerpt", {
-                    required: "Excerpt is required",
+                  {...register('excerpt', {
+                    required: 'Excerpt is required',
                   })}
                 />
                 {errors.excerpt && (
@@ -116,8 +119,8 @@ export default function CreatePostPage() {
                   rows={10}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Write your post content here..."
-                  {...register("content", {
-                    required: "Content is required",
+                  {...register('content', {
+                    required: 'Content is required',
                   })}
                 />
                 {errors.content && (
@@ -140,8 +143,8 @@ export default function CreatePostPage() {
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="e.g., Technology, Lifestyle"
-                    {...register("category", {
-                      required: "Category is required",
+                    {...register('category', {
+                      required: 'Category is required',
                     })}
                   />
                   {errors.category && (
@@ -163,8 +166,8 @@ export default function CreatePostPage() {
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="javascript, react, web-development"
-                    {...register("tags", {
-                      required: "At least one tag is required",
+                    {...register('tags', {
+                      required: 'At least one tag is required',
                     })}
                   />
                   {errors.tags && (
@@ -190,7 +193,7 @@ export default function CreatePostPage() {
               disabled={isLoading}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Creating Post..." : "Create Post"}
+              {isLoading ? 'Creating Post...' : 'Create Post'}
             </button>
           </form>
         </div>
