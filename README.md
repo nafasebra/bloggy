@@ -72,7 +72,9 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 ### Development Tools
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
-- **Jest** - Testing framework
+- **Jest** - Backend testing framework
+- **Vitest** - Frontend testing framework
+- **Storybook** - UI component development and documentation
 - **Concurrently** - Run multiple commands
 
 ## 🚀 Quick Start
@@ -178,6 +180,9 @@ npm run dev          # Start development server
 npm run build        # Build the application
 npm run start        # Start production server
 npm run lint         # Run ESLint
+npm run test         # Run tests with Vitest
+npm run storybook    # Start Storybook development server
+npm run build-storybook  # Build Storybook for production
 ```
 
 ## 📚 API Documentation
@@ -314,17 +319,6 @@ cd back && npm run test:e2e
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Development Guidelines
-- Follow TypeScript best practices
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-- Follow the existing code style
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - [Next.js](https://nextjs.org/) - React framework
@@ -332,14 +326,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [MongoDB](https://mongodb.com/) - Database
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [TypeScript](https://typescriptlang.org/) - Type safety
-
-## 📞 Support
-
-If you have any questions or need help:
-
-- 📧 Email: your-email@example.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/bloggy/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/bloggy/discussions)
 
 ---
 
