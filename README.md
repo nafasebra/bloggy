@@ -28,7 +28,6 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 - **Dashboard Overview**: View key statistics and metrics
 - **Post Management**: Create, edit, and delete blog posts
 - **User Management**: Manage user accounts and roles
-- **Content Moderation**: Moderate comments and user content
 
 ### 🔍 Discovery & Search
 - **Advanced Search**: Search posts by title, content, and tags
@@ -341,10 +340,6 @@ If you have any questions or need help:
 - 📧 Email: your-email@example.com
 - 🐛 Issues: [GitHub Issues](https://github.com/yourusername/bloggy/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/bloggy/discussions)
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=nafasebra/bloggy&type=Date)](https://star-history.com/#nafasebra/bloggy&Date)
 
 ---
 
