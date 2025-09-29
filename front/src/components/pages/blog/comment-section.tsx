@@ -3,6 +3,10 @@
 import { useAuth } from '@/contexts/auth-provider';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import CommentCard from '@/components/shared/comment-card';
 
 interface Comment {
   id: number;
@@ -15,6 +19,13 @@ interface Comment {
 interface CommentSectionProps {
   postId: number;
 }
+
+// Zod schema for comment validation
+const commentSchema = z.object({
+  comment: z.string().min(1, 'Comment is required').max(1000, 'Comment must be less than 1000 characters'),
+});
+
+type CommentFormData = z.infer<typeof commentSchema>;
 
 // Mock comments data
 const mockComments: Comment[] = [
@@ -49,6 +60,21 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const { accessToken } = useAuth();
   console.log(postId);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CommentFormData>({
+    resolver: zodResolver(commentSchema),
+  });
+
+  const onSubmit = (data: CommentFormData) => {
+    console.log('Comment submitted:', data);
+    // Handle comment submission here
+    reset();
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
@@ -56,7 +82,10 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       </h3>
 
       {accessToken ? (
-        <form className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4">
+        <form 
+          onSubmit={handleSubmit(onSubmit)}
+          className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4"
+        >
           <div className="flex flex-col gap-2">
             <label
               htmlFor="comment"
@@ -67,10 +96,13 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             <textarea
               id="comment"
               rows={4}
+              {...register('comment')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               placeholder="Share your thoughts..."
-              required
             />
+            {errors.comment && (
+              <p className="text-red-500 text-sm">{errors.comment.message}</p>
+            )}
           </div>
 
           <button
@@ -94,43 +126,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       {/* Comments List */}
       <div className="space-y-6 mt-9">
         {mockComments.map((comment) => (
-          <div key={comment.id} className="flex space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-sm font-medium">
-                {comment.avatar}
-              </span>
-            </div>
-
-            <div className="flex-1">
-              <div className="flex items-center space-x-2 mb-2">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {comment.author}
-                </h4>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(comment.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              </div>
-
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                {comment.content}
-              </p>
-
-              <div className="flex items-center space-x-4 mt-3">
-                <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Reply
-                </button>
-                <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Like
-                </button>
-              </div>
-            </div>
-          </div>
+          <CommentCard key={comment.id} comment={comment} />
         ))}
       </div>
 
