@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import http from '@/lib/http';
+import BlogCard from '@/components/shared/blog-card';
 
 // Mock data for latest posts
 const mockLatestPosts = [
@@ -68,66 +69,7 @@ export default async function LatestPosts() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {mockLatestPosts.map((post: any) => (
-            <article
-              key={post.id}
-              className="bg-white dark:bg-gray-700 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 dark:border-gray-600"
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
-                    {post.category}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {post.readTime}
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                  <Link
-                    href={`/post/${post.id}`}
-                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  >
-                    {post.title}
-                  </Link>
-                </h3>
-
-                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {post.author.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <Link
-                        href={`/user/${post.authorId}`}
-                        className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-                      >
-                        {post.author}
-                      </Link>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(post.date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/post/${post.id}`}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm"
-                  >
-                    Read more →
-                  </Link>
-                </div>
-              </div>
-            </article>
+            <BlogCard key={post.id} post={post} />
           ))}
         </div>
 

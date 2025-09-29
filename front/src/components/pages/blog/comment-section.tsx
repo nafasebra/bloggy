@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/contexts/auth-provider';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -44,84 +45,55 @@ const mockComments: Comment[] = [
 ];
 
 export default function CommentSection({ postId }: CommentSectionProps) {
-  const [comments, setComments] = useState<Comment[]>(mockComments);
-  const [newComment, setNewComment] = useState('');
-  const [authorName, setAuthorName] = useState('');
-
+  // get accesstoken
+  const { accessToken } = useAuth();
   console.log(postId);
-
-  const handleSubmitComment = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!newComment.trim() || !authorName.trim()) return;
-
-    const comment: Comment = {
-      id: comments.length + 1,
-      author: authorName,
-      content: newComment,
-      date: new Date().toISOString(),
-      avatar: authorName
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase(),
-    };
-
-    setComments([comment, ...comments]);
-    setNewComment('');
-    setAuthorName('');
-  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        Comments ({comments.length})
+        Comments ({mockComments.length})
       </h3>
 
-      {/** required login panel to comment */}
-      <div className="flex flex-col gap-2">
-        <p>Please login to comment</p>
-        <Link href="/auth/login">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200">
-            Login
-          </button>
-        </Link>
-      </div>
+      {accessToken ? (
+        <form className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="comment"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Comment
+            </label>
+            <textarea
+              id="comment"
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              placeholder="Share your thoughts..."
+              required
+            />
+          </div>
 
-      {/* Add Comment Form */}
-      <form
-        onSubmit={handleSubmitComment}
-        className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4"
-      >
-        <div className="flex flex-col gap-2">
-          <label
-            htmlFor="comment"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
           >
-            Comment
-          </label>
-          <textarea
-            id="comment"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-            placeholder="Share your thoughts..."
-            required
-          />
+            Post Comment
+          </button>
+        </form>
+      ) : (
+        <div className="bg-gray-50 dark:bg-gray-700 flex flex-col gap-3 border border-gray-300 dark:border-gray-600 py-5 px-3 rounded-lg text-center items-center justify-center ">
+          <p>Please login to write your thoughts</p>
+          <Link href="/auth/login">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200">
+              Login
+            </button>
+          </Link>
         </div>
-
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
-        >
-          Post Comment
-        </button>
-      </form>
+      )}
 
       {/* Comments List */}
-      <div className="space-y-6">
-        {comments.map((comment) => (
+      <div className="space-y-6 mt-9">
+        {mockComments.map((comment) => (
           <div key={comment.id} className="flex space-x-4">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white text-sm font-medium">
@@ -162,7 +134,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         ))}
       </div>
 
-      {comments.length === 0 && (
+      {mockComments.length === 0 && (
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
