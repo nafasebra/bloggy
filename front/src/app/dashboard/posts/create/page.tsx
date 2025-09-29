@@ -17,6 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAuth } from '@/contexts/auth-provider';
+import { decodeJWT } from '@/lib/utils';
+import { PostService } from '@/services/post.services';
 
 const categories = [
   'Technology',
@@ -43,6 +46,7 @@ type CreatePostForm = z.infer<typeof createPostSchema>;
 
 export default function CreatePostPage() {
   const router = useRouter();
+  const { accessToken } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreatePostForm>({
@@ -63,17 +67,33 @@ export default function CreatePostPage() {
   };
 
   const onSubmit = async (data: CreatePostForm) => {
+    if (!accessToken) {
+      alert('You must be logged in to create a post');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Mock API call - replace with actual API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const decoded = decodeJWT(accessToken);
+      const authorId = decoded?.sub || decoded?.userId; // Assuming sub or userId in token
 
-    const readTime = calculateReadTime(data.content);
+      const postData = {
+        ...data,
+        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : [],
+        authorId,
+        createdAt: new Date().toISOString(),
+      };
 
-    console.log('Creating post:', { ...data, readTime });
+      await PostService.createPost(postData);
 
-    setIsLoading(false);
-    router.push('/dashboard/posts');
+      router.push('/dashboard/posts');
+    } catch (error) {
+      console.error('Error creating post:', error);
+      alert('Failed to create post');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
