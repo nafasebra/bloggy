@@ -20,19 +20,7 @@ import {
 import { useAuth } from '@/contexts/auth-provider';
 import { decodeJWT } from '@/lib/utils';
 import { PostService } from '@/services/post.services';
-
-const categories = [
-  'Technology',
-  'Lifestyle',
-  'Food',
-  'Travel',
-  'Health',
-  'Business',
-  'Creative',
-  'Education',
-  'Entertainment',
-  'Sports',
-];
+import { categories } from '@/data';
 
 const createPostSchema = z.object({
   title: z.string().min(1, 'Title is required'),

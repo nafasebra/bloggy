@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { DotSquare, Menu, MoreVertical } from 'lucide-react';
+import { categories } from '@/data';
 
 // Mock user data
 const users = [
@@ -29,7 +30,7 @@ const users = [
     postsCount: 24,
     followers: 1200,
     following: 350,
-    category: 'Technology',
+    category: categories[0],
     joinDate: '2023-03-15',
   },
   {
@@ -43,7 +44,7 @@ const users = [
     postsCount: 18,
     followers: 890,
     following: 120,
-    category: 'Lifestyle',
+    category: categories[1],
     joinDate: '2023-06-22',
   },
   {
@@ -57,7 +58,7 @@ const users = [
     postsCount: 32,
     followers: 2100,
     following: 450,
-    category: 'Food',
+    category: categories[2],
     joinDate: '2023-01-10',
   },
 ];

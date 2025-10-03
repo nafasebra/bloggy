@@ -4,17 +4,7 @@ import Link from 'next/link';
 import SearchBar from '@/components/pages/home/search-bar';
 import BlogCard from '@/components/pages/blog/blog-card';
 import http from '@/lib/http';
-
-const categories = [
-  'All',
-  'Technology',
-  'Lifestyle',
-  'Food',
-  'Travel',
-  'Health',
-  'Business',
-  'Creative',
-];
+import { categories } from '@/data';
 
 async function getAllPosts(query: string) {
   try {
