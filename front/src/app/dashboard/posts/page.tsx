@@ -73,7 +73,9 @@ export default async function PostsPage() {
           <CardTitle>All Posts</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
+          {
+            posts.length ? (
+              <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
@@ -114,6 +116,12 @@ export default async function PostsPage() {
               ))}
             </TableBody>
           </Table>
+            ) : (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                No posts yet. Create your first post to get started!
+              </p>
+            )
+          }
         </CardContent>
       </Card>
     </div>

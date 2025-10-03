@@ -174,7 +174,7 @@ export default function LoginPage() {
 
             <div className="text-center pt-4">
               <Link
-                href="/register"
+                href="/auth/signup"
                 className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
                 Don't have an account? Sign up

@@ -46,12 +46,6 @@ export default function CreatePostPage() {
     },
   });
 
-  const calculateReadTime = (content: string) => {
-    const wordsPerMinute = 200;
-    const wordCount = content.trim().split(/\s+/).length;
-    return Math.ceil(wordCount / wordsPerMinute);
-  };
-
   const getCurrentUser = async () => {
     try {
       const response = await http.get('/users/me', {
@@ -82,7 +76,9 @@ export default function CreatePostPage() {
         createdAt: new Date().toISOString(),
       };
 
-      const response = await http.post('/posts', postData);
+      const response = await http.post('/posts', postData, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
 
       if (response.status === 201) {
         router.push('/dashboard/posts');
@@ -90,7 +86,7 @@ export default function CreatePostPage() {
         throw new Error("Failed to create post: " + response.status + " - " + response.statusText);
       }
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.log('Error creating post:', error);
     }
   };
 
@@ -167,22 +163,6 @@ export default function CreatePostPage() {
                   </p>
                 )}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="readTime">Read Time (minutes)</Label>
-                <Input
-                  id="readTime"
-                  value={
-                    form.watch('content')
-                      ? calculateReadTime(form.watch('content'))
-                      : 0
-                  }
-                  readOnly
-                  placeholder="Auto-calculated"
-                />
-              </div>
-            </div>
-
             <div className="flex flex-col gap-2">
               <Label htmlFor="tags">Tags</Label>
               <Input
@@ -193,6 +173,7 @@ export default function CreatePostPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Separate tags with commas (e.g., "Web Development, AI, Frameworks")
               </p>
+            </div>
             </div>
 
             <div className="flex flex-col gap-2">
