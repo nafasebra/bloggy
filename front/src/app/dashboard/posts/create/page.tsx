@@ -21,6 +21,7 @@ import { useAuth } from '@/contexts/auth-provider';
 import { decodeJWT } from '@/lib/utils';
 import { PostService } from '@/services/post.services';
 import { categories } from '@/data';
+import http from '@/lib/http';
 
 const createPostSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -35,7 +36,6 @@ type CreatePostForm = z.infer<typeof createPostSchema>;
 export default function CreatePostPage() {
   const router = useRouter();
   const { accessToken } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreatePostForm>({
     resolver: zodResolver(createPostSchema),
@@ -54,17 +54,28 @@ export default function CreatePostPage() {
     return Math.ceil(wordCount / wordsPerMinute);
   };
 
+  const getCurrentUser = async () => {
+    try {
+      const response = await http.get('/users/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+      return null;
+    }
+  }
+
   const onSubmit = async (data: CreatePostForm) => {
     if (!accessToken) {
       alert('You must be logged in to create a post');
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      const decoded = decodeJWT(accessToken);
-      const authorId = decoded?.sub || decoded?.userId; // Assuming sub or userId in token
+      const authorId = (await getCurrentUser())?._id;
 
       const postData = {
         ...data,
@@ -73,14 +84,15 @@ export default function CreatePostPage() {
         createdAt: new Date().toISOString(),
       };
 
-      await PostService.createPost(postData);
+      const response = await http.post('/posts', postData);
 
-      router.push('/dashboard/posts');
+      if (response.status === 201) {
+        router.push('/dashboard/posts');
+      } else {
+        throw new Error("Failed to create post: " + response.status + " - " + response.statusText);
+      }
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Failed to create post');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -210,8 +222,8 @@ export default function CreatePostPage() {
             </div>
 
             <div className="flex space-x-4">
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Creating...' : 'Create Post'}
+              <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>
+                {form.formState.isSubmitting ? 'Creating...' : 'Create Post'}
               </Button>
               <Button
                 type="button"

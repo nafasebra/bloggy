@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   ApiBody,
@@ -6,6 +6,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UpdateUserDto, UserResponseDto, SingleUserResponseDto, UsersResponseDto, ErrorResponseDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -26,6 +27,21 @@ export class UsersController {
   })
   findAll() {
     return this.usersService.findAll();
+  }
+
+  // get current user info from access token
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user information from access token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Current user information',
+    type: SingleUserResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  getCurrentUser(@Request() req: any) {
+    return this.usersService.findOne(req.user.userId);
   }
 
   @Get(':id')
