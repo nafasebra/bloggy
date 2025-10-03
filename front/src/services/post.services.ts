@@ -1,37 +1,5 @@
 import http from '@/lib/http';
-
-export interface CreatePostData {
-  title: string;
-  content: string;
-  excerpt: string;
-  category: string;
-  tags: string[];
-  authorId: string;
-  createdAt: string;
-}
-
-export interface UpdatePostData {
-  title?: string;
-  content?: string;
-  excerpt?: string;
-  category?: string;
-  tags?: string[];
-}
-
-export interface Post {
-  _id: string;
-  title: string;
-  content: string;
-  excerpt: string;
-  tags: string[];
-  category: string;
-  authorId: string;
-  views?: number;
-  likes?: number;
-  commentIds?: string[];
-  createdAt: string;
-  updatedAt?: string;
-}
+import type { Post, CreatePostData, UpdatePostData } from '@/types';
 
 export class PostService {
   static async createPost(data: CreatePostData): Promise<Post> {

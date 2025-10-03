@@ -18,8 +18,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/contexts/auth-provider';
-import { decodeJWT } from '@/lib/utils';
-import { PostService } from '@/services/post.services';
 import { categories } from '@/data';
 import http from '@/lib/http';
 

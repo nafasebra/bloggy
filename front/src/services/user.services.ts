@@ -1,32 +1,19 @@
 import http from '@/lib/http';
-
-export interface UpdateUserData {
-  name?: string;
-  username?: string;
-  email?: string;
-  bio?: string;
-  avatar?: string;
-}
-
-export interface User {
-  _id: string;
-  name: string;
-  username: string;
-  email: string;
-  bio?: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt?: string;
-}
+import type { User, UpdateUserData } from '@/types';
 
 export class UserService {
   static async getCurrentUser(): Promise<User> {
-    const response = await http.get<User>('/users/me');
+    const response = await http.get<User>('/users/me/profile');
     return response.data;
   }
 
   static async getAllUsers(): Promise<User[]> {
     const response = await http.get<User[]>('/users');
+    return response.data;
+  }
+
+  static async getUserById(id: string): Promise<User> {
+    const response = await http.get<User>(`/users/${id}`);
     return response.data;
   }
 

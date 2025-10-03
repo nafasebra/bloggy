@@ -1,3 +1,5 @@
+"use server"
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import http from '@/lib/http';
+import { Post } from '@/types';
 
 // Mock data - replace with actual API call
 const posts = [
@@ -35,7 +39,19 @@ const posts = [
   },
 ];
 
-export default function PostsPage() {
+async function getPosts() {
+  try {
+    const response = await http.get('/posts');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
+}
+
+export default async function PostsPage() {
+  const posts = await getPosts();
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -68,11 +84,11 @@ export default function PostsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {posts.map((post) => (
-                <TableRow key={post.id}>
+              {posts.map((post: Post) => (
+                <TableRow key={post._id}>
                   <TableCell className="font-medium">{post.title}</TableCell>
-                  <TableCell>{post.author}</TableCell>
-                  <TableCell>
+                  <TableCell>{post.authorId}</TableCell>
+                  {/* <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         post.status === 'Published'
@@ -82,7 +98,7 @@ export default function PostsPage() {
                     >
                       {post.status}
                     </span>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>{post.createdAt}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
