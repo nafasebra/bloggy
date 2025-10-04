@@ -53,18 +53,18 @@ export default async function PostsPage() {
   const posts = await getPosts();
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Posts
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
             Manage your blog posts
           </p>
         </div>
         <Link href="/dashboard/posts/create">
-          <Button>Create New Post</Button>
+          <Button className="w-full sm:w-auto">Create New Post</Button>
         </Link>
       </div>
 
@@ -75,49 +75,48 @@ export default async function PostsPage() {
         <CardContent>
           {
             posts.length ? (
-              <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Author</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts.map((post: Post) => (
-                <TableRow key={post._id}>
-                  <TableCell className="font-medium">{post.title}</TableCell>
-                  <TableCell>{post.authorId}</TableCell>
-                  {/* <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        post.status === 'Published'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                      }`}
-                    >
-                      {post.status}
-                    </span>
-                  </TableCell> */}
-                  <TableCell>{post.createdAt}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Delete
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[200px]">Title</TableHead>
+                      <TableHead className="hidden md:table-cell">Author</TableHead>
+                      <TableHead className="hidden lg:table-cell">Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {posts.map((post: Post) => (
+                      <TableRow key={post._id}>
+                        <TableCell className="font-medium">
+                          <div>
+                            <div className="line-clamp-2">{post.title}</div>
+                            <div className="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {new Date(post.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{post.authorId}</TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="outline" size="sm">
+                              Edit
+                            </Button>
+                            <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             ) : (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm sm:text-base">
                 No posts yet. Create your first post to get started!
               </p>
             )

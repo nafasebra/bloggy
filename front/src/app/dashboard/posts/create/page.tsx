@@ -91,22 +91,22 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className='space-y-3'>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+    <div className="space-y-6 sm:space-y-8">
+      <div className='space-y-2 sm:space-y-3'>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
           Create New Post
         </h1>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
           Write a new blog post
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Post Details</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Post Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -136,7 +136,7 @@ export default function CreatePostPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="category">Category *</Label>
                 <Controller
@@ -170,7 +170,7 @@ export default function CreatePostPage() {
                 {...form.register('tags')}
                 placeholder="Enter tags separated by commas..."
               />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Separate tags with commas (e.g., "Web Development, AI, Frameworks")
               </p>
             </div>
@@ -200,14 +200,19 @@ export default function CreatePostPage() {
               </div>
             </div>
 
-            <div className="flex space-x-4">
-              <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button 
+                type="submit" 
+                disabled={form.formState.isSubmitting || !form.formState.isValid}
+                className="w-full sm:w-auto"
+              >
                 {form.formState.isSubmitting ? 'Creating...' : 'Create Post'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
