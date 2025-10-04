@@ -5,6 +5,7 @@ import SearchBar from '@/components/pages/home/search-bar';
 import BlogCard from '@/components/pages/blog/blog-card';
 import http from '@/lib/http';
 import { categories } from '@/data';
+import { Plus } from 'lucide-react';
 
 async function getAllPosts(query: string) {
   try {
@@ -45,19 +46,7 @@ export default async function BlogPage({
               href="/blog/new"
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <Plus />
               Create New Post
             </Link>
           </div>
@@ -106,7 +95,7 @@ export default async function BlogPage({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {postData.map((post: any) => (
-                <BlogCard key={post.id} post={post} />
+                <BlogCard key={post._id} post={post} />
               ))}
             </div>
           </>

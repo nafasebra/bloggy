@@ -55,7 +55,7 @@ const mockComments: Comment[] = [
   },
 ];
 
-export default function CommentSection({ postId }: CommentSectionProps) {
+export default function CommentSection({ postId }: any) {
   // get accesstoken
   const { accessToken } = useAuth();
   console.log(postId);

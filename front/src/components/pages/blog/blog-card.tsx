@@ -1,22 +1,9 @@
+import { Post } from '@/types';
 import Link from 'next/link';
 
-interface BlogPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  author: string;
-  authorId: number;
-  date: string;
-  readTime: string;
-  category: string;
-  tags: string[];
-}
-
-interface BlogCardProps {
-  post: BlogPost;
-}
-
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({ post }: {
+  post:Post
+}) {
   return (
     <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700 group">
       <div className="p-6">
@@ -24,13 +11,13 @@ export default function BlogCard({ post }: BlogCardProps) {
           <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
             {post.category}
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          {/* <span className="text-sm text-gray-500 dark:text-gray-400">
             {post.readTime}
-          </span>
+          </span> */}
         </div>
 
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-          <Link href={`/post/${post.id}`}>{post.title}</Link>
+          <Link href={`/post/${post._id}`}>{post.title}</Link>
         </h3>
 
         <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
@@ -57,19 +44,19 @@ export default function BlogCard({ post }: BlogCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">
+              {/* <span className="text-white text-sm font-medium">
                 {post.author.charAt(0)}
-              </span>
+              </span> */}
             </div>
             <div>
               <Link
                 href={`/user/${post.authorId}`}
                 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                {post.author}
+                {post.authorId}
               </Link>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(post.date).toLocaleDateString('en-US', {
+                {new Date(post.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric',
@@ -79,7 +66,7 @@ export default function BlogCard({ post }: BlogCardProps) {
           </div>
 
           <Link
-            href={`/post/${post.id}`}
+            href={`/post/${post._id}`}
             className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm group-hover:translate-x-1 transition-transform"
           >
             Read more →
