@@ -7,7 +7,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { setAccessToken } from '@/lib/http';
+import { UserService } from '@/services/user.services';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -46,6 +46,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUserState(user);
   };
 
+  const fetchUser = async (token: string | null) => {
+    try {
+      const userData = await UserService.getCurrentUser(token as string);
+      setUser(userData);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      setUser(null);
+    }
+  };
+
   const refreshToken = async () => {
     try {
       const response = await fetch('/api/refresh', {
@@ -57,10 +67,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         const token = data.access_token;
-        const userData = data.user;
         setAccessTokenState(token);
         setAccessToken(token);
-        setUser(userData);
+        await fetchUser(data.access_token);
       } else {
         // Handle refresh failure, e.g., logout
         setAccessTokenState(null);

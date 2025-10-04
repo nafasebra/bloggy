@@ -2,8 +2,12 @@ import http from '@/lib/http';
 import type { User, UpdateUserData } from '@/types';
 
 export class UserService {
-  static async getCurrentUser(): Promise<User> {
-    const response = await http.get<User>('/users/me/profile');
+  static async getCurrentUser(token: string): Promise<User> {
+    const response = await http.get<User>('/users/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   }
 

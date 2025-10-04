@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 interface UserPost {
-  id: number;
+  id: string;
   title: string;
   excerpt: string;
   date: string;

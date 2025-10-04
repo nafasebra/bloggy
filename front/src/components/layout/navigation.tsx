@@ -17,7 +17,9 @@ import { useAuth } from '@/contexts/auth-provider';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+
+  console.log(user)
 
   const changeMenuState = useCallback((state: boolean) => {
     setIsMenuOpen(state);
@@ -52,7 +54,7 @@ export default function Navigation() {
                   </Link>
                 </>
               ) : (
-                <Link href="/user/1">
+                <Link href={`/user/${user?._id}`}>
                   <Button>My Account</Button>
                 </Link>
               )}
@@ -101,7 +103,7 @@ export default function Navigation() {
                         </Link>
                       </>
                     ) : (
-                      <Link href="/user/1" onClick={() => setIsMenuOpen(false)}>
+                      <Link href={`/user/${user?._id}`} onClick={() => setIsMenuOpen(false)}>
                         <Button>My Account</Button>
                       </Link>
                     )}
