@@ -11,8 +11,10 @@ import { setAccessToken } from '@/lib/http';
 
 interface AuthContextType {
   accessToken: string | null;
+  user: { _id: string; name: string; username: string; email: string } | null;
   refreshToken: () => Promise<void>;
   setAccessToken: (token: string | null) => void;
+  setUser: (user: { _id: string; name: string; username: string; email: string } | null) => void;
   logout: () => void;
 }
 
@@ -32,11 +34,16 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
+  const [user, setUserState] = useState<{ _id: string; name: string; username: string; email: string } | null>(null);
 
   const setAccessToken = (token: string | null) => {
     if (!accessToken) {
       setAccessTokenState(token);
     }
+  };
+
+  const setUser = (user: { _id: string; name: string; username: string; email: string } | null) => {
+    setUserState(user);
   };
 
   const refreshToken = async () => {
@@ -50,16 +57,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         const token = data.access_token;
+        const userData = data.user;
         setAccessTokenState(token);
         setAccessToken(token);
+        setUser(userData);
       } else {
         // Handle refresh failure, e.g., logout
         setAccessTokenState(null);
         setAccessToken(null);
+        setUser(null);
       }
     } catch (error) {
       setAccessTokenState(null);
       setAccessToken(null);
+      setUser(null);
       console.error('Error refreshing token:', error);
     }
   };
@@ -67,6 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setAccessTokenState(null);
     setAccessToken(null);
+    setUser(null);
     // Optionally, call logout API to clear cookie
     fetch('/api/logout', { method: 'POST' });
   };
@@ -84,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, refreshToken, setAccessToken, logout }}
+      value={{ accessToken, user, refreshToken, setAccessToken, setUser, logout }}
     >
       {children}
     </AuthContext.Provider>

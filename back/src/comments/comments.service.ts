@@ -15,9 +15,9 @@ export class CommentsService {
   ) {}
 
   async findByPostId(id: string): Promise<Comment[]> {
-    const comments = await this.commentModel.find({ post_id: id }).exec();
+    const comments = await this.commentModel.find({ postId: id }).populate('authorId').exec();
     if (!comments || comments.length === 0) {
-      throw new NotFoundException(`Comments not found for post id: ${id}`);
+      return [];
     }
     return comments;
   }

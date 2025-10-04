@@ -8,7 +8,7 @@ export class CommentService {
   }
 
   static async getCommentsByPostId(postId: string): Promise<Comment[]> {
-    const response = await http.get<Comment[]>(`/comments/post/${postId}`);
+    const response = await http.get<Comment[]>(`/comments/${postId}`);
     return response.data;
   }
 

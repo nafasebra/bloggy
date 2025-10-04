@@ -2,22 +2,17 @@
 
 import { useAuth } from '@/contexts/auth-provider';
 import Link from 'next/link';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import CommentCard from '@/components/shared/comment-card';
-
-interface Comment {
-  id: number;
-  author: string;
-  content: string;
-  date: string;
-  avatar: string;
-}
+import { CommentWithAuthor, CreateCommentData } from '@/types';
+import { CommentService } from '@/services/comment.services';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { MessageCircle } from 'lucide-react';
 
 interface CommentSectionProps {
-  postId: number;
+  postId: string;
 }
 
 // Zod schema for comment validation
@@ -27,38 +22,23 @@ const commentSchema = z.object({
 
 type CommentFormData = z.infer<typeof commentSchema>;
 
-// Mock comments data
-const mockComments: Comment[] = [
-  {
-    id: 1,
-    author: 'John Doe',
-    content:
-      "This is a fantastic article! I've been following these trends and it's great to see them all summarized in one place.",
-    date: '2024-01-15T10:30:00Z',
-    avatar: 'JD',
-  },
-  {
-    id: 2,
-    author: 'Jane Smith',
-    content:
-      'I particularly enjoyed the section about AI-powered development tools. GitHub Copilot has been a game-changer for my workflow.',
-    date: '2024-01-15T14:20:00Z',
-    avatar: 'JS',
-  },
-  {
-    id: 3,
-    author: 'Mike Johnson',
-    content:
-      "Great insights! I'm excited to see how these technologies evolve throughout the year.",
-    date: '2024-01-16T09:15:00Z',
-    avatar: 'MJ',
-  },
-];
+export default function CommentSection({ postId }: CommentSectionProps) {
+  const { accessToken, user } = useAuth();
+  const queryClient = useQueryClient();
 
-export default function CommentSection({ postId }: any) {
-  // get accesstoken
-  const { accessToken } = useAuth();
-  console.log(postId);
+  const { data: comments = [], isLoading } = useQuery<CommentWithAuthor[]>({
+    queryKey: ['comments', postId],
+    queryFn: () => CommentService.getCommentsByPostId(postId),
+    enabled: !!postId,
+  });
+
+  const createCommentMutation = useMutation({
+    mutationFn: (data: CreateCommentData) => CommentService.createComment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+      reset();
+    },
+  });
 
   const {
     register,
@@ -70,19 +50,23 @@ export default function CommentSection({ postId }: any) {
   });
 
   const onSubmit = (data: CommentFormData) => {
-    console.log('Comment submitted:', data);
-    // Handle comment submission here
-    reset();
+    if (user) {
+      createCommentMutation.mutate({
+        content: data.comment,
+        postId,
+        authorId: user._id,
+      });
+    }
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        Comments ({mockComments.length})
+        Comments ({comments.length})
       </h3>
 
       {accessToken ? (
-        <form 
+        <form
           onSubmit={handleSubmit(onSubmit)}
           className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4"
         >
@@ -107,9 +91,10 @@ export default function CommentSection({ postId }: any) {
 
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+            disabled={createCommentMutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50"
           >
-            Post Comment
+            {createCommentMutation.isPending ? 'Posting...' : 'Post Comment'}
           </button>
         </form>
       ) : (
@@ -125,27 +110,19 @@ export default function CommentSection({ postId }: any) {
 
       {/* Comments List */}
       <div className="space-y-6 mt-9">
-        {mockComments.map((comment) => (
-          <CommentCard key={comment.id} comment={comment} />
-        ))}
+        {isLoading ? (
+          <p>Loading comments...</p>
+        ) : (
+          comments.map((comment) => (
+            <CommentCard key={comment._id} comment={comment} />
+          ))
+        )}
       </div>
 
-      {mockComments.length === 0 && (
+      {!isLoading && comments.length === 0 && (
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
+            <MessageCircle />
           </div>
           <p className="text-gray-500 dark:text-gray-400">
             No comments yet. Be the first to share your thoughts!
