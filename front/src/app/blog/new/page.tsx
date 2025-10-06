@@ -3,18 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { PostService } from '@/services/post.services';
 import { useAuth } from '@/contexts/auth-provider';
 import { ArrowLeft } from 'lucide-react';
 
-interface BlogPostForm {
-  title: string;
-  excerpt: string;
-  content: string;
-  category: string;
-  tags: string;
-  readTime: string;
-}
+const createPostSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
+  excerpt: z.string().min(1, 'Excerpt is required').max(500, 'Excerpt must be less than 500 characters'),
+  content: z.string().min(1, 'Content is required').min(50, 'Content must be at least 50 characters'),
+  category: z.string().min(1, 'Category is required'),
+  tags: z.string().optional(),
+});
+
+type BlogPostForm = z.infer<typeof createPostSchema>;
 
 const categories = [
   'Technology',
@@ -30,50 +34,40 @@ const categories = [
 ];
 
 export default function NewBlogPost() {
-  const [formData, setFormData] = useState<BlogPostForm>({
-    title: '',
-    excerpt: '',
-    content: '',
-    category: '',
-    tags: '',
-    readTime: '',
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
 
   const { accessToken, user } = useAuth();
   const router = useRouter();
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const form = useForm<BlogPostForm>({
+    resolver: zodResolver(createPostSchema),
+    defaultValues: {
+      title: '',
+      excerpt: '',
+      content: '',
+      category: '',
+      tags: '',
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async (data: BlogPostForm) => {
     if (!user) {
       alert('You must be logged in to create a post');
       return;
     }
 
-    setIsSubmitting(true)
-
     try {
+      // Calculate read time
+      const wordsPerMinute = 200;
+      const wordCount = data.content.trim().split(/\s+/).length;
+      const readTime = Math.ceil(wordCount / wordsPerMinute);
+
       const postData = {
-        title: formData.title,
-        content: formData.content,
-        excerpt: formData.excerpt,
-        category: formData.category,
-        tags: formData.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag),
+        title: data.title,
+        content: data.content,
+        excerpt: data.excerpt,
+        category: data.category,
+        tags: data.tags ? data.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag) : [],
         authorId: user._id,
         createdAt: new Date().toISOString(),
       };
@@ -83,25 +77,8 @@ export default function NewBlogPost() {
       router.push('/blog');
     } catch (error) {
       console.log('Error creating post:', error);
-    } finally {
-      setIsSubmitting(false);
+      alert('Failed to create post. Please try again.');
     }
-  };
-
-  const calculateReadTime = (content: string) => {
-    const wordsPerMinute = 200;
-    const wordCount = content.trim().split(/\s+/).length;
-    const readTime = Math.ceil(wordCount / wordsPerMinute);
-    return readTime;
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const content = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      content,
-      readTime: calculateReadTime(content).toString(),
-    }));
   };
 
   return (
@@ -123,9 +100,7 @@ export default function NewBlogPost() {
               className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
             >
               <ArrowLeft />
-              <span>
-                Back to Blog
-              </span>
+              <span>Back to Blog</span>
             </Link>
           </div>
         </div>
@@ -160,7 +135,7 @@ export default function NewBlogPost() {
           </div>
 
           {!isPreview ? (
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 space-y-6">
               {/* Title */}
               <div>
                 <label
@@ -172,13 +147,15 @@ export default function NewBlogPost() {
                 <input
                   type="text"
                   id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
+                  {...form.register('title')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="Enter your post title..."
-                  required
                 />
+                {form.formState.errors.title && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                    {form.formState.errors.title.message}
+                  </p>
+                )}
               </div>
 
               {/* Excerpt */}
@@ -191,14 +168,16 @@ export default function NewBlogPost() {
                 </label>
                 <textarea
                   id="excerpt"
-                  name="excerpt"
-                  value={formData.excerpt}
-                  onChange={handleInputChange}
+                  {...form.register('excerpt')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="Write a brief summary of your post..."
-                  required
                 />
+                {form.formState.errors.excerpt && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                    {form.formState.errors.excerpt.message}
+                  </p>
+                )}
               </div>
 
               {/* Category and Read Time */}
@@ -210,40 +189,38 @@ export default function NewBlogPost() {
                   >
                     Category *
                   </label>
-                  <select
-                    id="category"
+                  <Controller
                     name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    required
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    control={form.control}
+                    render={({ field }) => (
+                      <select
+                        id="category"
+                        {...field}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">Select a category</option>
+                        {categories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                  {form.formState.errors.category && (
+                    <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                      {form.formState.errors.category.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="readTime"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Read Time (minutes)
                   </label>
-                  <input
-                    type="number"
-                    id="readTime"
-                    name="readTime"
-                    value={formData.readTime}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Auto-calculated"
-                    readOnly
-                  />
+                  <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                    {form.watch('content') ? Math.ceil(form.watch('content')!.trim().split(/\s+/).length / 200) : 0} min
+                  </div>
                 </div>
               </div>
 
@@ -258,9 +235,7 @@ export default function NewBlogPost() {
                 <input
                   type="text"
                   id="tags"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleInputChange}
+                  {...form.register('tags')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="Enter tags separated by commas..."
                 />
@@ -280,20 +255,22 @@ export default function NewBlogPost() {
                 </label>
                 <textarea
                   id="content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleContentChange}
+                  {...form.register('content')}
                   rows={15}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white font-mono"
                   placeholder="Write your blog post content here..."
-                  required
                 />
+                {form.formState.errors.content && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                    {form.formState.errors.content.message}
+                  </p>
+                )}
                 <div className="flex justify-between items-center mt-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {formData.content.length} characters
+                    {form.watch('content')?.length || 0} characters
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    ~{Math.ceil(formData.content.length / 5)} words
+                    ~{Math.ceil((form.watch('content')?.length || 0) / 5)} words
                   </p>
                 </div>
               </div>
@@ -309,10 +286,10 @@ export default function NewBlogPost() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={form.formState.isSubmitting}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {isSubmitting ? 'Publishing...' : 'Publish Post'}
+                  {form.formState.isSubmitting ? 'Publishing...' : 'Publish Post'}
                 </button>
               </div>
             </form>
@@ -321,28 +298,30 @@ export default function NewBlogPost() {
             <div className="p-6">
               <div className="prose prose-lg max-w-none dark:prose-invert">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  {formData.title || 'Your Post Title'}
+                  {form.watch('title') || 'Your Post Title'}
                 </h1>
 
                 <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-6">
-                  <span>{formData.category || 'Category'}</span>
+                  <span>{form.watch('category') || 'Category'}</span>
                   <span>•</span>
-                  <span>{formData.readTime || '0'} min read</span>
+                  <span>
+                    {form.watch('content') ? Math.ceil(form.watch('content')!.trim().split(/\s+/).length / 200) : 0} min read
+                  </span>
                   <span>•</span>
                   <span>{new Date().toLocaleDateString()}</span>
                 </div>
 
-                {formData.excerpt && (
+                {form.watch('excerpt') && (
                   <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
                     <p className="text-gray-700 dark:text-gray-300 italic">
-                      {formData.excerpt}
+                      {form.watch('excerpt')}
                     </p>
                   </div>
                 )}
 
-                {formData.tags && (
+                {form.watch('tags') && form.watch('tags')!.trim() && (
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {formData.tags.split(',').map((tag, index) => (
+                    {form.watch('tags')!.split(',').map((tag, index) => (
                       <span
                         key={index}
                         className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
@@ -354,7 +333,7 @@ export default function NewBlogPost() {
                 )}
 
                 <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                  {formData.content || 'Your content will appear here...'}
+                  {form.watch('content') || 'Your content will appear here...'}
                 </div>
               </div>
 
