@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { PostService } from '@/services/post.services';
+import { useAuth } from '@/contexts/auth-provider';
+import { ArrowLeft } from 'lucide-react';
 
 interface BlogPostForm {
   title: string;
@@ -38,6 +42,9 @@ export default function NewBlogPost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
 
+  const { accessToken, user } = useAuth();
+  const router = useRouter();
+
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -52,14 +59,33 @@ export default function NewBlogPost() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (!user) {
+      alert('You must be logged in to create a post');
+      return;
+    }
 
-    setIsSubmitting(false);
-    // Here you would typically send the data to your backend
-    console.log('Blog post data:', formData);
+    setIsSubmitting(true)
+
+    try {
+      const postData = {
+        title: formData.title,
+        content: formData.content,
+        excerpt: formData.excerpt,
+        category: formData.category,
+        tags: formData.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag),
+        authorId: user._id,
+        createdAt: new Date().toISOString(),
+      };
+
+      await PostService.createPost(postData, accessToken);
+      
+      router.push('/blog');
+    } catch (error) {
+      console.log('Error creating post:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateReadTime = (content: string) => {
@@ -94,9 +120,12 @@ export default function NewBlogPost() {
             </div>
             <Link
               href="/blog"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+              className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
             >
-              ← Back to Blog
+              <ArrowLeft />
+              <span>
+                Back to Blog
+              </span>
             </Link>
           </div>
         </div>
