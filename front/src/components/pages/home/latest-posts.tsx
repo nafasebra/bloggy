@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import http from '@/lib/http';
 import BlogCard from '@/components/shared/blog-card';
+import { ArrowRight } from 'lucide-react';
 
 // Mock data for latest posts
 const mockLatestPosts = [
@@ -79,17 +80,7 @@ export default async function LatestPosts() {
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
           >
             View All Posts
-            <svg
-              className="ml-2 -mr-1 w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <ArrowRight className="ml-2 -mr-1 w-5 h-5" />
           </Link>
         </div>
       </div>
