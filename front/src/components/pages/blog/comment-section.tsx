@@ -33,7 +33,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   });
 
   const createCommentMutation = useMutation({
-    mutationFn: (data: CreateCommentData) => CommentService.createComment(data),
+    mutationFn: (data: CreateCommentData) => CommentService.createComment(data, postId, accessToken),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       reset();
