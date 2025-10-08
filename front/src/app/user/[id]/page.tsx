@@ -187,7 +187,7 @@ export default function UserPage() {
                 Posts
               </div>
             </div>
-            <div className="text-center">
+            {/* <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {userData.followers || 0}
               </div>
@@ -202,9 +202,9 @@ export default function UserPage() {
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Following
               </div>
-            </div>
+            </div> */}
             {/* Follow/Following Button */}
-            <FollowButton userId={userData._id} initialFollowing={false} />
+            {/* <FollowButton userId={userData._id} initialFollowing={false} /> */}
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant={'ghost'}>
@@ -226,7 +226,40 @@ export default function UserPage() {
 
       {/* Posts Section */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Tabs defaultValue="posts" className="w-full">
+                    <div className="space-y-4 pt-6">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Posts by {userData.name}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {posts.length} article{posts.length !== 1 ? 's' : ''}{' '}
+                  published
+                </p>
+              </div>
+
+              {isLoadingPosts ? (
+                <div>Loading posts...</div>
+              ) : posts.length > 0 ? (
+                <div className="space-y-6">
+                  {posts.map((post) => (
+                    <UserPostCard key={post.id} post={post} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <XSquare />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    No posts yet
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {userData.name} hasn't published any articles yet.
+                  </p>
+                </div>
+              )}
+            </div>
+        {/* <Tabs defaultValue="posts" className="w-full">
           <TabsList>
             <TabsTrigger value="posts">Posts</TabsTrigger>
             <TabsTrigger value="followers">Followers</TabsTrigger>
@@ -273,7 +306,7 @@ export default function UserPage() {
           <TabsContent value="following">
             <FollowingList />
           </TabsContent>
-        </Tabs>
+        </Tabs> */}
       </div>
     </div>
   );
