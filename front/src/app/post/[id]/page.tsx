@@ -6,6 +6,7 @@ import CommentSection from '@/components/pages/blog/comment-section';
 import { ChevronLeft } from 'lucide-react';
 import http from '@/lib/http';
 import { Post } from '@/types';
+import MarkdownPreview from '@/components/shared/markdown-preview';
 
 interface PostPageProps {
   params: {
@@ -90,10 +91,7 @@ export default async function PostPage({ params }: PostPageProps) {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
-          <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          <MarkdownPreview content={post.content} />
 
           {/* Tags */}
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">

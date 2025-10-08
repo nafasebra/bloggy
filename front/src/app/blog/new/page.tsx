@@ -9,6 +9,8 @@ import { z } from 'zod';
 import { PostService } from '@/services/post.services';
 import { useAuth } from '@/contexts/auth-provider';
 import { ArrowLeft } from 'lucide-react';
+import MarkdownEditor from '@/components/shared/markdown-editor';
+import MarkdownPreview from '@/components/shared/markdown-preview';
 
 const createPostSchema = z.object({
   title: z
@@ -274,14 +276,18 @@ export default function NewBlogPost() {
                   htmlFor="content"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Content *
+                  Content * (Markdown supported)
                 </label>
-                <textarea
-                  id="content"
-                  {...form.register('content')}
-                  rows={15}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white font-mono"
-                  placeholder="Write your blog post content here..."
+                <Controller
+                  name="content"
+                  control={form.control}
+                  render={({ field }) => (
+                    <MarkdownEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Write your blog post content here using Markdown..."
+                    />
+                  )}
                 />
                 {form.formState.errors.content && (
                   <p className="text-sm text-red-600 dark:text-red-400 mt-1">
@@ -321,7 +327,7 @@ export default function NewBlogPost() {
           ) : (
             /* Preview Mode */
             <div className="p-6">
-              <div className="prose prose-lg max-w-none dark:prose-invert">
+              <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                   {form.watch('title') || 'Your Post Title'}
                 </h1>
@@ -365,11 +371,9 @@ export default function NewBlogPost() {
                       ))}
                   </div>
                 )}
-
-                <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                  {form.watch('content') || 'Your content will appear here...'}
-                </div>
               </div>
+
+              <MarkdownPreview content={form.watch('content') || ''} />
 
               <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
                 <button

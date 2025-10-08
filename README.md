@@ -11,8 +11,10 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 ## ✨ Features
 
 ### 📝 Content Management
-- **Rich Blog Creation**: Write and publish beautiful blog posts
-- **Live Preview**: Preview your posts before publishing
+- **Rich Markdown Editor**: Write with a powerful markdown editor featuring a toolbar
+- **Markdown Support**: Full GitHub Flavored Markdown (GFM) support
+- **Live Preview**: Real-time preview of your markdown content
+- **Side-by-Side Editing**: Edit and preview simultaneously
 - **Category & Tags**: Organize content with categories and tags
 - **Auto-calculated Read Time**: Smart reading time estimation
 - **Draft System**: Save and edit drafts before publishing
@@ -62,6 +64,8 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first CSS framework
 - **React Hooks** - State management
+- **React SimpleMDE Editor** - Rich markdown editor
+- **React Markdown** - Markdown rendering with GFM support
 
 ### Backend
 - **NestJS** - Progressive Node.js framework
@@ -216,7 +220,15 @@ DELETE /comments/:id       # Delete comment
 ## 🎨 Features in Detail
 
 ### Blog Post Creation
-- Rich text editor with live preview
+- **Rich Markdown Editor** with intuitive toolbar
+  - Bold, Italic, Headings formatting
+  - Lists (ordered & unordered)
+  - Code blocks and inline code
+  - Tables, quotes, and links
+  - Image embedding support
+  - Fullscreen and side-by-side modes
+- **Live Preview**: Real-time markdown rendering
+- **GitHub Flavored Markdown** (GFM) support
 - Category and tag selection
 - Auto-calculated read time
 - Draft saving and editing

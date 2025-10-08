@@ -1,0 +1,119 @@
+/* Markdown Editor Styling */
+.markdown-editor-wrapper .EasyMDEContainer {
+  @apply border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror {
+  @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 10px;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar {
+  @apply bg-gray-50 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar button {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar button:hover {
+  @apply bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar button.active {
+  @apply bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar i.separator {
+  @apply border-l border-gray-300 dark:border-gray-600;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-statusbar {
+  @apply bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-t border-gray-300 dark:border-gray-600;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror-cursor {
+  @apply border-l-2 border-gray-900 dark:border-gray-100;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .cm-header {
+  @apply text-blue-600 dark:text-blue-400 font-bold;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .cm-quote {
+  @apply text-gray-600 dark:text-gray-400 italic;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .cm-link {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .cm-url {
+  @apply text-blue-500 dark:text-blue-300 underline;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror-selected {
+  @apply bg-blue-100 dark:bg-blue-900;
+}
+
+/* Preview Mode Styling */
+.markdown-editor-wrapper .editor-preview,
+.markdown-editor-wrapper .editor-preview-side {
+  @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+  padding: 20px;
+}
+
+.markdown-editor-wrapper .editor-preview h1,
+.markdown-editor-wrapper .editor-preview-side h1 {
+  @apply text-3xl font-bold text-gray-900 dark:text-white mb-4;
+}
+
+.markdown-editor-wrapper .editor-preview h2,
+.markdown-editor-wrapper .editor-preview-side h2 {
+  @apply text-2xl font-bold text-gray-900 dark:text-white mb-3;
+}
+
+.markdown-editor-wrapper .editor-preview h3,
+.markdown-editor-wrapper .editor-preview-side h3 {
+  @apply text-xl font-bold text-gray-900 dark:text-white mb-2;
+}
+
+.markdown-editor-wrapper .editor-preview a,
+.markdown-editor-wrapper .editor-preview-side a {
+  @apply text-blue-600 dark:text-blue-400 hover:underline;
+}
+
+.markdown-editor-wrapper .editor-preview code,
+.markdown-editor-wrapper .editor-preview-side code {
+  @apply bg-gray-100 dark:bg-gray-700 text-pink-600 dark:text-pink-400 px-1 py-0.5 rounded;
+}
+
+.markdown-editor-wrapper .editor-preview pre,
+.markdown-editor-wrapper .editor-preview-side pre {
+  @apply bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-4 rounded overflow-x-auto;
+}
+
+.markdown-editor-wrapper .editor-preview blockquote,
+.markdown-editor-wrapper .editor-preview-side blockquote {
+  @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400;
+}
+
+.markdown-editor-wrapper .editor-preview table,
+.markdown-editor-wrapper .editor-preview-side table {
+  @apply border-collapse border border-gray-300 dark:border-gray-600 w-full;
+}
+
+.markdown-editor-wrapper .editor-preview th,
+.markdown-editor-wrapper .editor-preview-side th,
+.markdown-editor-wrapper .editor-preview td,
+.markdown-editor-wrapper .editor-preview-side td {
+  @apply border border-gray-300 dark:border-gray-600 px-4 py-2;
+}
+
+.markdown-editor-wrapper .editor-preview th,
+.markdown-editor-wrapper .editor-preview-side th {
+  @apply bg-gray-100 dark:bg-gray-700 font-bold;
+}

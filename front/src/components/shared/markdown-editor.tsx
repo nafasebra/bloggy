@@ -1,0 +1,62 @@
+'use client';
+
+import { useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import 'easymde/dist/easymde.min.css';
+import type { Options } from 'easymde';
+
+interface MarkdownEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
+  ssr: false,
+});
+
+export default function MarkdownEditor({
+  value,
+  onChange,
+  placeholder = 'Write your content here...',
+}: MarkdownEditorProps) {
+  const options = useMemo<Options>(
+    () => ({
+      placeholder,
+      spellChecker: false,
+      autofocus: false,
+      status: ['lines', 'words', 'cursor'],
+      toolbar: [
+        'bold',
+        'italic',
+        'heading',
+        '|',
+        'quote',
+        'unordered-list',
+        'ordered-list',
+        '|',
+        'link',
+        'image',
+        '|',
+        'code',
+        'table',
+        '|',
+        'preview',
+        'side-by-side',
+        'fullscreen',
+        '|',
+        'guide',
+      ],
+      minHeight: '400px',
+      maxHeight: '600px',
+      sideBySideFullscreen: false,
+    }),
+    [placeholder]
+  );
+
+  return (
+    <div className="markdown-editor-wrapper">
+      <SimpleMDE value={value} onChange={onChange} options={options} />
+    </div>
+  );
+}
