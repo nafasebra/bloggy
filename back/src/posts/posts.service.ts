@@ -33,6 +33,21 @@ export class PostsService {
       .exec();
   }
 
+  // find by category
+  async findByCategory(category: string): Promise<Post[]> {
+    if (!category || category.trim() === '') {
+      return this.postModel.find().sort({ createdAt: -1 }).exec();
+    }
+
+    const categoryQuery = category.trim();
+    return this.postModel
+      .find({
+        category: { $regex: categoryQuery, $options: 'i' }
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
   async findById(id: string): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {

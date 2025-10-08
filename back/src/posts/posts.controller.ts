@@ -49,6 +49,14 @@ export class PostsController {
     return this.postsService.findBySearch(query);
   }
 
+  // search by category
+  @Get('search/category')
+  @ApiOperation({ summary: 'Search posts by category' })
+  @ApiResponse({ status: 200, description: 'List of matching posts', type: PostsResponseDto })
+  async searchPostsByCategory(@Query('category') category: string): Promise<PostEntity[]> {
+    return this.postsService.findByCategory(category);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
   @ApiResponse({ status: 200, description: 'List of posts', type: PostsResponseDto })
