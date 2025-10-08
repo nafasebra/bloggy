@@ -17,7 +17,10 @@ interface CommentSectionProps {
 
 // Zod schema for comment validation
 const commentSchema = z.object({
-  comment: z.string().min(1, 'Comment is required').max(1000, 'Comment must be less than 1000 characters'),
+  comment: z
+    .string()
+    .min(1, 'Comment is required')
+    .max(1000, 'Comment must be less than 1000 characters'),
 });
 
 type CommentFormData = z.infer<typeof commentSchema>;
@@ -33,7 +36,8 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   });
 
   const createCommentMutation = useMutation({
-    mutationFn: (data: CreateCommentData) => CommentService.createComment(data, postId, accessToken),
+    mutationFn: (data: CreateCommentData) =>
+      CommentService.createComment(data, postId, accessToken),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       reset();
@@ -55,7 +59,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         content: data.comment,
         postId,
         authorId: user._id,
-        authorName: user.name
+        authorName: user.name,
       });
     }
   };

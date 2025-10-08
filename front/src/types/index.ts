@@ -186,7 +186,7 @@ export const POST_CATEGORIES = [
   'Sports',
 ] as const;
 
-export type PostCategory = typeof POST_CATEGORIES[number];
+export type PostCategory = (typeof POST_CATEGORIES)[number];
 
 // ==================== Extended Post Types with Relations ====================
 

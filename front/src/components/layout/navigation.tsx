@@ -19,7 +19,7 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { accessToken, user } = useAuth();
 
-  console.log(user)
+  console.log(user);
 
   const changeMenuState = useCallback((state: boolean) => {
     setIsMenuOpen(state);
@@ -103,7 +103,10 @@ export default function Navigation() {
                         </Link>
                       </>
                     ) : (
-                      <Link href={`/user/${user?._id}`} onClick={() => setIsMenuOpen(false)}>
+                      <Link
+                        href={`/user/${user?._id}`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
                         <Button>My Account</Button>
                       </Link>
                     )}

@@ -14,7 +14,9 @@ interface AuthContextType {
   user: { _id: string; name: string; username: string; email: string } | null;
   refreshToken: () => Promise<void>;
   setAccessToken: (token: string | null) => void;
-  setUser: (user: { _id: string; name: string; username: string; email: string } | null) => void;
+  setUser: (
+    user: { _id: string; name: string; username: string; email: string } | null
+  ) => void;
   logout: () => void;
 }
 
@@ -34,7 +36,12 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
-  const [user, setUserState] = useState<{ _id: string; name: string; username: string; email: string } | null>(null);
+  const [user, setUserState] = useState<{
+    _id: string;
+    name: string;
+    username: string;
+    email: string;
+  } | null>(null);
 
   const setAccessToken = (token: string | null) => {
     if (!accessToken) {
@@ -42,7 +49,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const setUser = (user: { _id: string; name: string; username: string; email: string } | null) => {
+  const setUser = (
+    user: { _id: string; name: string; username: string; email: string } | null
+  ) => {
     setUserState(user);
   };
 
@@ -105,7 +114,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, user, refreshToken, setAccessToken, setUser, logout }}
+      value={{
+        accessToken,
+        user,
+        refreshToken,
+        setAccessToken,
+        setUser,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

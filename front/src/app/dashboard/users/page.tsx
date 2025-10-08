@@ -72,7 +72,9 @@ export default function UsersPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      {user.email}
+                    </TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -84,7 +86,9 @@ export default function UsersPage() {
                         {user.role}
                       </span>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">{user.joinedAt}</TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      {user.joinedAt}
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
                         <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">

@@ -11,8 +11,8 @@ async function getAllPosts(query: string) {
   try {
     const response = await http.get(`/posts`, {
       params: {
-        q: query 
-      }
+        q: query,
+      },
     });
     return response.data;
   } catch (error) {
@@ -21,9 +21,9 @@ async function getAllPosts(query: string) {
 }
 
 export default async function BlogPage({
-  searchParams
+  searchParams,
 }: {
-  searchParams: { q: string }
+  searchParams: { q: string };
 }) {
   const postData = await getAllPosts(searchParams.q);
 
@@ -57,8 +57,7 @@ export default async function BlogPage({
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            <SearchBar
-            />
+            <SearchBar />
 
             <div className="flex flex-wrap gap-2">
               {categories.map((category, index) => (
@@ -84,13 +83,13 @@ export default async function BlogPage({
         {postData.length > 0 ? (
           <>
             <div className="mb-8">
-                <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Showing {postData.length} of {postData.length} articles
                 {/* Mock search query */}
-                {" for \"Web Development\""}
+                {' for "Web Development"'}
                 {/* Mock category filter */}
-                {" in Technology"}
-                </p>
+                {' in Technology'}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

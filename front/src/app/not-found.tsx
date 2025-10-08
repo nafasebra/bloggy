@@ -17,7 +17,7 @@ export default function NotFound() {
             <h1 className="text-8xl sm:text-9xl lg:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 select-none">
               404
             </h1>
-            
+
             {/* Floating Elements */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="animate-bounce delay-100">
@@ -39,8 +39,9 @@ export default function NotFound() {
             Oops! Page Not Found
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-            The page you're looking for seems to have wandered off into the digital void. 
-            Don't worry, even the best explorers sometimes take a wrong turn!
+            The page you're looking for seems to have wandered off into the
+            digital void. Don't worry, even the best explorers sometimes take a
+            wrong turn!
           </p>
         </div>
 
@@ -53,7 +54,7 @@ export default function NotFound() {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Go Back
           </button>
-          
+
           <Link
             href="/"
             className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl"

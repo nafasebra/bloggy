@@ -1,14 +1,13 @@
 'use client';
 
-import { useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Search, X } from "lucide-react";
+import { useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Search, X } from 'lucide-react';
 
-export default function SearchBar({
-}) {
+export default function SearchBar({}) {
   const [value, setValue] = useState('');
   const searchParams = useSearchParams();
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +23,7 @@ export default function SearchBar({
   };
 
   const pressEnterToSearch = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSubmit(e);
     }
   };
@@ -36,10 +35,10 @@ export default function SearchBar({
       </div>
       <input
         type="text"
-        value={value || ""}
+        value={value || ''}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={pressEnterToSearch}
-        placeholder={"Search title, tag or article..."}
+        placeholder={'Search title, tag or article...'}
         className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
       />
       {value && (

@@ -11,9 +11,18 @@ import { useAuth } from '@/contexts/auth-provider';
 import { ArrowLeft } from 'lucide-react';
 
 const createPostSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-  excerpt: z.string().min(1, 'Excerpt is required').max(500, 'Excerpt must be less than 500 characters'),
-  content: z.string().min(1, 'Content is required').min(50, 'Content must be at least 50 characters'),
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(200, 'Title must be less than 200 characters'),
+  excerpt: z
+    .string()
+    .min(1, 'Excerpt is required')
+    .max(500, 'Excerpt must be less than 500 characters'),
+  content: z
+    .string()
+    .min(1, 'Content is required')
+    .min(50, 'Content must be at least 50 characters'),
   category: z.string().min(1, 'Category is required'),
   tags: z.string().optional(),
 });
@@ -67,14 +76,19 @@ export default function NewBlogPost() {
         content: data.content,
         excerpt: data.excerpt,
         category: data.category,
-        tags: data.tags ? data.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag) : [],
+        tags: data.tags
+          ? data.tags
+              .split(',')
+              .map((tag) => tag.trim())
+              .filter((tag) => tag)
+          : [],
         authorId: user._id,
         authorName: user.name,
         createdAt: new Date().toISOString(),
       };
 
       await PostService.createPost(postData, accessToken);
-      
+
       router.push('/blog');
     } catch (error) {
       console.log('Error creating post:', error);
@@ -136,7 +150,10 @@ export default function NewBlogPost() {
           </div>
 
           {!isPreview ? (
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 space-y-6">
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="p-6 space-y-6"
+            >
               {/* Title */}
               <div>
                 <label
@@ -220,7 +237,13 @@ export default function NewBlogPost() {
                     Read Time (minutes)
                   </label>
                   <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                    {form.watch('content') ? Math.ceil(form.watch('content')!.trim().split(/\s+/).length / 200) : 0} min
+                    {form.watch('content')
+                      ? Math.ceil(
+                          form.watch('content')!.trim().split(/\s+/).length /
+                            200
+                        )
+                      : 0}{' '}
+                    min
                   </div>
                 </div>
               </div>
@@ -290,7 +313,9 @@ export default function NewBlogPost() {
                   disabled={form.formState.isSubmitting}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {form.formState.isSubmitting ? 'Publishing...' : 'Publish Post'}
+                  {form.formState.isSubmitting
+                    ? 'Publishing...'
+                    : 'Publish Post'}
                 </button>
               </div>
             </form>
@@ -306,7 +331,13 @@ export default function NewBlogPost() {
                   <span>{form.watch('category') || 'Category'}</span>
                   <span>•</span>
                   <span>
-                    {form.watch('content') ? Math.ceil(form.watch('content')!.trim().split(/\s+/).length / 200) : 0} min read
+                    {form.watch('content')
+                      ? Math.ceil(
+                          form.watch('content')!.trim().split(/\s+/).length /
+                            200
+                        )
+                      : 0}{' '}
+                    min read
                   </span>
                   <span>•</span>
                   <span>{new Date().toLocaleDateString()}</span>
@@ -322,14 +353,17 @@ export default function NewBlogPost() {
 
                 {form.watch('tags') && form.watch('tags')!.trim() && (
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {form.watch('tags')!.split(',').map((tag, index) => (
-                      <span
-                        key={index}
-                        className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
-                      >
-                        {tag.trim()}
-                      </span>
-                    ))}
+                    {form
+                      .watch('tags')!
+                      .split(',')
+                      .map((tag, index) => (
+                        <span
+                          key={index}
+                          className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
+                        >
+                          {tag.trim()}
+                        </span>
+                      ))}
                   </div>
                 )}
 

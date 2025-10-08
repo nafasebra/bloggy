@@ -58,7 +58,7 @@ export default function CreatePostPage() {
       console.error('Error fetching current user:', error);
       return null;
     }
-  }
+  };
 
   const onSubmit = async (data: CreatePostForm) => {
     if (!accessToken) {
@@ -71,19 +71,24 @@ export default function CreatePostPage() {
 
       const postData = {
         ...data,
-        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : [],
+        tags: data.tags ? data.tags.split(',').map((tag) => tag.trim()) : [],
         authorId,
         createdAt: new Date().toISOString(),
       };
 
       const response = await http.post('/posts', postData, {
-        headers: { Authorization: `Bearer ${accessToken}` }
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       if (response.status === 201) {
         router.push('/dashboard/posts');
       } else {
-        throw new Error("Failed to create post: " + response.status + " - " + response.statusText);
+        throw new Error(
+          'Failed to create post: ' +
+            response.status +
+            ' - ' +
+            response.statusText
+        );
       }
     } catch (error) {
       console.log('Error creating post:', error);
@@ -92,7 +97,7 @@ export default function CreatePostPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div className='space-y-2 sm:space-y-3'>
+      <div className="space-y-2 sm:space-y-3">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
           Create New Post
         </h1>
@@ -106,7 +111,10 @@ export default function CreatePostPage() {
           <CardTitle className="text-lg sm:text-xl">Post Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-6"
+          >
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -143,8 +151,8 @@ export default function CreatePostPage() {
                   name="category"
                   control={form.control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value} >
-                      <SelectTrigger className='w-full'>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -163,17 +171,18 @@ export default function CreatePostPage() {
                   </p>
                 )}
               </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="tags">Tags</Label>
-              <Input
-                id="tags"
-                {...form.register('tags')}
-                placeholder="Enter tags separated by commas..."
-              />
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                Separate tags with commas (e.g., "Web Development, AI, Frameworks")
-              </p>
-            </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="tags">Tags</Label>
+                <Input
+                  id="tags"
+                  {...form.register('tags')}
+                  placeholder="Enter tags separated by commas..."
+                />
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                  Separate tags with commas (e.g., "Web Development, AI,
+                  Frameworks")
+                </p>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -194,16 +203,17 @@ export default function CreatePostPage() {
                   {form.watch('content')?.length || 0} characters
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  ~
-                  {Math.ceil((form.watch('content')?.length || 0) / 5)} words
+                  ~{Math.ceil((form.watch('content')?.length || 0) / 5)} words
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button 
-                type="submit" 
-                disabled={form.formState.isSubmitting || !form.formState.isValid}
+              <Button
+                type="submit"
+                disabled={
+                  form.formState.isSubmitting || !form.formState.isValid
+                }
                 className="w-full sm:w-auto"
               >
                 {form.formState.isSubmitting ? 'Creating...' : 'Create Post'}

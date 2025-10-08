@@ -1,9 +1,7 @@
 import { Post } from '@/types';
 import Link from 'next/link';
 
-export default function BlogCard({ post }: {
-  post:Post
-}) {
+export default function BlogCard({ post }: { post: Post }) {
   return (
     <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700 group">
       <div className="p-6">

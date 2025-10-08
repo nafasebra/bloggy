@@ -2,7 +2,11 @@ import http from '@/lib/http';
 import type { Comment, CreateCommentData, UpdateCommentData } from '@/types';
 
 export class CommentService {
-  static async createComment(data: CreateCommentData, postId: string, accessToken: string | null): Promise<Comment> {
+  static async createComment(
+    data: CreateCommentData,
+    postId: string,
+    accessToken: string | null
+  ): Promise<Comment> {
     const response = await http.post<Comment>(`/comments/${postId}`, data, {
       headers: {
         Authorization: `Bearer ${accessToken}`,

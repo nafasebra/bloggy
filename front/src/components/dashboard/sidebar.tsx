@@ -4,7 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Menu, X, LayoutDashboard, FileText, PlusCircle, Users } from 'lucide-react';
+import {
+  Menu,
+  X,
+  LayoutDashboard,
+  FileText,
+  PlusCircle,
+  Users,
+} from 'lucide-react';
 
 const sidebarItems = [
   {
@@ -68,7 +75,9 @@ export default function Sidebar() {
       <aside
         className={cn(
           'fixed lg:static inset-y-0 left-0 z-40 flex h-full w-64 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out',
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          isMobileMenuOpen
+            ? 'translate-x-0'
+            : '-translate-x-full lg:translate-x-0'
         )}
       >
         <div className="flex h-16 items-center border-b border-gray-200 dark:border-gray-700 px-6">

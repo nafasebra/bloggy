@@ -1,10 +1,10 @@
 import http from '@/lib/http';
-import type { 
-  AuthResponse, 
-  LoginCredentials, 
-  RegisterData, 
+import type {
+  AuthResponse,
+  LoginCredentials,
+  RegisterData,
   RefreshTokenData,
-  ChangePasswordData 
+  ChangePasswordData,
 } from '@/types';
 
 export class AuthService {
@@ -18,8 +18,13 @@ export class AuthService {
     return response.data;
   }
 
-  static async refreshToken(data: RefreshTokenData): Promise<{ access_token: string }> {
-    const response = await http.post<{ access_token: string }>('/auth/refresh', data);
+  static async refreshToken(
+    data: RefreshTokenData
+  ): Promise<{ access_token: string }> {
+    const response = await http.post<{ access_token: string }>(
+      '/auth/refresh',
+      data
+    );
     return response.data;
   }
 
