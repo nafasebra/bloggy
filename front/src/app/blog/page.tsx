@@ -93,7 +93,8 @@ export default async function BlogPage({
           <>
             <div className="mb-8">
               <p className="text-gray-600 dark:text-gray-400">
-                Showing {postData.length} article{postData.length !== 1 ? 's' : ''}
+                Showing {postData.length} article
+                {postData.length !== 1 ? 's' : ''}
                 {query && ` for "${query}"`}
               </p>
             </div>
@@ -113,10 +114,9 @@ export default async function BlogPage({
               {query ? 'No articles found' : 'No articles available'}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {query 
+              {query
                 ? `No articles found for "${query}". Try different search terms.`
-                : 'There are no articles to display yet. Be the first to create one!'
-              }
+                : 'There are no articles to display yet. Be the first to create one!'}
             </p>
             {query && (
               <Link
