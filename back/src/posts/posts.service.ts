@@ -27,7 +27,10 @@ export class PostsService {
     const searchQuery = query.trim();
     return this.postModel
       .find({
-        title: { $regex: searchQuery, $options: 'i' }
+      $or: [
+        { title: { $regex: searchQuery, $options: 'i' } },
+        { category: { $regex: searchQuery, $options: 'i' } }
+      ]
       })
       .sort({ createdAt: -1 })
       .exec();

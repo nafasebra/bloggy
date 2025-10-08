@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import SearchBar from '@/components/pages/home/search-bar';
 import BlogCard from '@/components/pages/blog/blog-card';
+import CategoryButtons from '@/components/pages/blog/category-buttons';
 import http from '@/lib/http';
-import { categories } from '@/data';
 import { Plus, Search } from 'lucide-react';
 
 async function getAllPosts(query: string) {
@@ -31,10 +31,16 @@ async function getAllPosts(query: string) {
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: { q: string };
+  searchParams: { q: string; category: string };
 }) {
   const query = searchParams.q;
-  const postData = await getAllPosts(query);
+  const selectedCategory = searchParams.category;
+  let postData = await getAllPosts(query);
+
+  // Filter by category if selected
+  if (selectedCategory) {
+    postData = postData.filter((post: any) => post.category === selectedCategory);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -68,21 +74,7 @@ export default async function BlogPage({
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             <SearchBar />
 
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category, index) => (
-                <button
-                  key={category}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    // selectedCategory === category
-                    index == 1
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+            <CategoryButtons />
           </div>
         </div>
       </div>
@@ -96,6 +88,14 @@ export default async function BlogPage({
                 Showing {postData.length} article
                 {postData.length !== 1 ? 's' : ''}
                 {query && ` for "${query}"`}
+                {selectedCategory && ` in ${selectedCategory}`}
+                {(query || selectedCategory) && ' • '}
+                <Link
+                  href="/blog"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                >
+                  Clear filters
+                </Link>
               </p>
             </div>
 
@@ -111,19 +111,23 @@ export default async function BlogPage({
               <Search className="w-12 h-12 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              {query ? 'No articles found' : 'No articles available'}
+              {query || selectedCategory ? 'No articles found' : 'No articles available'}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {query
+              {query && selectedCategory
+                ? `No articles found for "${query}" in ${selectedCategory} category.`
+                : query
                 ? `No articles found for "${query}". Try different search terms.`
+                : selectedCategory
+                ? `No articles found in ${selectedCategory} category.`
                 : 'There are no articles to display yet. Be the first to create one!'}
             </p>
-            {query && (
+            {(query || selectedCategory) && (
               <Link
                 href="/blog"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
               >
-                Clear search
+                Clear filters
               </Link>
             )}
           </div>
