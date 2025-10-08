@@ -20,15 +20,16 @@ export class PostsService {
   }
 
   async findBySearch(query: string): Promise<Post[]> {
-    console.log(query)
+    if (!query || query.trim() === '') {
+      return this.postModel.find().sort({ createdAt: -1 }).exec();
+    }
+
+    const searchQuery = query.trim();
     return this.postModel
       .find({
-      $or: [
-        { title: { $regex: String(query), $options: 'i' } },
-        // { tags: { $regex: String(query), $options: 'i' } },
-        // { author: { $regex: String(query), $options: 'i' } },
-      ]
+        title: { $regex: searchQuery, $options: 'i' }
       })
+      .sort({ createdAt: -1 })
       .exec();
   }
 
@@ -53,8 +54,8 @@ export class PostsService {
   }
 
   async findAllByUserId(userId: string): Promise<Post[]> {
-    const posts = await this.postModel.find({ userId }).exec();
-    if (!posts) {
+    const posts = await this.postModel.find({ authorId: userId }).exec();
+    if (!posts || posts.length === 0) {
       throw new NotFoundException('No posts found for this user');
     }
     return posts;

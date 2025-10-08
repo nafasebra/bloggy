@@ -9,14 +9,22 @@ import { Plus, Search } from 'lucide-react';
 
 async function getAllPosts(query: string) {
   try {
-    const response = await http.get(`/posts`, {
-      params: {
-        q: query,
-      },
-    });
+    let response;
+    if (query && query.trim()) {
+      // Use search endpoint when there's a query
+      response = await http.get(`/posts/search`, {
+        params: {
+          query: query.trim(),
+        },
+      });
+    } else {
+      // Use regular posts endpoint when no query
+      response = await http.get(`/posts`);
+    }
     return response.data;
   } catch (error) {
-    throw new Error('Failed to fetch all posts');
+    console.error('Failed to fetch posts:', error);
+    return [];
   }
 }
 
@@ -25,7 +33,8 @@ export default async function BlogPage({
 }: {
   searchParams: { q: string };
 }) {
-  const postData = await getAllPosts(searchParams.q);
+  const query = searchParams.q;
+  const postData = await getAllPosts(query);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -84,11 +93,8 @@ export default async function BlogPage({
           <>
             <div className="mb-8">
               <p className="text-gray-600 dark:text-gray-400">
-                Showing {postData.length} of {postData.length} articles
-                {/* Mock search query */}
-                {' for "Web Development"'}
-                {/* Mock category filter */}
-                {' in Technology'}
+                Showing {postData.length} article{postData.length !== 1 ? 's' : ''}
+                {query && ` for "${query}"`}
               </p>
             </div>
 
@@ -104,20 +110,22 @@ export default async function BlogPage({
               <Search className="w-12 h-12 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No articles found
+              {query ? 'No articles found' : 'No articles available'}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Try adjusting your search terms or browse all categories
+              {query 
+                ? `No articles found for "${query}". Try different search terms.`
+                : 'There are no articles to display yet. Be the first to create one!'
+              }
             </p>
-            <button
-              // onClick={() => {
-              //   setSearchQuery('');
-              //   setSelectedCategory('All');
-              // }}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-            >
-              Clear filters
-            </button>
+            {query && (
+              <Link
+                href="/blog"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+              >
+                Clear search
+              </Link>
+            )}
           </div>
         )}
       </div>
