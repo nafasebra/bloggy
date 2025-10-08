@@ -92,7 +92,6 @@ export default function NewBlogPost() {
       router.push('/blog');
     } catch (error) {
       console.log('Error creating post:', error);
-      alert('Failed to create post. Please try again.');
     }
   };
 

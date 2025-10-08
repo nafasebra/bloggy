@@ -33,12 +33,6 @@ export default function SearchBar({}) {
     router.push(`?${params.toString()}`);
   };
 
-  const pressEnterToSearch = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(e);
-    }
-  };
-
   return (
     <form onSubmit={handleSubmit} className="relative w-full max-w-md">
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
