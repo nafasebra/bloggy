@@ -19,7 +19,7 @@ async function getPostById(id: string) {
     const response = await http.get<Post>(`/posts/${id}`);
     return response.data;
   } catch (error) {
-    throw new Error('Failed to fetch post');
+    console.log('Failed to fetch post');
   }
 }
 

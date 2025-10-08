@@ -55,6 +55,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         content: data.comment,
         postId,
         authorId: user._id,
+        authorName: user.name
       });
     }
   };

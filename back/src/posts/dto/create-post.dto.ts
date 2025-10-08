@@ -53,6 +53,14 @@ export class CreatePostDto {
   authorId: string;
 
   @ApiProperty({
+    description: 'Name of the author',
+    example: 'John Doe',
+  })
+  @IsNotEmpty()
+  @IsString()
+  authorName: string;
+
+  @ApiProperty({
     description: 'Creation timestamp (ISO 8601)',
     example: '2025-09-12T12:34:56.789Z',
   })

@@ -41,5 +41,13 @@ export class ReplyCommentDto {
   @IsNotEmpty()
   @IsMongoId()
   authorId: string;
+
+  @ApiProperty({
+    description: 'Name of the author',
+    example: 'John Doe',
+  })
+  @IsNotEmpty()
+  @IsString()
+  authorName: string;
 }
 

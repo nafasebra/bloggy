@@ -52,6 +52,13 @@ export class PostResponseDto {
   @IsMongoId()
   authorId: string;
 
+  @ApiProperty({
+    description: 'Name of the author',
+    example: 'John Doe',
+  })
+  @IsString()
+  authorName: string;
+
   @ApiPropertyOptional({
     description: 'The number of views of the post',
     example: 150,

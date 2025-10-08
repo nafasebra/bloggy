@@ -8,6 +8,7 @@ export interface Post {
   tags: string[];
   category: string;
   authorId: string;
+  authorName: string;
   views?: number;
   likes?: number;
   commentIds?: string[];
@@ -22,6 +23,7 @@ export interface CreatePostData {
   category: string;
   tags: string[];
   authorId: string;
+  authorName: string;
   createdAt: string;
 }
 
@@ -32,6 +34,7 @@ export interface UpdatePostData {
   category: string;
   tags: string[];
   authorId: string;
+  authorName: string;
   updatedAt: string;
 }
 
@@ -74,6 +77,7 @@ export interface Comment {
   content: string;
   postId: string;
   authorId: string;
+  authorName: string;
   likes?: number;
   parentId?: string;
   createdAt: string;
@@ -84,6 +88,7 @@ export interface CreateCommentData {
   content: string;
   postId: string;
   authorId: string;
+  authorName: string;
   parentId?: string;
 }
 

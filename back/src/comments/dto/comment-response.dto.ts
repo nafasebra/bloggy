@@ -3,13 +3,6 @@ import { IsString, IsNumber, IsDate, IsOptional, IsArray, IsMongoId } from 'clas
 
 export class CommentResponseDto {
   @ApiProperty({
-    description: 'The unique identifier of the comment',
-    example: '507f1f77bcf86cd799439011',
-  })
-  @IsString()
-  _id: string;
-
-  @ApiProperty({
     description: 'The content of the comment',
     example: 'This is a great post!',
   })
@@ -29,6 +22,13 @@ export class CommentResponseDto {
   })
   @IsMongoId()
   authorId: string;
+
+  @ApiProperty({
+    description: 'The name of the user who authored the comment',
+    example: 'John Doe',
+  })
+  @IsString()
+  authorName: string;
 
   @ApiPropertyOptional({
     description: 'The number of likes for this comment',
@@ -131,4 +131,3 @@ export class SingleCommentResponseDto {
   })
   data: CommentResponseDto;
 }
-

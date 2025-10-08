@@ -14,6 +14,9 @@ export class Comment {
   @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
   authorId: ObjectId;
 
+  @Prop({ required: true })
+  authorName: string;
+
   @Prop()
   likes?: number;
 

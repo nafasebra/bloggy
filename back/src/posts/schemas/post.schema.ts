@@ -23,6 +23,9 @@ export class Post {
   @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
   authorId: ObjectId;
 
+  @Prop({ required: true })
+  authorName: string;
+
   @Prop()
   views?: number;
 

@@ -69,6 +69,7 @@ export default function NewBlogPost() {
         category: data.category,
         tags: data.tags ? data.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag) : [],
         authorId: user._id,
+        authorName: user.name,
         createdAt: new Date().toISOString(),
       };
 
