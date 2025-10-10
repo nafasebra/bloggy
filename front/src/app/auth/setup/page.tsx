@@ -5,16 +5,23 @@ import { useForm } from 'react-hook-form';
 import { Camera } from 'lucide-react';
 import http from '@/lib/http';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/auth-provider';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-interface FormData {
-  fullname: string;
-  bio: string;
-  avatar: FileList | null;
-  location: string;
-  website: string;
-  twitter: string;
-  category: string;
-}
+const setupSchema = z.object({
+  bio: z.string().optional(),
+  avatar: z.any().optional(),
+  location: z.string().optional(),
+  website: z.string().url('Please enter a valid URL').or(z.literal('')).optional(),
+  twitter: z.string()
+    .regex(/^@?[A-Za-z0-9_]{1,15}$/, 'Please enter a valid Twitter username')
+    .or(z.literal(''))
+    .optional(),
+  category: z.string().optional(),
+});
+
+type FormData = z.infer<typeof setupSchema>;
 
 export default function CreateUserPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,16 +33,26 @@ export default function CreateUserPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    resolver: zodResolver(setupSchema),
+  });
+
+  const { user, accessToken } = useAuth();
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     setError('');
 
+    const { avatar, ...tempdata } = data;
+
     try {
-      const response = await http.put('/users', data);
+      const response = await http.patch(`/users/${user?._id}`, tempdata, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if(response.data) {
-        router.push(`/user/${response.data._id}`);
+        router.push(`/user/${user?._id}`);
       } else {
         setError(`Failed with error: ${response.statusText} - ${response.status}`);
       }
@@ -47,8 +64,8 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+    <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-5">
+      <div className="w-full max-w-5xl bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left Column - Avatar Upload */}
           <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-8 flex items-center justify-center">
@@ -111,29 +128,6 @@ export default function CreateUserPage() {
 
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="fullname"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    id="fullname"
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your full name"
-                    {...register('fullname', {
-                      required: 'Full name is required',
-                    })}
-                  />
-                  {errors.fullname && (
-                    <p className="mt-2 text-sm text-red-600">
-                      {errors.fullname.message}
-                    </p>
-                  )}
-                </div>
-
                 <div>
                   <label
                     htmlFor="bio"

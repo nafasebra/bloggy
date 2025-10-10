@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { setAccessToken } = useAuth();
+  const { setAccessToken, setUser } = useAuth();
 
   const {
     register,
@@ -47,8 +47,9 @@ export default function LoginPage() {
         const result = await response.json();
         if (result.access_token) {
           setAccessToken(result.access_token);
-
-          if (result.isNew) {
+          const { isNew, ...userWithoutIsNew } = result.user;
+          setUser(userWithoutIsNew);
+          if (isNew) {
             router.push('/auth/setup');
           } else {
             router.push('/');
