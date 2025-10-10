@@ -43,6 +43,9 @@ export class User {
 
   @Prop({ type: [SchemaTypes.ObjectId], ref: 'Post' })
   postIds?: ObjectId[];
+
+  @Prop({ default: true })
+  isNew: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

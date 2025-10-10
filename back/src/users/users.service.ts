@@ -34,6 +34,8 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    user.isNew = false;
+    await user.save();
     return user;
   }
 
