@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/auth-provider';
 import { ArrowLeft } from 'lucide-react';
 import MarkdownEditor from '@/components/shared/markdown-editor';
 import MarkdownPreview from '@/components/shared/markdown-preview';
+import {getReadTime} from '@/lib/utils'
+import { categories } from '@/data';
 
 const createPostSchema = z.object({
   title: z
@@ -30,19 +32,6 @@ const createPostSchema = z.object({
 });
 
 type BlogPostForm = z.infer<typeof createPostSchema>;
-
-const categories = [
-  'Technology',
-  'Lifestyle',
-  'Food',
-  'Travel',
-  'Health',
-  'Business',
-  'Creative',
-  'Education',
-  'Entertainment',
-  'Sports',
-];
 
 export default function NewBlogPost() {
   const [isPreview, setIsPreview] = useState(false);
@@ -68,11 +57,6 @@ export default function NewBlogPost() {
     }
 
     try {
-      // Calculate read time
-      const wordsPerMinute = 200;
-      const wordCount = data.content.trim().split(/\s+/).length;
-      const readTime = Math.ceil(wordCount / wordsPerMinute);
-
       const postData = {
         title: data.title,
         content: data.content,
@@ -238,12 +222,7 @@ export default function NewBlogPost() {
                     Read Time (minutes)
                   </label>
                   <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                    {form.watch('content')
-                      ? Math.ceil(
-                          form.watch('content')!.trim().split(/\s+/).length /
-                            200
-                        )
-                      : 0}{' '}
+                    {getReadTime(form.watch('content'))}
                     min
                   </div>
                 </div>
