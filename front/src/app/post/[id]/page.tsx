@@ -66,7 +66,7 @@ export default async function PostPage({ params }: PostPageProps) {
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-white text-lg font-medium">
-                {post.authorId.charAt(0)}
+                {post.authorName ? post.authorName.charAt(0) : post.authorId.charAt(0)}
               </span>
             </div>
             <div>
@@ -74,7 +74,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 href={`/user/${post.authorId}`}
                 className="text-lg font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
               >
-                {post.authorId}
+                {post.authorName ? post.authorName : post.authorId}
               </Link>
               <p className="text-gray-500 dark:text-gray-400">
                 {new Date(post.createdAt).toLocaleDateString('en-US', {

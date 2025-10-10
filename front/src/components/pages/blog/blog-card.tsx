@@ -42,16 +42,16 @@ export default function BlogCard({ post }: { post: Post }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              {/* <span className="text-white text-sm font-medium">
-                {post.author.charAt(0)}
-              </span> */}
+              <span className="text-white text-sm font-medium">
+                {post.authorName ? post.authorName.charAt(0) : post.authorId.charAt(0)}
+              </span>
             </div>
             <div>
               <Link
                 href={`/user/${post.authorId}`}
                 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                {post.authorId}
+                {post.authorName ? post.authorName : post.authorId}
               </Link>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {new Date(post.createdAt).toLocaleDateString('en-US', {
