@@ -98,6 +98,7 @@ export class AuthController {
     return {
       status: 'success',
       message: 'User logged in successfully',
+      isNew: result.user.isNew,
       access_token: result.access_token,
     };
   }

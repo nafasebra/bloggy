@@ -47,7 +47,12 @@ export default function LoginPage() {
         const result = await response.json();
         if (result.access_token) {
           setAccessToken(result.access_token);
-          router.push('/');
+
+          if (result.isNew) {
+            router.push('/auth/setup');
+          } else {
+            router.push('/');
+          }
         }
       } else {
         const errorData = await response.json();

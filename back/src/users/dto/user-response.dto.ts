@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsDate, IsOptional, IsArray, IsMongoId, IsEmail } from 'class-validator';
+import { IsString, IsNumber, IsDate, IsOptional, IsArray, IsMongoId, IsEmail, IsBoolean } from 'class-validator';
 
 export class UserResponseDto {
   @ApiProperty({
@@ -92,6 +92,14 @@ export class UserResponseDto {
   })
   @IsString()
   category: string;
+
+  @ApiPropertyOptional({
+    description: 'Indicates if the user is new',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isNew?: boolean;
 
   @ApiPropertyOptional({
     description: 'Array of post IDs created by the user',

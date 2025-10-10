@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Camera } from 'lucide-react';
+import http from '@/lib/http';
+import { useRouter } from 'next/navigation';
 
 interface FormData {
   fullname: string;
@@ -18,6 +20,8 @@ export default function CreateUserPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const router = useRouter()
+
   const {
     register,
     handleSubmit,
@@ -29,9 +33,12 @@ export default function CreateUserPage() {
     setError('');
 
     try {
-      // Handle form submission here
-      console.log(data);
-      // API call would go here
+      const response = await http.put('/users', data);
+      if(response.data) {
+        router.push(`/user/${response.data._id}`);
+      } else {
+        setError(`Failed with error: ${response.statusText} - ${response.status}`);
+      }
     } catch (err) {
       setError('Failed to create profile. Please try again.');
     } finally {
