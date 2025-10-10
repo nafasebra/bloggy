@@ -47,11 +47,11 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left Column - Avatar Upload */}
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-8 flex items-center justify-center">
             <div className="text-center">
               <div className="mb-6">
                 <div className="relative mx-auto w-32 h-32 mb-4">
@@ -88,10 +88,10 @@ export default function CreateUserPage() {
                     {...register('avatar')}
                   />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
                   Upload Your Photo
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   Choose a photo that represents you best
                 </p>
               </div>
@@ -101,10 +101,10 @@ export default function CreateUserPage() {
           {/* Right Column - Form */}
           <div className="p-8">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Create Your Profile
               </h2>
-              <p className="text-gray-600 mt-2 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                 Set up your account information
               </p>
             </div>
@@ -114,14 +114,14 @@ export default function CreateUserPage() {
                 <div>
                   <label
                     htmlFor="fullname"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
                     Full Name
                   </label>
                   <input
                     id="fullname"
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your full name"
                     {...register('fullname', {
                       required: 'Full name is required',
@@ -137,14 +137,14 @@ export default function CreateUserPage() {
                 <div>
                   <label
                     htmlFor="bio"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
                     Bio
                   </label>
                   <textarea
                     id="bio"
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Tell us about yourself"
                     {...register('bio')}
                   />
@@ -159,14 +159,14 @@ export default function CreateUserPage() {
                   <div>
                     <label
                       htmlFor="location"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
                       Location
                     </label>
                     <input
                       id="location"
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="Your location"
                       {...register('location')}
                     />
@@ -180,14 +180,14 @@ export default function CreateUserPage() {
                   <div>
                     <label
                       htmlFor="category"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
                       Category
                     </label>
                     <input
                       id="category"
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Technology"
                       {...register('category')}
                     />
@@ -202,14 +202,14 @@ export default function CreateUserPage() {
                 <div>
                   <label
                     htmlFor="website"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
                     Website
                   </label>
                   <input
                     id="website"
                     type="url"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="https://"
                     {...register('website')}
                   />
@@ -223,14 +223,14 @@ export default function CreateUserPage() {
                 <div>
                   <label
                     htmlFor="twitter"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
                     Twitter Account
                   </label>
                   <input
                     id="twitter"
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="@username"
                     {...register('twitter')}
                   />
@@ -243,7 +243,7 @@ export default function CreateUserPage() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
                   {error}
                 </div>
               )}
