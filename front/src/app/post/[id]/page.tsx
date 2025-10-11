@@ -9,6 +9,7 @@ import { Post } from '@/types';
 import MarkdownPreview from '@/components/shared/markdown-preview';
 import { getReadTime } from '@/lib/utils';
 import { Eye, Heart } from 'lucide-react';
+import LikeButton from '@/components/pages/blog/like-button';
 
 interface PostPageProps {
   params: {
@@ -129,15 +130,12 @@ export default async function PostPage({ params }: PostPageProps) {
 
           {/* View and Like Counts */}
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-5">
+            <div className="w-full flex items-center justify-between gap-5">
                 <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
+                  <Eye />
                   <span>{post.views || 0}</span>
                 </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <Heart className="w-4 h-4" />
-                  <span>{post.likes || 0}</span>
-                </span>
+                <LikeButton postId={post._id} />
             </div>
           </div>
         </article>

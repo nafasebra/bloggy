@@ -12,10 +12,3 @@ export class ViewPostResponseDto {
   message: string;
 }
 
-export class PostViewStatsDto {
-  @ApiProperty({ description: 'Total number of views (including repeat views)' })
-  totalViews: number;
-
-  @ApiProperty({ description: 'Number of unique IP addresses that viewed this post' })
-  uniqueViews: number;
-}

@@ -44,4 +44,14 @@ export class PostService {
     const response = await http.get<Post[]>(`/posts/user/${userId}`);
     return response.data;
   }
+
+  static async likePost(id: string): Promise<{ post: Post; isNewLike: boolean; message: string }> {
+    const response = await http.post<{ post: Post; isNewLike: boolean; message: string }>(`/posts/${id}/like`);
+    return response.data;
+  }
+
+  static async viewPost(id: string): Promise<{ post: Post; isNewView: boolean; message: string }> {
+    const response = await http.post<{ post: Post; isNewView: boolean; message: string }>(`/posts/${id}/view`);
+    return response.data;
+  }
 }

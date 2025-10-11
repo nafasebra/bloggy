@@ -3,13 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post } from './schemas/post.schema';
 import { PostView } from './schemas/post-view.schema';
+import { PostLike } from './schemas/post-like.schema';
 import { CreatePostDto, UpdatePostDto } from './dto';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
-    @InjectModel(PostView.name) private readonly postViewModel: Model<PostView>
+    @InjectModel(PostView.name) private readonly postViewModel: Model<PostView>,
+    @InjectModel(PostLike.name) private readonly postLikeModel: Model<PostLike>
   ) {}
 
   async create(post: CreatePostDto): Promise<Post> {
@@ -113,4 +115,34 @@ export class PostsService {
       throw error;
     }
   }
+
+  async likePost(postId: string, ipAddress: string): Promise<{ post: Post; isNewLike: boolean }> {
+    const post = await this.findById(postId);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    let isNewLike = false;
+    try {
+      const newLike = new this.postLikeModel({ postId, ipAddress });
+      await newLike.save();
+      isNewLike = true;
+
+      await this.postModel.findByIdAndUpdate(
+        postId,
+        { $inc: { likes: 1 } }
+      ).exec();
+
+      // Get updated post with new like count
+      const updatedPost = await this.findById(postId);
+      return { post: updatedPost, isNewLike };
+    } catch (error) {
+      // If error is due to duplicate key (same IP already liked), just return the post
+      if (error.code === 11000) {
+        return { post, isNewLike };
+      }
+      throw error;
+    }
+  }
+
 }

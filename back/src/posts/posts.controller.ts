@@ -14,7 +14,7 @@ import {
 import { Request } from 'express';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './schemas/post.schema';
-import { CreatePostDto, UpdatePostDto, PostResponseDto, PostsResponseDto, SinglePostResponseDto, ErrorResponseDto, ViewPostResponseDto, PostViewStatsDto } from './dto';
+import { CreatePostDto, UpdatePostDto, PostResponseDto, PostsResponseDto, SinglePostResponseDto, ErrorResponseDto, ViewPostResponseDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
@@ -25,6 +25,7 @@ import {
   ApiParam,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { LikePostResponseDto } from './dto/like-post.dto';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -130,6 +131,30 @@ export class PostsController {
     return {
       ...result,
       message: result.isNewView ? 'View counted' : 'Already viewed from this IP'
+    };
+  }
+
+  @Post(':id/like')
+  @ApiOperation({ summary: 'Like a post (tracks IP-based likes)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
+  @ApiResponse({ status: 200, description: 'Post liked successfully', type: LikePostResponseDto })
+  @ApiResponse({ status: 404, description: 'Post not found', type: ErrorResponseDto })
+  async likePost(
+    @Param('id') id: string,
+    @Ip() ip: string,
+    @Req() req: Request
+  ): Promise<{ post: PostEntity; isNewLike: boolean; message: string }> {
+    const clientIP = req.headers['x-forwarded-for'] as string ||
+      req.headers['x-real-ip'] as string ||
+      req.connection.remoteAddress ||
+      ip;
+
+    const realIP = Array.isArray(clientIP) ? clientIP[0] : clientIP.split(',')[0];
+    const result = await this.postsService.likePost(id, realIP);
+
+    return {
+      ...result,
+      message: result.isNewLike ? 'Like counted' : 'Already liked from this IP'
     };
   }
 
