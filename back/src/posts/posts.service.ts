@@ -86,17 +86,17 @@ export class PostsService {
   }
 
   async viewPost(postId: string, ipAddress: string): Promise<{ post: Post; isNewView: boolean }> {
-    // Check if post exists
     const post = await this.findById(postId);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
 
-    // Try to create a new view record (will fail if IP already viewed this post)
     let isNewView = false;
     try {
       const newView = new this.postViewModel({ postId, ipAddress });
       await newView.save();
       isNewView = true;
 
-      // Increment view count on the post
       await this.postModel.findByIdAndUpdate(
         postId,
         { $inc: { views: 1 } }
