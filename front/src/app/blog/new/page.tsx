@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/auth-provider';
 import { ArrowLeft } from 'lucide-react';
 import MarkdownEditor from '@/components/shared/markdown-editor';
 import MarkdownPreview from '@/components/shared/markdown-preview';
-import {getReadTime} from '@/lib/utils'
+import { getReadTime } from '@/lib/utils';
 import { categories } from '@/data';
 
 const createPostSchema = z.object({
@@ -38,6 +38,8 @@ export default function NewBlogPost() {
 
   const { accessToken, user } = useAuth();
   const router = useRouter();
+
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<BlogPostForm>({
     resolver: zodResolver(createPostSchema),
@@ -78,6 +80,7 @@ export default function NewBlogPost() {
       router.push('/blog');
     } catch (error) {
       console.log('Error creating post:', error);
+      setError('Failed to create post');
     }
   };
 
@@ -282,6 +285,12 @@ export default function NewBlogPost() {
                   </p>
                 </div>
               </div>
+
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
+                  {error}
+                </div>
+              )}
 
               {/* Submit Buttons */}
               <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">

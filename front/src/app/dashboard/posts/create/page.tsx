@@ -38,6 +38,7 @@ export default function CreatePostPage() {
   const router = useRouter();
   const { accessToken } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<CreatePostForm>({
     resolver: zodResolver(createPostSchema),
@@ -59,7 +60,7 @@ export default function CreatePostPage() {
       });
       return response.data;
     } catch (error) {
-      console.error('Error fetching current user:', error);
+      setError('Failed to fetch current user: ' + error);
       return null;
     }
   };
@@ -87,7 +88,7 @@ export default function CreatePostPage() {
       if (response.status === 201) {
         router.push('/dashboard/posts');
       } else {
-        throw new Error(
+        setError(
           'Failed to create post: ' +
             response.status +
             ' - ' +
@@ -95,7 +96,7 @@ export default function CreatePostPage() {
         );
       }
     } catch (error) {
-      console.log('Error creating post:', error);
+      setError('Failed to create post: ' + error);
     }
   };
 
@@ -200,7 +201,9 @@ export default function CreatePostPage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="content">Content * (Markdown supported)</Label>
+                  <Label htmlFor="content">
+                    Content * (Markdown supported)
+                  </Label>
                   <Controller
                     name="content"
                     control={form.control}
@@ -228,6 +231,12 @@ export default function CreatePostPage() {
                   </div>
                 </div>
 
+                {error && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
+                    {error}
+                  </div>
+                )}
+
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button
                     type="submit"
@@ -236,7 +245,9 @@ export default function CreatePostPage() {
                     }
                     className="w-full sm:w-auto"
                   >
-                    {form.formState.isSubmitting ? 'Creating...' : 'Create Post'}
+                    {form.formState.isSubmitting
+                      ? 'Creating...'
+                      : 'Create Post'}
                   </Button>
                   <Button
                     type="button"
@@ -315,7 +326,9 @@ export default function CreatePostPage() {
                       form.formState.isSubmitting || !form.formState.isValid
                     }
                   >
-                    {form.formState.isSubmitting ? 'Creating...' : 'Create Post'}
+                    {form.formState.isSubmitting
+                      ? 'Creating...'
+                      : 'Create Post'}
                   </Button>
                 </div>
               </div>

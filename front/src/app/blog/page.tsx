@@ -39,7 +39,9 @@ export default async function BlogPage({
 
   // Filter by category if selected
   if (selectedCategory) {
-    postData = postData.filter((post: any) => post.category === selectedCategory);
+    postData = postData.filter(
+      (post: any) => post.category === selectedCategory
+    );
   }
 
   return (
@@ -111,16 +113,18 @@ export default async function BlogPage({
               <Search className="w-12 h-12 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              {query || selectedCategory ? 'No articles found' : 'No articles available'}
+              {query || selectedCategory
+                ? 'No articles found'
+                : 'No articles available'}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {query && selectedCategory
                 ? `No articles found for "${query}" in ${selectedCategory} category.`
                 : query
-                ? `No articles found for "${query}". Try different search terms.`
-                : selectedCategory
-                ? `No articles found in ${selectedCategory} category.`
-                : 'There are no articles to display yet. Be the first to create one!'}
+                  ? `No articles found for "${query}". Try different search terms.`
+                  : selectedCategory
+                    ? `No articles found in ${selectedCategory} category.`
+                    : 'There are no articles to display yet. Be the first to create one!'}
             </p>
             {(query || selectedCategory) && (
               <Link

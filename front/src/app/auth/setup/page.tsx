@@ -13,8 +13,13 @@ const setupSchema = z.object({
   bio: z.string().optional(),
   avatar: z.any().optional(),
   location: z.string().optional(),
-  website: z.string().url('Please enter a valid URL').or(z.literal('')).optional(),
-  twitter: z.string()
+  website: z
+    .string()
+    .url('Please enter a valid URL')
+    .or(z.literal(''))
+    .optional(),
+  twitter: z
+    .string()
     .regex(/^@?[A-Za-z0-9_]{1,15}$/, 'Please enter a valid Twitter username')
     .or(z.literal(''))
     .optional(),
@@ -27,7 +32,7 @@ export default function CreateUserPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const router = useRouter()
+  const router = useRouter();
 
   const {
     register,
@@ -51,10 +56,12 @@ export default function CreateUserPage() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      if(response.data) {
+      if (response.data) {
         router.push(`/user/${user?._id}`);
       } else {
-        setError(`Failed with error: ${response.statusText} - ${response.status}`);
+        setError(
+          `Failed with error: ${response.statusText} - ${response.status}`
+        );
       }
     } catch (err) {
       setError('Failed to create profile. Please try again.');
