@@ -1,4 +1,5 @@
 import { Post } from '@/types';
+import { Eye, Heart } from 'lucide-react';
 import Link from 'next/link';
 
 export default function BlogCard({ post }: { post: Post }) {
@@ -71,6 +72,19 @@ export default function BlogCard({ post }: { post: Post }) {
           >
             Read more →
           </Link>
+        </div>
+
+        <div className="pt-5 mt-5 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-5">
+              <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <Eye className="w-4 h-4" />
+                <span>{post.views || 0}</span>
+              </span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                <span>{post.likes || 0}</span>
+              </span>
+          </div>
         </div>
       </div>
     </article>

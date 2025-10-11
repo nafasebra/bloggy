@@ -37,7 +37,6 @@ export default async function BlogPage({
   const selectedCategory = searchParams.category;
   let postData = await getAllPosts(query);
 
-  // Filter by category if selected
   if (selectedCategory) {
     postData = postData.filter(
       (post: any) => post.category === selectedCategory
@@ -94,7 +93,7 @@ export default async function BlogPage({
                 {(query || selectedCategory) && ' • '}
                 <Link
                   href="/blog"
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                  className="px-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
                 >
                   Clear filters
                 </Link>

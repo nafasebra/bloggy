@@ -123,25 +123,14 @@ export class PostsController {
                      req.headers['x-real-ip'] as string || 
                      req.connection.remoteAddress || 
                      ip;
-    
-    // Take the first IP if multiple IPs are present
+
     const realIP = Array.isArray(clientIP) ? clientIP[0] : clientIP.split(',')[0];
-    
     const result = await this.postsService.viewPost(id, realIP);
     
     return {
       ...result,
       message: result.isNewView ? 'View counted' : 'Already viewed from this IP'
     };
-  }
-
-  @Get(':id/views')
-  @ApiOperation({ summary: 'Get view statistics for a post' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
-  @ApiResponse({ status: 200, description: 'View statistics', type: PostViewStatsDto })
-  @ApiResponse({ status: 404, description: 'Post not found', type: ErrorResponseDto })
-  async getPostViews(@Param('id') id: string): Promise<PostViewStatsDto> {
-    return this.postsService.getPostViews(id);
   }
 
   @Get('user/:userId')

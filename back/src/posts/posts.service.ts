@@ -113,14 +113,4 @@ export class PostsService {
       throw error;
     }
   }
-
-  async getPostViews(postId: string): Promise<{ totalViews: number; uniqueViews: number }> {
-    const post = await this.findById(postId);
-    const uniqueViews = await this.postViewModel.countDocuments({ postId }).exec();
-    
-    return {
-      totalViews: post.views || 0,
-      uniqueViews
-    };
-  }
 }
