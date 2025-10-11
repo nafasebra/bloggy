@@ -26,7 +26,7 @@ export class Post {
   @Prop({ required: true })
   authorName: string;
 
-  @Prop()
+  @Prop({ default: 0 })
   views?: number;
 
   @Prop()

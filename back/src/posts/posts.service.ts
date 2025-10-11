@@ -2,12 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post } from './schemas/post.schema';
+import { PostView } from './schemas/post-view.schema';
 import { CreatePostDto, UpdatePostDto } from './dto';
 
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectModel(Post.name) private readonly postModel: Model<Post>
+    @InjectModel(Post.name) private readonly postModel: Model<Post>,
+    @InjectModel(PostView.name) private readonly postViewModel: Model<PostView>
   ) {}
 
   async create(post: CreatePostDto): Promise<Post> {
@@ -81,5 +83,44 @@ export class PostsService {
 
   async delete(id: string): Promise<void> {
     await this.postModel.findByIdAndDelete(id).exec();
+  }
+
+  async viewPost(postId: string, ipAddress: string): Promise<{ post: Post; isNewView: boolean }> {
+    // Check if post exists
+    const post = await this.findById(postId);
+
+    // Try to create a new view record (will fail if IP already viewed this post)
+    let isNewView = false;
+    try {
+      const newView = new this.postViewModel({ postId, ipAddress });
+      await newView.save();
+      isNewView = true;
+
+      // Increment view count on the post
+      await this.postModel.findByIdAndUpdate(
+        postId,
+        { $inc: { views: 1 } }
+      ).exec();
+
+      // Get updated post with new view count
+      const updatedPost = await this.findById(postId);
+      return { post: updatedPost, isNewView };
+    } catch (error) {
+      // If error is due to duplicate key (same IP already viewed), just return the post
+      if (error.code === 11000) {
+        return { post, isNewView };
+      }
+      throw error;
+    }
+  }
+
+  async getPostViews(postId: string): Promise<{ totalViews: number; uniqueViews: number }> {
+    const post = await this.findById(postId);
+    const uniqueViews = await this.postViewModel.countDocuments({ postId }).exec();
+    
+    return {
+      totalViews: post.views || 0,
+      uniqueViews
+    };
   }
 }
