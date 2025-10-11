@@ -25,8 +25,23 @@ async function getPostById(id: string) {
   }
 }
 
+// post view based ip
+async function getPostViewCountByIP(postId: string) {
+  try {
+    const response = await http.post(`/posts/${postId}/view`);
+    return response.data;
+  } catch (error) {
+    console.log('Failed to fetch post view count by IP:', error);
+  }
+}
+
 export default async function PostPage({ params }: PostPageProps) {
-  const post = await getPostById(params.id);
+  const [post, postViewCount] = await Promise.all([
+    getPostById(params.id),
+    getPostViewCountByIP(params.id),
+  ]);
+
+  console.log(postViewCount);
 
   if (!post) {
     notFound();
