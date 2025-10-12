@@ -131,11 +131,11 @@ export default async function PostPage({ params }: PostPageProps) {
           {/* View and Like Counts */}
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="w-full flex items-center justify-between gap-5">
-                <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <Eye />
-                  <span>{post.views || 0}</span>
-                </span>
-                <LikeButton postId={post._id} />
+              <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <Eye />
+                <span>{post.views || 0}</span>
+              </span>
+              <LikeButton postId={post._id} />
             </div>
           </div>
         </article>

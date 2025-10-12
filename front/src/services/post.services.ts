@@ -45,8 +45,20 @@ export class PostService {
     return response.data;
   }
 
-  static async toggleLikePost(id: string): Promise<{ post: Post; isLiked: boolean; action: 'liked' | 'unliked'; message: string }> {
-    const response = await http.post<{ post: Post; isLiked: boolean; action: 'liked' | 'unliked'; message: string }>(`/posts/${id}/like`);
+  static async toggleLikePost(
+    id: string
+  ): Promise<{
+    post: Post;
+    isLiked: boolean;
+    action: 'liked' | 'unliked';
+    message: string;
+  }> {
+    const response = await http.post<{
+      post: Post;
+      isLiked: boolean;
+      action: 'liked' | 'unliked';
+      message: string;
+    }>(`/posts/${id}/like`);
     return response.data;
   }
 
@@ -55,8 +67,14 @@ export class PostService {
     return response.data;
   }
 
-  static async viewPost(id: string): Promise<{ post: Post; isNewView: boolean; message: string }> {
-    const response = await http.post<{ post: Post; isNewView: boolean; message: string }>(`/posts/${id}/view`);
+  static async viewPost(
+    id: string
+  ): Promise<{ post: Post; isNewView: boolean; message: string }> {
+    const response = await http.post<{
+      post: Post;
+      isNewView: boolean;
+      message: string;
+    }>(`/posts/${id}/view`);
     return response.data;
   }
 }
