@@ -1,4 +1,13 @@
-import { Controller, Get, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   ApiBody,
@@ -8,7 +17,13 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UpdateUserDto, UserResponseDto, SingleUserResponseDto, UsersResponseDto, ErrorResponseDto } from './dto';
+import {
+  UpdateUserDto,
+  UserResponseDto,
+  SingleUserResponseDto,
+  UsersResponseDto,
+  ErrorResponseDto,
+} from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 

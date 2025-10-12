@@ -68,4 +68,3 @@ export class CreatePostDto {
   @IsString()
   createdAt: string;
 }
-

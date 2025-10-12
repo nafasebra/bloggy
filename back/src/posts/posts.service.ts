@@ -31,10 +31,10 @@ export class PostsService {
     const searchQuery = query.trim();
     return this.postModel
       .find({
-      $or: [
-        { title: { $regex: searchQuery, $options: 'i' } },
-        { category: { $regex: searchQuery, $options: 'i' } }
-      ]
+        $or: [
+          { title: { $regex: searchQuery, $options: 'i' } },
+          { category: { $regex: searchQuery, $options: 'i' } },
+        ],
       })
       .sort({ createdAt: -1 })
       .exec();
@@ -49,7 +49,7 @@ export class PostsService {
     const categoryQuery = category.trim();
     return this.postModel
       .find({
-        category: { $regex: categoryQuery, $options: 'i' }
+        category: { $regex: categoryQuery, $options: 'i' },
       })
       .sort({ createdAt: -1 })
       .exec();
@@ -87,7 +87,10 @@ export class PostsService {
     await this.postModel.findByIdAndDelete(id).exec();
   }
 
-  async viewPost(postId: string, ipAddress: string): Promise<{ post: Post; isNewView: boolean }> {
+  async viewPost(
+    postId: string,
+    ipAddress: string
+  ): Promise<{ post: Post; isNewView: boolean }> {
     const post = await this.findById(postId);
     if (!post) {
       throw new NotFoundException('Post not found');
@@ -99,10 +102,9 @@ export class PostsService {
       await newView.save();
       isNewView = true;
 
-      await this.postModel.findByIdAndUpdate(
-        postId,
-        { $inc: { views: 1 } }
-      ).exec();
+      await this.postModel
+        .findByIdAndUpdate(postId, { $inc: { views: 1 } })
+        .exec();
 
       // Get updated post with new view count
       const updatedPost = await this.findById(postId);
@@ -116,23 +118,27 @@ export class PostsService {
     }
   }
 
-  async toggleLikePost(postId: string, ipAddress: string): Promise<{ post: Post; isLiked: boolean; }> {
+  async toggleLikePost(
+    postId: string,
+    ipAddress: string
+  ): Promise<{ post: Post; isLiked: boolean }> {
     const post = await this.findById(postId);
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
     // Check if the IP has already liked the post
-    const existingLike = await this.postLikeModel.findOne({ postId, ipAddress }).exec();
+    const existingLike = await this.postLikeModel
+      .findOne({ postId, ipAddress })
+      .exec();
 
     if (existingLike) {
       // Unlike: Remove the like record and decrement the count
       await this.postLikeModel.deleteOne({ postId, ipAddress }).exec();
-      
-      await this.postModel.findByIdAndUpdate(
-        postId,
-        { $inc: { likes: -1 } }
-      ).exec();
+
+      await this.postModel
+        .findByIdAndUpdate(postId, { $inc: { likes: -1 } })
+        .exec();
 
       const updatedPost = await this.findById(postId);
       return { post: updatedPost, isLiked: false };
@@ -141,10 +147,9 @@ export class PostsService {
       const newLike = new this.postLikeModel({ postId, ipAddress });
       await newLike.save();
 
-      await this.postModel.findByIdAndUpdate(
-        postId,
-        { $inc: { likes: 1 } }
-      ).exec();
+      await this.postModel
+        .findByIdAndUpdate(postId, { $inc: { likes: 1 } })
+        .exec();
 
       const updatedPost = await this.findById(postId);
       return { post: updatedPost, isLiked: true };
@@ -152,8 +157,9 @@ export class PostsService {
   }
 
   async checkIfLiked(postId: string, ipAddress: string): Promise<boolean> {
-    const existingLike = await this.postLikeModel.findOne({ postId, ipAddress }).exec();
+    const existingLike = await this.postLikeModel
+      .findOne({ postId, ipAddress })
+      .exec();
     return !!existingLike;
   }
-
 }

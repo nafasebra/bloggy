@@ -35,12 +35,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user._id, username: user.username, email: user.email };
+    const payload = {
+      sub: user._id,
+      username: user.username,
+      email: user.email,
+    };
     const access_token = this.jwtService.sign(payload, { expiresIn: '1h' });
     const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
 
@@ -52,7 +59,7 @@ export class AuthService {
         name: user.name,
         username: user.username,
         email: user.email,
-        isNew: user.isNew
+        isNew: user.isNew,
       },
     };
   }
@@ -63,7 +70,11 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid refresh token');
     }
-    const newPayload = { sub: user._id, username: user.username, email: user.email };
+    const newPayload = {
+      sub: user._id,
+      username: user.username,
+      email: user.email,
+    };
     const access_token = this.jwtService.sign(newPayload, { expiresIn: '1h' });
     return {
       access_token,
@@ -74,14 +85,22 @@ export class AuthService {
     const user = await this.userModel.findById(changePasswordDto.userId);
     if (!user) {
       throw new UnauthorizedException('User not found');
-    } 
+    }
 
-    const isOldPasswordValid = await bcrypt.compare(changePasswordDto.old_password, user.password);
+    const isOldPasswordValid = await bcrypt.compare(
+      changePasswordDto.old_password,
+      user.password
+    );
     if (!isOldPasswordValid) {
       throw new UnauthorizedException('Invalid old password');
     }
 
-    const hashedNewPassword = await bcrypt.hash(changePasswordDto.new_password, 10);
-    await this.userModel.findByIdAndUpdate(changePasswordDto.userId, { password: hashedNewPassword });
+    const hashedNewPassword = await bcrypt.hash(
+      changePasswordDto.new_password,
+      10
+    );
+    await this.userModel.findByIdAndUpdate(changePasswordDto.userId, {
+      password: hashedNewPassword,
+    });
   }
 }

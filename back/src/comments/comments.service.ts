@@ -2,11 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment } from './schemas/comment.schema';
-import {
-  CreateCommentDto,
-  ReplyCommentDto,
-  LikeCommentDto,
-} from './dto';
+import { CreateCommentDto, ReplyCommentDto, LikeCommentDto } from './dto';
 
 @Injectable()
 export class CommentsService {
@@ -15,7 +11,10 @@ export class CommentsService {
   ) {}
 
   async findByPostId(id: string): Promise<Comment[]> {
-    const comments = await this.commentModel.find({ postId: id }).populate('authorId').exec();
+    const comments = await this.commentModel
+      .find({ postId: id })
+      .populate('authorId')
+      .exec();
     if (!comments || comments.length === 0) {
       return [];
     }

@@ -1,5 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsDate, IsOptional, IsArray, IsMongoId, IsEmail, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsDate,
+  IsOptional,
+  IsArray,
+  IsMongoId,
+  IsEmail,
+  IsBoolean,
+} from 'class-validator';
 
 export class UserResponseDto {
   @ApiProperty({

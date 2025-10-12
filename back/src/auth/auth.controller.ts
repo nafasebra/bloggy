@@ -85,7 +85,10 @@ export class AuthController {
     description: 'Internal server error',
     type: ErrorResponseDto,
   })
-  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const result = await this.authService.login(loginDto);
 
     // Set http-only cookie with refresh_token
@@ -94,7 +97,7 @@ export class AuthController {
       secure: true,
       sameSite: 'strict',
     });
-    
+
     return {
       status: 'success',
       message: 'User logged in successfully',
@@ -150,12 +153,12 @@ export class AuthController {
   })
   async logout(@Res({ passthrough: true }) res: Response) {
     // Clear the http-only refresh_token cookie
-    res.clearCookie('refresh_token', { 
-      httpOnly: true, 
-      secure: true, 
-      sameSite: 'strict' 
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
     });
-    
+
     return {
       status: 'success',
       message: 'User logged out successfully',
