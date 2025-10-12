@@ -116,33 +116,44 @@ export class PostsService {
     }
   }
 
-  async likePost(postId: string, ipAddress: string): Promise<{ post: Post; isNewLike: boolean }> {
+  async toggleLikePost(postId: string, ipAddress: string): Promise<{ post: Post; isLiked: boolean; action: 'liked' | 'unliked' }> {
     const post = await this.findById(postId);
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    let isNewLike = false;
-    try {
+    // Check if the IP has already liked the post
+    const existingLike = await this.postLikeModel.findOne({ postId, ipAddress }).exec();
+
+    if (existingLike) {
+      // Unlike: Remove the like record and decrement the count
+      await this.postLikeModel.deleteOne({ postId, ipAddress }).exec();
+      
+      await this.postModel.findByIdAndUpdate(
+        postId,
+        { $inc: { likes: -1 } }
+      ).exec();
+
+      const updatedPost = await this.findById(postId);
+      return { post: updatedPost, isLiked: false, action: 'unliked' };
+    } else {
+      // Like: Create a new like record and increment the count
       const newLike = new this.postLikeModel({ postId, ipAddress });
       await newLike.save();
-      isNewLike = true;
 
       await this.postModel.findByIdAndUpdate(
         postId,
         { $inc: { likes: 1 } }
       ).exec();
 
-      // Get updated post with new like count
       const updatedPost = await this.findById(postId);
-      return { post: updatedPost, isNewLike };
-    } catch (error) {
-      // If error is due to duplicate key (same IP already liked), just return the post
-      if (error.code === 11000) {
-        return { post, isNewLike };
-      }
-      throw error;
+      return { post: updatedPost, isLiked: true, action: 'liked' };
     }
+  }
+
+  async checkIfLiked(postId: string, ipAddress: string): Promise<boolean> {
+    const existingLike = await this.postLikeModel.findOne({ postId, ipAddress }).exec();
+    return !!existingLike;
   }
 
 }

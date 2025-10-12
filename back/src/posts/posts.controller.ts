@@ -135,27 +135,47 @@ export class PostsController {
   }
 
   @Post(':id/like')
-  @ApiOperation({ summary: 'Like a post (tracks IP-based likes)' })
+  @ApiOperation({ summary: 'Toggle like on a post (tracks IP-based likes)' })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
-  @ApiResponse({ status: 200, description: 'Post liked successfully', type: LikePostResponseDto })
+  @ApiResponse({ status: 200, description: 'Post like toggled successfully', type: LikePostResponseDto })
   @ApiResponse({ status: 404, description: 'Post not found', type: ErrorResponseDto })
-  async likePost(
+  async toggleLikePost(
     @Param('id') id: string,
     @Ip() ip: string,
     @Req() req: Request
-  ): Promise<{ post: PostEntity; isNewLike: boolean; message: string }> {
+  ): Promise<{ post: PostEntity; isLiked: boolean; action: string; message: string }> {
     const clientIP = req.headers['x-forwarded-for'] as string ||
       req.headers['x-real-ip'] as string ||
       req.connection.remoteAddress ||
       ip;
 
     const realIP = Array.isArray(clientIP) ? clientIP[0] : clientIP.split(',')[0];
-    const result = await this.postsService.likePost(id, realIP);
+    const result = await this.postsService.toggleLikePost(id, realIP);
 
     return {
       ...result,
-      message: result.isNewLike ? 'Like counted' : 'Already liked from this IP'
+      message: result.action === 'liked' ? 'Post liked' : 'Post unliked'
     };
+  }
+
+  @Get(':id/liked')
+  @ApiOperation({ summary: 'Check if post is liked by current IP' })
+  @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
+  @ApiResponse({ status: 200, description: 'Like status retrieved', schema: { type: 'object', properties: { isLiked: { type: 'boolean' } } } })
+  async checkIfPostLiked(
+    @Param('id') id: string,
+    @Ip() ip: string,
+    @Req() req: Request
+  ): Promise<{ isLiked: boolean }> {
+    const clientIP = req.headers['x-forwarded-for'] as string ||
+      req.headers['x-real-ip'] as string ||
+      req.connection.remoteAddress ||
+      ip;
+
+    const realIP = Array.isArray(clientIP) ? clientIP[0] : clientIP.split(',')[0];
+    const isLiked = await this.postsService.checkIfLiked(id, realIP);
+
+    return { isLiked };
   }
 
   @Get('user/:userId')

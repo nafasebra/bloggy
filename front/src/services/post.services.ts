@@ -45,8 +45,13 @@ export class PostService {
     return response.data;
   }
 
-  static async likePost(id: string): Promise<{ post: Post; isNewLike: boolean; message: string }> {
-    const response = await http.post<{ post: Post; isNewLike: boolean; message: string }>(`/posts/${id}/like`);
+  static async toggleLikePost(id: string): Promise<{ post: Post; isLiked: boolean; action: 'liked' | 'unliked'; message: string }> {
+    const response = await http.post<{ post: Post; isLiked: boolean; action: 'liked' | 'unliked'; message: string }>(`/posts/${id}/like`);
+    return response.data;
+  }
+
+  static async checkIfPostLiked(id: string): Promise<{ isLiked: boolean }> {
+    const response = await http.get<{ isLiked: boolean }>(`/posts/${id}/liked`);
     return response.data;
   }
 
