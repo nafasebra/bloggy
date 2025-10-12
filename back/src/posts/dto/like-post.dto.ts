@@ -8,9 +8,6 @@ export class LikePostResponseDto {
   @ApiProperty({ description: 'Whether the post is currently liked by this IP address' })
   isLiked: boolean;
 
-  @ApiProperty({ description: 'The action performed: "liked" or "unliked"', enum: ['liked', 'unliked'] })
-  action: string;
-
   @ApiProperty({ description: 'Message about the like status' })
   message: string;
 }

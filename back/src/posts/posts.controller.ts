@@ -143,7 +143,7 @@ export class PostsController {
     @Param('id') id: string,
     @Ip() ip: string,
     @Req() req: Request
-  ): Promise<{ post: PostEntity; isLiked: boolean; action: string; message: string }> {
+  ): Promise<{ post: PostEntity; isLiked: boolean; message: string }> {
     const clientIP = req.headers['x-forwarded-for'] as string ||
       req.headers['x-real-ip'] as string ||
       req.connection.remoteAddress ||
@@ -151,10 +151,11 @@ export class PostsController {
 
     const realIP = Array.isArray(clientIP) ? clientIP[0] : clientIP.split(',')[0];
     const result = await this.postsService.toggleLikePost(id, realIP);
+    const isLiked = await this.postsService.checkIfLiked(id, realIP);
 
     return {
       ...result,
-      message: result.action === 'liked' ? 'Post liked' : 'Post unliked'
+      message: isLiked ? 'liked' : 'unliked'
     };
   }
 

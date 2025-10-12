@@ -116,7 +116,7 @@ export class PostsService {
     }
   }
 
-  async toggleLikePost(postId: string, ipAddress: string): Promise<{ post: Post; isLiked: boolean; action: 'liked' | 'unliked' }> {
+  async toggleLikePost(postId: string, ipAddress: string): Promise<{ post: Post; isLiked: boolean; }> {
     const post = await this.findById(postId);
     if (!post) {
       throw new NotFoundException('Post not found');
@@ -135,7 +135,7 @@ export class PostsService {
       ).exec();
 
       const updatedPost = await this.findById(postId);
-      return { post: updatedPost, isLiked: false, action: 'unliked' };
+      return { post: updatedPost, isLiked: false };
     } else {
       // Like: Create a new like record and increment the count
       const newLike = new this.postLikeModel({ postId, ipAddress });
@@ -147,7 +147,7 @@ export class PostsService {
       ).exec();
 
       const updatedPost = await this.findById(postId);
-      return { post: updatedPost, isLiked: true, action: 'liked' };
+      return { post: updatedPost, isLiked: true };
     }
   }
 

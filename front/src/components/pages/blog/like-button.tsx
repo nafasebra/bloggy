@@ -25,19 +25,15 @@ function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
     const toggleLikeMutation = useMutation({
         mutationFn: () => PostService.toggleLikePost(postId),
         onSuccess: (response) => {
-            // Update the like status in the cache
             queryClient.setQueryData(['postLiked', postId], { isLiked: response.isLiked });
             
-            // Show feedback
-            if (response.action === 'liked') {
+            if (response.message === 'liked') {
                 setFeedback('Liked!');
             } else {
                 setFeedback('Unliked');
             }
             
             setTimeout(() => setFeedback(''), 2000);
-
-            // Optionally invalidate related queries
             queryClient.invalidateQueries({ queryKey: ['post', postId] });
         },
         onError: (error) => {
