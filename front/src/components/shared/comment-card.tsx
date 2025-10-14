@@ -75,8 +75,8 @@ const CommentCard: React.FC<CommentCardProps> = ({
               size={16}
               fill={isLiked ? 'red' : 'none'}
               color={isLiked ? 'red' : 'currentColor'}
-            />{' '}
-            Like
+            />
+            Like (0)
           </button>
         </div>
 
