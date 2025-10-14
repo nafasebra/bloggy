@@ -45,9 +45,7 @@ export class PostService {
     return response.data;
   }
 
-  static async toggleLikePost(
-    id: string
-  ): Promise<{
+  static async toggleLikePost(id: string): Promise<{
     post: Post;
     isLiked: boolean;
     action: 'liked' | 'unliked';

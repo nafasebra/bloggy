@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CommentWithAuthor } from '@/types';
 import { Heart } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-provider';
 
 interface CommentCardProps {
   comment: CommentWithAuthor;
@@ -14,6 +15,8 @@ const CommentCard: React.FC<CommentCardProps> = ({
   onLike,
 }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isReply, setIsReply] = useState(false);
+  const { accessToken } = useAuth();
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -49,34 +52,60 @@ const CommentCard: React.FC<CommentCardProps> = ({
         </p>
 
         <div className="flex items-center space-x-4 mt-3">
-            <button 
-                onClick={() => onReply?.(comment._id)}
-                className="cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-                Reply
-            </button>
-           <button
-              onClick={handleLike}
-              className={`cursor-pointer text-xs ${
-                isLiked ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
-              } transition-colors flex items-center`}
-            >
-              <Heart className="mr-1" size={16} fill={isLiked ? 'red' : 'none'} color={isLiked ? 'red' : 'currentColor'} /> Like
-            </button>
-        </div>
-
-
-      {/* Reply Input */}
-      <div className="flex flex-col sm:flex-row gap-2 mt-4">
-        <input
-          type="text"
-          placeholder="Add a reply..."
-          className="w-full p-2 border rounded-md text-sm focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-        />
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs">
+          <button
+            onClick={() => setIsReply(!isReply)}
+            className={`cursor-pointer text-xs transition-colors ${
+              isReply
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
+            }`}
+          >
             Reply
           </button>
-      </div>
+          <button
+            onClick={handleLike}
+            className={`cursor-pointer text-xs ${
+              isLiked
+                ? 'text-red-600 dark:text-red-400'
+                : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
+            } transition-colors flex items-center`}
+          >
+            <Heart
+              className="mr-1"
+              size={16}
+              fill={isLiked ? 'red' : 'none'}
+              color={isLiked ? 'red' : 'currentColor'}
+            />{' '}
+            Like
+          </button>
+        </div>
+
+        {/* Reply Input */}
+        {isReply && (
+          <>
+            {accessToken ? (
+              <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                <input
+                  type="text"
+                  placeholder="Add a reply..."
+                  className="w-full p-2 border rounded-md text-sm focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs">
+                  Reply
+                </button>
+              </div>
+            ) : (
+              <div className="text-center mt-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg py-3">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  You should be logged in to reply.
+                </p>
+                <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs">
+                  Login
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
