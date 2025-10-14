@@ -54,7 +54,11 @@ export default function EditPostPage() {
     },
   });
 
-  const { data: post, isLoading, error: queryError } = useQuery({
+  const {
+    data: post,
+    isLoading,
+    error: queryError,
+  } = useQuery({
     queryKey: ['post', id],
     queryFn: () => PostService.getPostById(id as string),
     enabled: !!id && !!accessToken,

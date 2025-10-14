@@ -36,7 +36,10 @@ function PostTable({ posts }: PostTableProps) {
   return (
     <div className="overflow-x-auto -mx-4 sm:mx-0">
       {deletePostId && (
-        <AlertDialog open={isDialogDeleteOpen} onOpenChange={setIsDialogDeleteOpen}>
+        <AlertDialog
+          open={isDialogDeleteOpen}
+          onOpenChange={setIsDialogDeleteOpen}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -81,11 +84,11 @@ function PostTable({ posts }: PostTableProps) {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
-                    <Link href={`/dashboard/posts/edit/${post._id}`}>
-                      <Button variant="outline" size="sm">
-                        <Edit />
-                      </Button>
-                    </Link>
+                  <Link href={`/dashboard/posts/edit/${post._id}`}>
+                    <Button variant="outline" size="sm">
+                      <Edit />
+                    </Button>
+                  </Link>
                   <Button
                     variant="outline"
                     size="sm"
