@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CommentWithAuthor } from '@/types';
+import { Heart } from 'lucide-react';
 
 interface CommentCardProps {
   comment: CommentWithAuthor;
@@ -12,6 +13,13 @@ const CommentCard: React.FC<CommentCardProps> = ({
   onReply,
   onLike,
 }) => {
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    onLike?.(comment._id);
+  };
+
   return (
     <div key={comment._id} className="flex space-x-4">
       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -40,20 +48,35 @@ const CommentCard: React.FC<CommentCardProps> = ({
           {comment.content}
         </p>
 
-        {/* <div className="flex items-center space-x-4 mt-3">
-                    <button 
-                        onClick={() => onReply?.(comment._id)}
-                        className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    >
-                        Reply
-                    </button>
-                    <button 
-                        onClick={() => onLike?.(comment._id)}
-                        className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    >
-                        Like
-                    </button>
-                </div> */}
+        <div className="flex items-center space-x-4 mt-3">
+            <button 
+                onClick={() => onReply?.(comment._id)}
+                className="cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+                Reply
+            </button>
+           <button
+              onClick={handleLike}
+              className={`cursor-pointer text-xs ${
+                isLiked ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
+              } transition-colors flex items-center`}
+            >
+              <Heart className="mr-1" size={16} fill={isLiked ? 'red' : 'none'} color={isLiked ? 'red' : 'currentColor'} /> Like
+            </button>
+        </div>
+
+
+      {/* Reply Input */}
+      <div className="flex flex-col sm:flex-row gap-2 mt-4">
+        <input
+          type="text"
+          placeholder="Add a reply..."
+          className="w-full p-2 border rounded-md text-sm focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs">
+            Reply
+          </button>
+      </div>
       </div>
     </div>
   );
