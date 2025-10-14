@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import Link from 'next/link';
 
 interface PostTableProps {
   posts: Post[];
@@ -80,9 +81,11 @@ function PostTable({ posts }: PostTableProps) {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Edit />
-                  </Button>
+                    <Link href={`/dashboard/posts/edit/${post._id}`}>
+                      <Button variant="outline" size="sm">
+                        <Edit />
+                      </Button>
+                    </Link>
                   <Button
                     variant="outline"
                     size="sm"
