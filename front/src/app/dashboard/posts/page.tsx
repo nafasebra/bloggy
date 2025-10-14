@@ -3,16 +3,9 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import http from '@/lib/http';
 import { Post } from '@/types';
+import PostTable from '@/components/dashboard/post-table';
 
 // Mock data - replace with actual API call
 const posts = [
@@ -74,56 +67,7 @@ export default async function PostsPage() {
         </CardHeader>
         <CardContent>
           {posts.length ? (
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[200px]">Title</TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Author
-                    </TableHead>
-                    <TableHead className="hidden lg:table-cell">
-                      Created
-                    </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {posts.map((post: Post) => (
-                    <TableRow key={post._id}>
-                      <TableCell className="font-medium">
-                        <div>
-                          <div className="line-clamp-2">{post.title}</div>
-                          <div className="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {new Date(post.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {post.authorId}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="hidden sm:inline-flex"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <PostTable posts={posts} />
           ) : (
             <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm sm:text-base">
               No posts yet. Create your first post to get started!
