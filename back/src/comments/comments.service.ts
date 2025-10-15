@@ -34,19 +34,19 @@ export class CommentsService {
     return newComment.save();
   }
 
-  async like(commentId: string, userId: string): Promise<Comment> {
-    const comment = await this.commentModel.findById({ commentId });
+  async like(commentId: string, ipAddress: string): Promise<Comment> {
+    const comment = await this.commentModel.findById(commentId);
     if (!comment) {
       throw new NotFoundException('Comment not found');
     }
 
     const existingLike = await this.commentLikeModel
-      .findOne({ commentId: comment._id, userId })
+      .findOne({ commentId: comment._id, ipAddress })
       .exec();
 
     if (existingLike) {
       await this.commentLikeModel
-        .deleteOne({ commentId: comment._id, userId })
+        .deleteOne({ commentId: comment._id, ipAddress })
         .exec();
       await this.commentModel
         .findByIdAndUpdate(comment._id, { $inc: { likes: -1 } })
@@ -54,7 +54,7 @@ export class CommentsService {
     } else {
       const newLike = new this.commentLikeModel({
         commentId: comment._id,
-        userId,
+        ipAddress,
       });
       await newLike.save();
       await this.commentModel
@@ -65,9 +65,9 @@ export class CommentsService {
     return this.commentModel.findById(commentId).exec() as Promise<Comment>;
   }
 
-  async checkIfLiked(commentId: string, userId: string): Promise<boolean> {
+  async checkIfLiked(commentId: string, ipAddress: string): Promise<boolean> {
     const like = await this.commentLikeModel
-      .findOne({ commentId, userId })
+      .findOne({ commentId, ipAddress })
       .exec();
     return !!like;
   }

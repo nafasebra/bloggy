@@ -132,8 +132,8 @@ export default function CommentSection({ postId }: CommentSectionProps) {
           <p>Loading comments...</p>
         ) : (
           comments.map((comment) => (
-            <div className={comment.parentId ? 'ml-4 sm:ml-10' : ''}>
-              <CommentCard key={comment._id} comment={comment} />
+            <div  key={comment._id} className={comment.parentId ? 'ml-4 sm:ml-10' : ''}>
+              <CommentCard comment={comment} />
             </div>
           ))
         )}

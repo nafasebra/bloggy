@@ -28,6 +28,9 @@ const CommentCard: React.FC<CommentCardProps> = ({
       setIsLiked(!isLiked);
       queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
     },
+    onError: (error) => {
+      console.log('Error liking comment:', error);
+    },
   });
 
   const replyMutation = useMutation({
