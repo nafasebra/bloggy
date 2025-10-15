@@ -91,8 +91,6 @@ export class CommentsController {
   }
 
   @Put(':commentId/like')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Like or unlike a comment' })
   @ApiParam({ name: 'commentId', type: 'string', description: 'Comment id' })
   @ApiResponse({
@@ -100,12 +98,11 @@ export class CommentsController {
     description: 'Comment like toggled',
     type: SingleCommentResponseDto,
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async likeComment(
     @Param('commentId') commentId: string,
     @Ip() ip: string,
     @Req() req: Request
-  ): Promise<{ comment: Comment; isLiked: boolean }> {
+  ): Promise<Comment> {
     const clientIP =
       (req.headers['x-forwarded-for'] as string) ||
       (req.headers['x-real-ip'] as string) ||
@@ -116,9 +113,35 @@ export class CommentsController {
       ? clientIP[0]
       : clientIP.split(',')[0];
 
-    const result = await this.commentsService.like(commentId, realIP);
+    return this.commentsService.like(commentId, realIP);
+  }
+
+  // get state of like
+  @Get(':commentId/like')
+  @ApiOperation({ summary: 'Check if user has liked a comment' })
+  @ApiParam({ name: 'commentId', type: 'string', description: 'Comment id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Like state retrieved',
+    schema: { type: 'object', properties: { isLiked: { type: 'boolean' } } },
+  })
+  async checkIfLiked(
+    @Param('commentId') commentId: string,
+    @Ip() ip: string,
+    @Req() req: Request
+  ): Promise<{ isLiked: boolean }> {
+    const clientIP =
+      (req.headers['x-forwarded-for'] as string) ||
+      (req.headers['x-real-ip'] as string) ||
+      req.connection.remoteAddress ||
+      ip;
+
+    const realIP = Array.isArray(clientIP)
+      ? clientIP[0]
+      : clientIP.split(',')[0];
+
     const isLiked = await this.commentsService.checkIfLiked(commentId, realIP);
 
-    return { comment: result, isLiked };
+    return { isLiked };
   }
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CommentWithAuthor } from '@/types';
 import { Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CommentService } from '@/services/comment.services';
 import { UserService } from '@/services/user.services';
 
@@ -15,17 +15,19 @@ const CommentCard: React.FC<CommentCardProps> = ({
 }) => {
   const [isReply, setIsReply] = useState(false);
   const [replyText, setReplyText] = useState('');
-  const [isLiked, setIsLiked] = useState(false);
   const { accessToken } = useAuth();
   const queryClient = useQueryClient();
 
+  const { data: likeStatus } = useQuery({
+    queryKey: ['comment-like', comment._id],
+    queryFn: () => CommentService.checkIfCommentLiked(comment._id),
+    enabled: !!comment._id,
+  });
+
   const likeMutation = useMutation({
-    mutationFn: async () => {
-      const user = await UserService.getCurrentUser(accessToken!);
-      return CommentService.toggleLikeComment(comment._id, user._id, accessToken);
-    },
+    mutationFn: () => CommentService.toggleLikeComment(comment._id),
     onSuccess: () => {
-      setIsLiked(!isLiked);
+      queryClient.invalidateQueries({ queryKey: ['comment-like', comment._id] });
       queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
     },
     onError: (error) => {
@@ -53,10 +55,6 @@ const CommentCard: React.FC<CommentCardProps> = ({
   });
 
   const handleLike = () => {
-    if (!accessToken) {
-      alert('You must be logged in to like comments');
-      return;
-    }
     likeMutation.mutate();
   };
 
@@ -112,7 +110,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
             onClick={handleLike}
             disabled={likeMutation.isPending}
             className={`cursor-pointer text-xs ${
-              isLiked
+              likeStatus?.isLiked
                 ? 'text-red-600 dark:text-red-400'
                 : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
             } transition-colors flex items-center`}
@@ -120,8 +118,8 @@ const CommentCard: React.FC<CommentCardProps> = ({
             <Heart
               className="mr-1"
               size={16}
-              fill={isLiked ? 'red' : 'none'}
-              color={isLiked ? 'red' : 'currentColor'}
+              fill={likeStatus?.isLiked ? 'red' : 'none'}
+              color={likeStatus?.isLiked ? 'red' : 'currentColor'}
             />
             {likeMutation.isPending ? 'Liking...' : `Like (${comment.likes || 0})`}
           </button>

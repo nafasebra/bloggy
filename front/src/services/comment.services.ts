@@ -33,19 +33,13 @@ export class CommentService {
     return response.data;
   }
 
-  static async toggleLikeComment(
-    commentId: string,
-    userId: string,
-    accessToken: string | null
-  ): Promise<Comment> {
-    const response = await http.put<Comment>(`/comments/${commentId}/like`, 
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+  static async toggleLikeComment(commentId: string): Promise<Comment> {
+    const response = await http.put<Comment>(`/comments/${commentId}/like`);
+    return response.data;
+  }
+
+  static async checkIfCommentLiked(commentId: string): Promise<{ isLiked: boolean }> {
+    const response = await http.get<{ isLiked: boolean }>(`/comments/${commentId}/like`);
     return response.data;
   }
 }
