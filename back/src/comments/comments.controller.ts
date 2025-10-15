@@ -6,6 +6,8 @@ import {
   Get,
   Param,
   Put,
+  Req,
+  Ip,
 } from '@nestjs/common';
 import {
   CreateCommentDto,
@@ -28,6 +30,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @ApiTags('comments')
 @Controller('comments')
@@ -99,9 +102,23 @@ export class CommentsController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async likeComment(
-    @Param('postId') postId: string,
-    @Body() comment: LikeCommentDto
-  ): Promise<Comment> {
-    return this.commentsService.like(postId, comment);
+    @Param('commentId') commentId: string,
+    @Ip() ip: string,
+    @Req() req: Request
+  ): Promise<{ comment: Comment; isLiked: boolean }> {
+    const clientIP =
+      (req.headers['x-forwarded-for'] as string) ||
+      (req.headers['x-real-ip'] as string) ||
+      req.connection.remoteAddress ||
+      ip;
+
+    const realIP = Array.isArray(clientIP)
+      ? clientIP[0]
+      : clientIP.split(',')[0];
+
+    const result = await this.commentsService.like(commentId, realIP);
+    const isLiked = await this.commentsService.checkIfLiked(commentId, realIP);
+
+    return { comment: result, isLiked };
   }
 }

@@ -139,18 +139,6 @@ export class PostsController {
     return this.postsService.delete(id);
   }
 
-  @Get('debug')
-  @ApiOperation({ summary: 'Debug endpoint to show post data structure' })
-  async debugPosts(): Promise<any> {
-    const posts = await this.postsService.findAll();
-    return {
-      totalCount: posts.length,
-      samplePost: posts.length > 0 ? posts[0] : null,
-      titles: posts.slice(0, 5).map(p => p.title),
-      authors: posts.slice(0, 5).map(p => p.authorName),
-    };
-  }
-
   @Post(':id/view')
   @ApiOperation({ summary: 'View a post (tracks IP-based views)' })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
