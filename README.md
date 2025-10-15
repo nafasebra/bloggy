@@ -60,47 +60,56 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Hooks** - State management
-- **React SimpleMDE Editor** - Rich markdown editor
+- **Next.js 15** - React framework with App Router and Turbopack
+- **React 19** - Latest React with enhanced features
+- **TypeScript 5** - Type-safe development
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **shadcn/ui** - High-quality UI components built on Radix UI
+- **React SimpleMDE Editor** - Rich markdown editor (EasyMDE)
 - **React Markdown** - Markdown rendering with GFM support
+- **TanStack Query** - Data fetching and state management
+- **React Hook Form** - Form validation with Zod
+- **Axios** - HTTP client for API requests
+- **Lucide React** - Beautiful icon library
 
 ### Backend
-- **NestJS** - Progressive Node.js framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
-- **TypeScript** - Type-safe backend development
+- **NestJS 11** - Progressive Node.js framework
+- **MongoDB 8** - NoSQL database with Mongoose ODM
+- **Mongoose** - Elegant MongoDB object modeling
+- **Passport.js** - Authentication middleware (JWT & Local strategies)
+- **JWT** - JSON Web Token authentication
+- **Bcrypt** - Password hashing
+- **Express Session** - Session management with MongoDB store
+- **Swagger** - API documentation
+- **Class Validator** - DTO validation
+- **Class Transformer** - Object transformation
 
 ### Development Tools
-- **ESLint** - Code linting
+- **ESLint 9** - Code linting for both frontend and backend
 - **Prettier** - Code formatting
 - **Jest** - Backend testing framework
-- **Vitest** - Frontend testing framework
-- **Storybook** - UI component development and documentation
-- **Concurrently** - Run multiple commands
+- **Vitest** - Frontend testing framework with browser mode
+- **Storybook 9** - UI component development and documentation
+- **Playwright** - E2E testing browser automation
+- **TypeScript** - Static type checking across the stack
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Node.js 20+ 
+- npm or yarn or pnpm
 - MongoDB (local or Atlas)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/bloggy.git
+   git clone https://github.com/nafasebra/bloggy.git
    cd bloggy
    ```
 
 2. **Install dependencies**
    ```bash
-   # Install root dependencies
-   npm install
-   
    # Install backend dependencies
    cd back && npm install
    
@@ -115,6 +124,8 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
    MONGODB_URI=mongodb://localhost:27017/bloggy
    PORT=3000
    NODE_ENV=development
+   JWT_SECRET=your-secret-key-here
+   JWT_EXPIRES_IN=7d
    ```
 
    **Frontend (.env.local in `front/` directory):**
@@ -132,89 +143,166 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
    ```
 
 5. **Run the application**
+
+   **Backend (in `back/` directory):**
    ```bash
-   # From the root directory
+   cd back
+   npm run start:dev
+   ```
+   Backend will run at: http://localhost:3000
+
+   **Frontend (in `front/` directory):**
+   ```bash
+   cd front
    npm run dev
    ```
-
-   This will start both frontend and backend concurrently:
-   - Frontend: http://localhost:3001
-   - Backend: http://localhost:3000
+   Frontend will run at: http://localhost:3000 (Next.js default port)
 
 ## 📁 Project Structure
 
 ```
 bloggy/
-├── back/                    # Backend (NestJS)
+├── back/                           # Backend (NestJS)
 │   ├── src/
-│   │   ├── users/          # User module
-│   │   ├── config/         # Configuration
-│   │   └── database/       # Database setup
+│   │   ├── auth/                  # Authentication module
+│   │   │   ├── dto/               # Auth DTOs (login, register, etc.)
+│   │   │   ├── jwt-auth.guard.ts  # JWT authentication guard
+│   │   │   ├── jwt.strategy.ts    # JWT strategy
+│   │   │   └── auth.service.ts    # Auth business logic
+│   │   ├── users/                 # User management module
+│   │   │   ├── dto/               # User DTOs
+│   │   │   ├── schemas/           # User Mongoose schemas
+│   │   │   └── users.service.ts   # User business logic
+│   │   ├── posts/                 # Blog posts module
+│   │   │   ├── dto/               # Post DTOs
+│   │   │   ├── schemas/           # Post Mongoose schemas
+│   │   │   └── posts.service.ts   # Post business logic
+│   │   ├── comments/              # Comments module
+│   │   │   ├── dto/               # Comment DTOs
+│   │   │   ├── schemas/           # Comment Mongoose schemas
+│   │   │   └── comments.service.ts # Comment business logic
+│   │   ├── database/              # Database configuration
+│   │   │   └── database.module.ts # MongoDB setup
+│   │   ├── app.module.ts          # Root application module
+│   │   └── main.ts                # Application entry point
+│   ├── test/                      # E2E tests
+│   ├── eslint.config.mjs          # ESLint configuration
+│   ├── nest-cli.json              # NestJS CLI configuration
 │   └── package.json
-├── front/                   # Frontend (Next.js)
+├── front/                          # Frontend (Next.js)
 │   ├── src/
-│   │   ├── app/            # App Router pages
-│   │   ├── components/     # React components
-│   │   └── styles/         # Global styles
+│   │   ├── app/                   # Next.js App Router
+│   │   │   ├── auth/              # Authentication pages (login, register)
+│   │   │   ├── blog/              # Blog listing pages
+│   │   │   ├── post/              # Individual post pages
+│   │   │   ├── dashboard/         # Admin dashboard
+│   │   │   ├── user/              # User profile pages
+│   │   │   ├── api/               # API routes
+│   │   │   └── layout.tsx         # Root layout
+│   │   ├── components/            # React components
+│   │   │   ├── dashboard/         # Dashboard components
+│   │   │   ├── layout/            # Layout components (header, footer)
+│   │   │   ├── pages/             # Page-specific components
+│   │   │   ├── shared/            # Shared/reusable components
+│   │   │   └── ui/                # UI components (shadcn/ui)
+│   │   ├── contexts/              # React contexts
+│   │   │   └── auth-provider.tsx  # Authentication context
+│   │   ├── hooks/                 # Custom React hooks
+│   │   │   └── useTheme.ts        # Theme management hook
+│   │   ├── lib/                   # Utility libraries
+│   │   │   ├── http.ts            # HTTP client (axios)
+│   │   │   └── utils.ts           # Helper functions
+│   │   ├── services/              # API service layer
+│   │   │   ├── auth.services.ts   # Auth API calls
+│   │   │   ├── post.services.ts   # Post API calls
+│   │   │   ├── user.services.ts   # User API calls
+│   │   │   └── comment.services.ts # Comment API calls
+│   │   ├── stories/               # Storybook stories
+│   │   │   ├── Button.stories.ts  # Button component stories
+│   │   │   ├── Header.stories.ts  # Header component stories
+│   │   │   └── Page.stories.ts    # Page component stories
+│   │   ├── styles/                # Global styles
+│   │   │   └── markdown-editor.css # Markdown editor styles
+│   │   └── types/                 # TypeScript type definitions
+│   ├── public/                    # Static assets
+│   ├── components.json            # shadcn/ui configuration
+│   ├── vitest.config.ts           # Vitest configuration
 │   └── package.json
-├── package.json            # Root package.json
-└── README.md
+└── README.md                      # Project documentation
 ```
 
 ## 🎯 Available Scripts
 
-### Root Directory
-```bash
-npm run dev          # Start both frontend and backend
-npm run build        # Build both applications
-npm run start        # Start both applications in production
-```
-
 ### Backend (in `back/` directory)
 ```bash
-npm run start:dev    # Start in development mode
-npm run build        # Build the application
-npm run start        # Start in production mode
-npm run test         # Run tests
+npm run start:dev      # Start in development mode with watch
+npm run start:debug    # Start in debug mode
+npm run build          # Build the application
+npm run start          # Start in production mode (with env file)
+npm run start:prod     # Start in production mode (dist)
+npm run format         # Format code with Prettier
+npm run lint           # Lint and fix code with ESLint
+npm run test           # Run unit tests with Jest
+npm run test:watch     # Run tests in watch mode
+npm run test:cov       # Run tests with coverage
+npm run test:debug     # Run tests in debug mode
+npm run test:e2e       # Run end-to-end tests
 ```
 
 ### Frontend (in `front/` directory)
 ```bash
-npm run dev          # Start development server
-npm run build        # Build the application
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run test         # Run tests with Vitest
-npm run storybook    # Start Storybook development server
+npm run dev              # Start development server with Turbopack
+npm run build            # Build the application for production
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run format           # Format code with Prettier
+npm run test             # Run tests with Vitest
+npm run storybook        # Start Storybook development server (port 6006)
 npm run build-storybook  # Build Storybook for production
 ```
 
 ## 📚 API Documentation
 
+The backend includes Swagger documentation available at `http://localhost:3000/api` when running in development mode.
+
+### Authentication
+```
+POST   /auth/register         # Register new user
+POST   /auth/login            # Login user
+POST   /auth/refresh          # Refresh JWT token
+POST   /auth/forget-password  # Request password reset
+POST   /auth/change-password  # Change user password
+```
+
 ### Users
 ```
-GET    /users              # Get all users
-GET    /users/:id          # Get user by ID
-POST   /users              # Create new user
-PATCH  /users/:id          # Update user
-DELETE /users/:id          # Delete user
+GET    /users                 # Get all users
+GET    /users/:id             # Get user by ID
+POST   /users                 # Create new user (admin)
+PATCH  /users/:id             # Update user profile
+DELETE /users/:id             # Delete user (admin)
 ```
 
 ### Posts
 ```
-GET    /posts              # Get all posts
-GET    /posts/:id          # Get post by ID
-POST   /posts              # Create new post
-PATCH  /posts/:id          # Update post
-DELETE /posts/:id          # Delete post
-GET    /posts/search       # Search posts
+GET    /posts                 # Get all posts (with pagination, filters)
+GET    /posts/:id             # Get post by ID
+POST   /posts                 # Create new post (authenticated)
+PATCH  /posts/:id             # Update post (author only)
+DELETE /posts/:id             # Delete post (author/admin)
+GET    /posts/search          # Search posts by title, content, tags
+GET    /posts/category/:cat   # Get posts by category
+POST   /posts/:id/like        # Like/unlike a post
 ```
 
 ### Comments
 ```
-GET    /posts/:id/comments # Get post comments
-POST   /posts/:id/comments # Add comment
-DELETE /comments/:id       # Delete comment
+GET    /comments/:postId      # Get comments for a post
+POST   /comments              # Create new comment (authenticated)
+PATCH  /comments/:id          # Update comment (author only)
+DELETE /comments/:id          # Delete comment (author/admin)
+POST   /comments/:id/reply    # Reply to a comment
+POST   /comments/:id/like     # Like/unlike a comment
 ```
 
 ## 🎨 Features in Detail
@@ -263,7 +351,7 @@ DELETE /comments/:id       # Delete comment
 ## 🔧 Configuration
 
 ### Database Setup
-The application uses MongoDB. You can either:
+The application uses MongoDB with Mongoose ODM. You can either:
 
 1. **Use MongoDB Atlas** (Recommended for production)
    ```env
@@ -277,18 +365,30 @@ The application uses MongoDB. You can either:
 
 ### Environment Variables
 
-**Backend (.env)**
+**Backend (.env in `back/` directory)**
 ```env
+# Database
 MONGODB_URI=mongodb://localhost:27017/bloggy
+
+# Server
 PORT=3000
 NODE_ENV=development
-JWT_SECRET=your-secret-key
+
+# JWT Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRES_IN=7d
+
+# Session (if using express-session)
+SESSION_SECRET=your-session-secret-key
 ```
 
-**Frontend (.env.local)**
+**Frontend (.env.local in `front/` directory)**
 ```env
+# API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:3000
-NEXT_PUBLIC_SITE_URL=http://localhost:3001
+
+# Site Configuration (optional)
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ## 🚀 Deployment
@@ -312,15 +412,49 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3001
 
 ## 🧪 Testing
 
+### Backend Testing (Jest)
 ```bash
-# Run backend tests
-cd back && npm run test
+cd back
 
-# Run frontend tests
-cd front && npm run test
+# Run all tests
+npm run test
 
-# Run e2e tests
-cd back && npm run test:e2e
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:cov
+
+# Run E2E tests
+npm run test:e2e
+
+# Debug tests
+npm run test:debug
+```
+
+### Frontend Testing (Vitest)
+```bash
+cd front
+
+# Run tests
+npm run test
+
+# Run tests with UI
+npm run test -- --ui
+
+# Run tests with coverage
+npm run test -- --coverage
+```
+
+### Storybook Testing
+```bash
+cd front
+
+# Start Storybook for visual testing
+npm run storybook
+
+# Build Storybook
+npm run build-storybook
 ```
 
 ## 🤝 Contributing
@@ -331,13 +465,43 @@ cd back && npm run test:e2e
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 🙏 Acknowledgments
+## � Key Features Implementation
 
-- [Next.js](https://nextjs.org/) - React framework
-- [NestJS](https://nestjs.com/) - Node.js framework
-- [MongoDB](https://mongodb.com/) - Database
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+### Authentication System
+- JWT-based authentication with refresh tokens
+- Password hashing with bcrypt
+- Passport.js strategies (JWT and Local)
+- Protected routes with guards
+- Session management with MongoDB store
+
+### Database Schema
+- **Users**: Profile information, authentication credentials, social links
+- **Posts**: Blog content, metadata, categories, tags, read time
+- **Comments**: Nested comments with replies, likes
+- **Post Likes**: User engagement tracking
+- **Comment Likes**: Comment interaction tracking
+
+### Frontend Architecture
+- Server and Client Components (React Server Components)
+- API route handlers for backend communication
+- Context-based authentication state
+- Custom hooks for theme and data fetching
+- Service layer for API abstraction
+- Component-driven development with Storybook
+
+## �🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) - React framework with App Router
+- [NestJS](https://nestjs.com/) - Progressive Node.js framework
+- [MongoDB](https://mongodb.com/) - NoSQL database
+- [Mongoose](https://mongoosejs.com/) - MongoDB ODM
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
+- [Radix UI](https://www.radix-ui.com/) - Unstyled, accessible components
 - [TypeScript](https://typescriptlang.org/) - Type safety
+- [TanStack Query](https://tanstack.com/query) - Data fetching
+- [Storybook](https://storybook.js.org/) - Component documentation
+- [Vitest](https://vitest.dev/) - Fast unit testing
 
 ---
 
