@@ -2,25 +2,68 @@ import React, { useState } from 'react';
 import { CommentWithAuthor } from '@/types';
 import { Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CommentService } from '@/services/comment.services';
+import { UserService } from '@/services/user.services';
 
 interface CommentCardProps {
   comment: CommentWithAuthor;
-  onReply?: (commentId: string) => void;
-  onLike?: (commentId: string) => void;
 }
 
 const CommentCard: React.FC<CommentCardProps> = ({
   comment,
-  onReply,
-  onLike,
 }) => {
-  const [isLiked, setIsLiked] = useState(false);
   const [isReply, setIsReply] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [isLiked, setIsLiked] = useState(false);
   const { accessToken } = useAuth();
+  const queryClient = useQueryClient();
+
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      const user = await UserService.getCurrentUser(accessToken!);
+      return CommentService.toggleLikeComment(comment._id, user._id, accessToken);
+    },
+    onSuccess: () => {
+      setIsLiked(!isLiked);
+      queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
+    },
+  });
+
+  const replyMutation = useMutation({
+    mutationFn: async () => {
+      const user = await UserService.getCurrentUser(accessToken!);
+      const replyData = {
+        content: replyText,
+        authorId: user._id,
+        authorName: user.name,
+        postId: comment.postId,
+        parentId: comment._id,
+      };
+      return CommentService.replyToComment(replyData, comment.postId, accessToken);
+    },
+    onSuccess: () => {
+      setReplyText('');
+      setIsReply(false);
+      queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
+    },
+  });
 
   const handleLike = () => {
-    setIsLiked(!isLiked);
-    onLike?.(comment._id);
+    if (!accessToken) {
+      alert('You must be logged in to like comments');
+      return;
+    }
+    likeMutation.mutate();
+  };
+
+  const handleReply = () => {
+    if (!accessToken) {
+      alert('You must be logged in to reply');
+      return;
+    }
+    if (!replyText.trim()) return;
+    replyMutation.mutate();
   };
 
   return (
@@ -64,6 +107,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
           </button>
           <button
             onClick={handleLike}
+            disabled={likeMutation.isPending}
             className={`cursor-pointer text-xs ${
               isLiked
                 ? 'text-red-600 dark:text-red-400'
@@ -76,7 +120,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
               fill={isLiked ? 'red' : 'none'}
               color={isLiked ? 'red' : 'currentColor'}
             />
-            Like (0)
+            {likeMutation.isPending ? 'Liking...' : `Like (${comment.likes || 0})`}
           </button>
         </div>
 
@@ -87,11 +131,17 @@ const CommentCard: React.FC<CommentCardProps> = ({
               <div className="flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Add a reply..."
                   className="w-full p-2 border rounded-md text-sm focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs">
-                  Reply
+                <button
+                  onClick={handleReply}
+                  disabled={replyMutation.isPending}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs disabled:opacity-50"
+                >
+                  {replyMutation.isPending ? 'Replying...' : 'Reply'}
                 </button>
               </div>
             ) : (

@@ -90,11 +90,11 @@ export class CommentsController {
     return this.commentsService.reply(postId, comment);
   }
 
-  @Put('like/:postId')
+  @Put(':commentId/like')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Like or unlike a comment' })
-  @ApiBody({ type: LikeCommentDto })
+  @ApiParam({ name: 'commentId', type: 'string', description: 'Comment id' })
   @ApiResponse({
     status: 200,
     description: 'Comment like toggled',

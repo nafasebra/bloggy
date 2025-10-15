@@ -19,4 +19,33 @@ export class CommentService {
     const response = await http.get<Comment[]>(`/comments/${postId}`);
     return response.data;
   }
+
+  static async replyToComment(
+    data: CreateCommentData,
+    postId: string,
+    accessToken: string | null
+  ): Promise<Comment> {
+    const response = await http.put<Comment>(`/comments/reply/${postId}`, data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+
+  static async toggleLikeComment(
+    commentId: string,
+    userId: string,
+    accessToken: string | null
+  ): Promise<Comment> {
+    const response = await http.put<Comment>(`/comments/${commentId}/like`, 
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
 }
