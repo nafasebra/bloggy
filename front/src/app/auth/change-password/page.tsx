@@ -56,14 +56,14 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-sm mx-auto">
-        <div className="bg-white shadow-lg rounded-lg px-8 py-10">
+        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 py-10">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center text-gray-800">
+            <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
               Change your password
             </h2>
-            <p className="text-center text-gray-600 mt-2 text-sm">
+            <p className="text-center text-gray-600 dark:text-gray-300 mt-2 text-sm">
               Enter your old password and new password
             </p>
           </div>
@@ -73,7 +73,7 @@ export default function ChangePasswordPage() {
               <div>
                 <label
                   htmlFor="oldPassword"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Old Password
                 </label>
@@ -81,7 +81,7 @@ export default function ChangePasswordPage() {
                   <input
                     id="oldPassword"
                     type={showOldPassword ? 'text' : 'password'}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your old password"
                     {...register('oldPassword')}
                   />
@@ -91,9 +91,9 @@ export default function ChangePasswordPage() {
                     onClick={() => setShowOldPassword(!showOldPassword)}
                   >
                     {showOldPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
+                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-300" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
+                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-300" />
                     )}
                   </button>
                 </div>
@@ -107,7 +107,7 @@ export default function ChangePasswordPage() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   New Password
                 </label>
@@ -115,7 +115,7 @@ export default function ChangePasswordPage() {
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your new password"
                     {...register('password')}
                   />
@@ -125,9 +125,9 @@ export default function ChangePasswordPage() {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
+                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-300" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
+                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-300" />
                     )}
                   </button>
                 </div>
@@ -140,7 +140,7 @@ export default function ChangePasswordPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
                 {error}
               </div>
             )}
@@ -156,7 +156,7 @@ export default function ChangePasswordPage() {
             <div className="text-center pt-4">
               <Link
                 href="/user/1"
-                className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
+                className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
                 Back to profile
               </Link>
