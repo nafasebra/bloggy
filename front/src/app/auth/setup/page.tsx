@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Camera } from 'lucide-react';
 import http from '@/lib/http';
@@ -30,14 +29,12 @@ const setupSchema = z.object({
 type FormData = z.infer<typeof setupSchema>;
 
 export default function CreateUserPage() {
-  const [isLoading, setIsLoading] = useState(false);
-
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(setupSchema),
   });
@@ -45,8 +42,6 @@ export default function CreateUserPage() {
   const { user, accessToken } = useAuth();
 
   const onSubmit = async (data: FormData) => {
-    setIsLoading(true);
-
     const { avatar, ...tempdata } = data;
 
     try {
@@ -65,8 +60,6 @@ export default function CreateUserPage() {
       }
     } catch (err) {
       toast.error('Failed to create profile. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -245,10 +238,10 @@ export default function CreateUserPage() {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isSubmitting}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Creating Profile...' : 'Create Profile'}
+                {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
               </button>
             </form>
           </div>

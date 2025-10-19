@@ -1,8 +1,6 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -14,20 +12,15 @@ const forgetPasswordSchema = z.object({
 type ForgetPasswordFormData = z.infer<typeof forgetPasswordSchema>;
 
 export default function ForgetPasswordPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors , isSubmitting },
   } = useForm<ForgetPasswordFormData>({
     resolver: zodResolver(forgetPasswordSchema),
   });
 
   const onSubmit = async (data: ForgetPasswordFormData) => {
-    setIsLoading(true);
-
     try {
       const response = await fetch('/api/auth/forget-password', {
         method: 'POST',
@@ -44,8 +37,6 @@ export default function ForgetPasswordPage() {
       }
     } catch (err) {
       toast.error('Request failed. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -89,10 +80,10 @@ export default function ForgetPasswordPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Sending...' : 'Send reset link'}
+              {isSubmitting ? 'Sending...' : 'Send reset link'}
             </button>
 
             <div className="text-center pt-4">
