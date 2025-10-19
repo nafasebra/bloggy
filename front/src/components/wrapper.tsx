@@ -6,7 +6,7 @@ import React from 'react';
 import Footer from './layout/footer';
 import Navigation from './layout/navigation';
 import { usePathname } from 'next/navigation';
-import { Toaster } from './ui/sonner';
+import { Toaster } from 'sonner';
 
 const queryClient = new QueryClient();
 
@@ -20,7 +20,6 @@ function Wrapper({ children }: WrapperProps) {
 
   return (
     <>
-      <Toaster />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           {!isDashboard && <Navigation />}
@@ -28,6 +27,7 @@ function Wrapper({ children }: WrapperProps) {
         </AuthProvider>
       </QueryClientProvider>
       <Footer />
+      <Toaster />
     </>
   );
 }

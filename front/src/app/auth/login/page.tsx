@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-provider';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -17,7 +18,6 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { setAccessToken, setUser } = useAuth();
@@ -31,8 +31,6 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setError('');
-
     try {
       const response = await fetch('/api/login', {
         method: 'POST',
@@ -57,10 +55,10 @@ export default function LoginPage() {
         }
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'The Username or Password is incorrect');
+        toast.error(errorData.error || 'The Username or Password is incorrect');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      toast.error('Login failed. Please try again.');
     }
   };
 
@@ -134,12 +132,6 @@ export default function LoginPage() {
                 )}
               </div>
             </div>
-
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"

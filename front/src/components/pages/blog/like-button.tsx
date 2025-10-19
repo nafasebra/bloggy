@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '@/services/post.services';
+import { toast } from 'sonner';
 
 interface LikeButtonProps {
   postId: string;
@@ -11,7 +12,6 @@ interface LikeButtonProps {
 }
 
 function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
-  const [feedback, setFeedback] = React.useState<string>('');
   const queryClient = useQueryClient();
 
   // Query to check if the post is liked
@@ -30,18 +30,15 @@ function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
       });
 
       if (response.message === 'liked') {
-        setFeedback('Liked!');
+        toast.success('Liked!');
       } else {
-        setFeedback('Unliked');
+        toast.success('Unliked');
       }
 
-      setTimeout(() => setFeedback(''), 2000);
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
     },
     onError: (error) => {
-      console.error('Error toggling like:', error);
-      setFeedback('Failed');
-      setTimeout(() => setFeedback(''), 2000);
+      toast.error('Failed to toggle like');
     },
   });
 
@@ -72,11 +69,6 @@ function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
         />
         <span className="text-sm font-medium">{likes}</span>
       </button>
-      {feedback && (
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 text-xs rounded-md whitespace-nowrap z-10 shadow-lg">
-          {feedback}
-        </div>
-      )}
     </div>
   );
 }

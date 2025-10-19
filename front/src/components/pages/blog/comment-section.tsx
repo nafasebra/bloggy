@@ -10,7 +10,7 @@ import { CommentWithAuthor, CreateCommentData } from '@/types';
 import { CommentService } from '@/services/comment.services';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle } from 'lucide-react';
-import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface CommentSectionProps {
   postId: string;
@@ -30,8 +30,6 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const { accessToken, user } = useAuth();
   const queryClient = useQueryClient();
 
-  const [error, setError] = useState<string | null>(null);
-
   const { data: comments = [], isLoading } = useQuery<CommentWithAuthor[]>({
     queryKey: ['comments', postId],
     queryFn: () => CommentService.getCommentsByPostId(postId),
@@ -44,9 +42,10 @@ export default function CommentSection({ postId }: CommentSectionProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       reset();
+      toast.success('Comment posted successfully!');
     },
     onError: (error) => {
-      setError('Failed to create comment: ' + error);
+      toast.error('Failed to create comment: ' + error);
     },
   });
 
@@ -99,13 +98,6 @@ export default function CommentSection({ postId }: CommentSectionProps) {
               <p className="text-red-500 text-sm">{errors.comment.message}</p>
             )}
           </div>
-
-          {/* show error */}
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-              {error}
-            </div>
-          )}
 
           <button
             type="submit"

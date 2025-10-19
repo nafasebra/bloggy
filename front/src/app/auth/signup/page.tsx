@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 const signupSchema = z.object({
   username: z.string().min(2, 'Username must be at least 2 characters'),
@@ -18,7 +19,6 @@ const signupSchema = z.object({
 type signupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -31,8 +31,6 @@ export default function SignupPage() {
   });
 
   const onSubmit = async (data: signupFormData) => {
-    setError('');
-
     try {
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -43,12 +41,13 @@ export default function SignupPage() {
       });
 
       if (response.ok) {
+        toast.success('Account created successfully! Please log in.');
         router.push('/auth/login');
       } else {
-        setError('The username or email is already taken');
+        toast.error('The username or email is already taken');
       }
     } catch (err) {
-      setError('Signup failed. Please try again.');
+      toast.error('Signup failed. Please try again.');
     }
   };
 
@@ -163,12 +162,6 @@ export default function SignupPage() {
                 )}
               </div>
             </div>
-
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"

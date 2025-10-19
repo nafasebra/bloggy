@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-provider';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 const setupSchema = z.object({
   bio: z.string().optional(),
@@ -30,7 +31,6 @@ type FormData = z.infer<typeof setupSchema>;
 
 export default function CreateUserPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const router = useRouter();
 
@@ -46,7 +46,6 @@ export default function CreateUserPage() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    setError('');
 
     const { avatar, ...tempdata } = data;
 
@@ -57,14 +56,15 @@ export default function CreateUserPage() {
         },
       });
       if (response.data) {
+        toast.success('Profile created successfully!');
         router.push(`/user/${user?._id}`);
       } else {
-        setError(
+        toast.error(
           `Failed with error: ${response.statusText} - ${response.status}`
         );
       }
     } catch (err) {
-      setError('Failed to create profile. Please try again.');
+      toast.error('Failed to create profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -242,12 +242,6 @@ export default function CreateUserPage() {
                   )}
                 </div>
               </div>
-
-              {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                  {error}
-                </div>
-              )}
 
               <button
                 type="submit"

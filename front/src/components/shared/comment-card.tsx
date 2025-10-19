@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/auth-provider';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CommentService } from '@/services/comment.services';
 import { UserService } from '@/services/user.services';
+import { toast } from 'sonner';
 
 interface CommentCardProps {
   comment: CommentWithAuthor;
@@ -31,7 +32,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
       queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
     },
     onError: (error) => {
-      console.log('Error liking comment:', error);
+      toast.error('Failed to like comment');
     },
   });
 
@@ -51,6 +52,10 @@ const CommentCard: React.FC<CommentCardProps> = ({
       setReplyText('');
       setIsReply(false);
       queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
+      toast.success('Reply posted successfully!');
+    },
+    onError: (error) => {
+      toast.error('Failed to post reply');
     },
   });
 
@@ -60,7 +65,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
 
   const handleReply = () => {
     if (!accessToken) {
-      alert('You must be logged in to reply');
+      toast.error('You must be logged in to reply');
       return;
     }
     if (!replyText.trim()) return;

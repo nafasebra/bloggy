@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 const forgetPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -14,8 +15,6 @@ type ForgetPasswordFormData = z.infer<typeof forgetPasswordSchema>;
 
 export default function ForgetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const {
@@ -28,8 +27,6 @@ export default function ForgetPasswordPage() {
 
   const onSubmit = async (data: ForgetPasswordFormData) => {
     setIsLoading(true);
-    setError('');
-    setSuccess(false);
 
     try {
       const response = await fetch('/api/auth/forget-password', {
@@ -41,43 +38,16 @@ export default function ForgetPasswordPage() {
       });
 
       if (response.ok) {
-        setSuccess(true);
+        toast.success('Password reset link sent to your email!');
       } else {
-        setError('Failed to send reset email');
+        toast.error('Failed to send reset email');
       }
     } catch (err) {
-      setError('Request failed. Please try again.');
+      toast.error('Request failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="w-full max-w-sm mx-auto">
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 py-10">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                Check your email
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
-                We've sent a password reset link to your email address.
-              </p>
-            </div>
-            <div className="text-center pt-4">
-              <a
-                href="/auth/login"
-                className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
-              >
-                Back to login
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -116,12 +86,6 @@ export default function ForgetPasswordPage() {
                 )}
               </div>
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"

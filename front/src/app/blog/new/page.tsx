@@ -13,6 +13,7 @@ import MarkdownEditor from '@/components/shared/markdown-editor';
 import MarkdownPreview from '@/components/shared/markdown-preview';
 import { getReadTime } from '@/lib/utils';
 import { categories } from '@/data';
+import { toast } from 'sonner';
 
 const createPostSchema = z.object({
   title: z
@@ -39,8 +40,6 @@ export default function NewBlogPost() {
   const { accessToken, user } = useAuth();
   const router = useRouter();
 
-  const [error, setError] = useState<string | null>(null);
-
   const form = useForm<BlogPostForm>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
@@ -54,7 +53,7 @@ export default function NewBlogPost() {
 
   const handleSubmit = async (data: BlogPostForm) => {
     if (!user) {
-      alert('You must be logged in to create a post');
+      toast.error('You must be logged in to create a post');
       return;
     }
 
@@ -77,10 +76,10 @@ export default function NewBlogPost() {
 
       await PostService.createPost(postData, accessToken);
 
+      toast.success('Post created successfully!');
       router.push('/blog');
     } catch (error) {
-      console.log('Error creating post:', error);
-      setError('Failed to create post');
+      toast.error('Failed to create post');
     }
   };
 
@@ -285,12 +284,6 @@ export default function NewBlogPost() {
                   </p>
                 </div>
               </div>
-
-              {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                  {error}
-                </div>
-              )}
 
               {/* Submit Buttons */}
               <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">

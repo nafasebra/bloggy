@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PostService } from '@/services/post.services';
 import { UserService } from '@/services/user.services';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 const editPostSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -41,7 +42,6 @@ export default function EditPostPage() {
   const { id } = useParams();
   const { accessToken } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
-  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<EditPostForm>({
     resolver: zodResolver(editPostSchema),
@@ -92,16 +92,17 @@ export default function EditPostPage() {
       return PostService.updatePost(id as string, postData);
     },
     onSuccess: () => {
+      toast.success('Post updated successfully!');
       router.push('/dashboard/posts');
     },
     onError: (error) => {
-      setError('Failed to update post: ' + error.message);
+      toast.error('Failed to update post: ' + error.message);
     },
   });
 
   const onSubmit = async (data: EditPostForm) => {
     if (!accessToken) {
-      alert('You must be logged in to edit the post');
+      toast.error('You must be logged in to edit the post');
       return;
     }
 
@@ -256,12 +257,6 @@ export default function EditPostPage() {
                     </p>
                   </div>
                 </div>
-
-                {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                    {error}
-                  </div>
-                )}
 
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button

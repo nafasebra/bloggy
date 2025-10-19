@@ -23,6 +23,7 @@ import http from '@/lib/http';
 import MarkdownEditor from '@/components/shared/markdown-editor';
 import MarkdownPreview from '@/components/shared/markdown-preview';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 
 const createPostSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -38,7 +39,6 @@ export default function CreatePostPage() {
   const router = useRouter();
   const { accessToken } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
-  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<CreatePostForm>({
     resolver: zodResolver(createPostSchema),
@@ -60,14 +60,14 @@ export default function CreatePostPage() {
       });
       return response.data;
     } catch (error) {
-      setError('Failed to fetch current user: ' + error);
+      toast.error('Failed to fetch current user');
       return null;
     }
   };
 
   const onSubmit = async (data: CreatePostForm) => {
     if (!accessToken) {
-      alert('You must be logged in to create a post');
+      toast.error('You must be logged in to create a post');
       return;
     }
 
@@ -86,17 +86,13 @@ export default function CreatePostPage() {
       });
 
       if (response.status === 201) {
+        toast.success('Post created successfully!');
         router.push('/dashboard/posts');
       } else {
-        setError(
-          'Failed to create post: ' +
-            response.status +
-            ' - ' +
-            response.statusText
-        );
+        toast.error('Failed to create post');
       }
     } catch (error) {
-      setError('Failed to create post: ' + error);
+      toast.error('Failed to create post');
     }
   };
 
@@ -230,12 +226,6 @@ export default function CreatePostPage() {
                     </p>
                   </div>
                 </div>
-
-                {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                    {error}
-                  </div>
-                )}
 
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button

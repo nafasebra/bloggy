@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, 'Old password is required'),
@@ -16,8 +17,6 @@ const changePasswordSchema = z.object({
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 
 export default function ChangePasswordPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -25,15 +24,12 @@ export default function ChangePasswordPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
   });
 
   const onSubmit = async (data: ChangePasswordFormData) => {
-    setIsLoading(true);
-    setError('');
-
     try {
       const response = await fetch('/api/auth/change-password', {
         method: 'POST',
@@ -44,14 +40,13 @@ export default function ChangePasswordPage() {
       });
 
       if (response.ok) {
+        toast.success('Password changed successfully!');
         router.push('/profile'); // Assuming redirect to profile after change
       } else {
-        setError('Failed to change password');
+        toast.error('Failed to change password');
       }
     } catch (err) {
-      setError('Change failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      toast.error('Change failed. Please try again.');
     }
   };
 
@@ -139,18 +134,12 @@ export default function ChangePasswordPage() {
               </div>
             </div>
 
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm text-center">
-                {error}
-              </div>
-            )}
-
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Changing...' : 'Change Password'}
+              {isSubmitting ? 'Changing...' : 'Change Password'}
             </button>
 
             <div className="text-center pt-4">
