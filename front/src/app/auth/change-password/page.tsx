@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/auth-provider';
 
 const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, 'Old password is required'),
@@ -21,6 +22,8 @@ export default function ChangePasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  const { user } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -31,7 +34,7 @@ export default function ChangePasswordPage() {
 
   const onSubmit = async (data: ChangePasswordFormData) => {
     try {
-      const response = await fetch('/api/auth/change-password', {
+      const response = await fetch('/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +44,7 @@ export default function ChangePasswordPage() {
 
       if (response.ok) {
         toast.success('Password changed successfully!');
-        router.push('/profile'); // Assuming redirect to profile after change
+        router.push('/user/' + user?._id);
       } else {
         toast.error('Failed to change password');
       }
