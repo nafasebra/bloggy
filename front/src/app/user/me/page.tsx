@@ -3,10 +3,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import UserPostCard from '@/components/pages/user/user-post-card';
-import FollowButton from '@/components/pages/user/follow-button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import FollowerList from '@/components/pages/user/follower-list';
-import FollowingList from '@/components/pages/user/following-list';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,21 +17,18 @@ import { UserService } from '@/services/user.services';
 import { PostService } from '@/services/post.services';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-provider';
-import { useParams } from 'next/navigation';
 
 export default function UserPage() {
-  const { accessToken } = useAuth();
-  const params = useParams();
-  const id = params.id as string;
+  const { user, accessToken } = useAuth();
 
   const { data: userData, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['user', id],
-    queryFn: () => UserService.getUserById(id as string),
-  });
+    queryKey: ['user-me'],
+    queryFn: () => UserService.getCurrentUser(accessToken as string),
+  });       
 
   const { data: postsData, isLoading: isLoadingPosts } = useQuery({
-    queryKey: ['user-posts', id],
-    queryFn: () => PostService.getPostsByUserId(id),
+    queryKey: ['user-posts'],
+    queryFn: () => PostService.getPostsByUserId(user?._id as string),
     enabled: !!accessToken,
   });
 
@@ -208,8 +201,21 @@ export default function UserPage() {
                 Following
               </div>
             </div> */}
-            {/* Follow/Following Button */}
-            {/* <FollowButton userId={userData._id} initialFollowing={false} /> */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={'ghost'}>
+                  <MoreVertical />
+                  <span>Menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>
+                  <Link href={'/auth/change-password'}>Change Password</Link>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

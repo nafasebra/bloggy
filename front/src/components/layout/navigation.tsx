@@ -94,7 +94,7 @@ export default function Navigation() {
               </Sheet>
             </div>
           ) : (
-            <Link href={`/user/${user?._id}`}>
+            <Link href={`/user/me`}>
               <Button>
                 <User />
                 <span className="hidden md:flex">My Account</span>
