@@ -17,20 +17,40 @@ import { UserService } from '@/services/user.services';
 import { PostService } from '@/services/post.services';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-provider';
+import { useRouter } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
 
 export default function UserPage() {
-  const { user, accessToken } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { user, accessToken, logout } = useAuth();
+  const router = useRouter();
 
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user-me'],
     queryFn: () => UserService.getCurrentUser(accessToken as string),
-  });       
+  });
 
   const { data: postsData, isLoading: isLoadingPosts } = useQuery({
     queryKey: ['user-posts'],
     queryFn: () => PostService.getPostsByUserId(user?._id as string),
     enabled: !!accessToken,
   });
+
+  const handleLogout = () => {
+    logout(); // Clears auth state
+    router.push('/'); // Redirect to home page
+  };
 
   if (isLoadingUser) {
     return (
@@ -107,6 +127,22 @@ export default function UserPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to log out? You will need to log in again to
+              access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
       {/* Profile Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -213,7 +249,10 @@ export default function UserPage() {
                   <Link href={'/auth/change-password'}>Change Password</Link>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowLogoutDialog(true)}>
+                  Logout
+                </DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem> */}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
