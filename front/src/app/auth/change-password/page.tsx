@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-provider';
+import http from '@/lib/http';
 
 const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, 'Old password is required'),
@@ -22,7 +23,7 @@ export default function ChangePasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
 
   const {
     register,
@@ -33,21 +34,21 @@ export default function ChangePasswordPage() {
   });
 
   const onSubmit = async (data: ChangePasswordFormData) => {
+    const tempData = {
+      userId: user?._id,
+      old_password: data.oldPassword,
+      new_password: data.password,
+    };
+
     try {
-      const response = await fetch('/auth/change-password', {
-        method: 'POST',
+      await http.post('/auth/change-password', tempData, {
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        toast.success('Password changed successfully!');
-        router.push('/user/' + user?._id);
-      } else {
-        toast.error('Failed to change password');
-      }
+      toast.success('Password changed successfully!');
+      router.push('/user/' + user?._id);
     } catch (err) {
       toast.error('Change failed. Please try again.');
     }
