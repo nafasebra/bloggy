@@ -93,12 +93,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setAccessTokenState(null);
-    setAccessToken(null);
-    setUser(null);
-    // Optionally, call logout API to clear cookie
-    fetch('/api/logout', { method: 'POST' });
+  const logout = async () => {
+    try {
+      // Call logout API to clear the refresh_token cookie
+      await fetch('/api/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      // Clear local state regardless of API call success
+      setAccessTokenState(null);
+      setAccessToken(null);
+      setUser(null);
+    }
   };
 
   useEffect(() => {
