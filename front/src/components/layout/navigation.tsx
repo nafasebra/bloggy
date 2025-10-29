@@ -37,8 +37,10 @@ export default function Navigation() {
           </Link>
         </div>
 
-        <div className="hidden md:block">
-          <div className="ml-10 flex items-center space-x-4">
+        <div className="flex items-center gap-3">
+          {accessToken && <NotificationButton />}
+          <ThemeButton />
+          <div className="flex items-center gap-4">
             {!accessToken && (
               <>
                 <Link href="/auth/login">
@@ -50,11 +52,6 @@ export default function Navigation() {
               </>
             )}
           </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {accessToken && <NotificationButton />}
-          <ThemeButton />
           {!accessToken ? (
             <div className="md:hidden flex">
               <Sheet open={isMenuOpen} onOpenChange={changeMenuState}>
