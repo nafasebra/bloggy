@@ -93,6 +93,41 @@ A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, 
 - **Playwright** - E2E testing browser automation
 - **TypeScript** - Static type checking across the stack
 
+### 🪝 Git Hooks (Husky)
+
+This repository uses Husky to manage Git hooks in the root. Husky is installed and configured in the root `package.json` and the `.husky/` folder. Commit message linting is provided by `commitlint` and configured in `commitlint.config.cjs`.
+
+- Location: `.husky/` at the repo root (hooks are versioned)
+- Commitlint config: `commitlint.config.cjs` (root)
+
+Installing / enabling Husky
+```bash
+# from repo root
+npm install          # installs devDependencies and runs 'prepare' which installs hooks
+# or manually
+npx husky install
+```
+
+Add or update hooks
+```bash
+# Add a pre-commit hook that lints frontend then backend
+npx husky add .husky/pre-commit "npm --prefix ./front run lint || npm --prefix ./back run lint"
+
+# Ensure commit-msg hook runs commitlint (the project already contains this hook)
+npx husky add .husky/commit-msg "npx --no-install commitlint --edit \"$1\""
+```
+
+Run hooks manually
+```bash
+# Run the pre-commit hook manually
+npx husky run pre-commit
+```
+
+Tips
+- If you need to remove or change a hook, edit or delete files in the `.husky/` directory and commit the changes
+- If you prefer hooks only in a specific package, update the package script and hook commands accordingly
+
+
 ## 🚀 Quick Start
 
 ### Prerequisites
