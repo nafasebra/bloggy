@@ -8,11 +8,15 @@ import { useAuth } from '@/contexts/auth-provider';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
-const setupSchema = z.object({
-  bio: z.string().optional(),
+const editProfileSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
+  email: z.string().email('Please enter a valid email').optional(),
+  bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   avatar: z.any().optional(),
-  location: z.string().optional(),
+  location: z.string().max(100, 'Location must be less than 100 characters').optional(),
   website: z
     .string()
     .url('Please enter a valid URL')
@@ -23,45 +27,93 @@ const setupSchema = z.object({
     .regex(/^@?[A-Za-z0-9_]{1,15}$/, 'Please enter a valid Twitter username')
     .or(z.literal(''))
     .optional(),
-  category: z.string().optional(),
+  category: z.string().max(50, 'Category must be less than 50 characters').optional(),
 });
 
-type FormData = z.infer<typeof setupSchema>;
+type FormData = z.infer<typeof editProfileSchema>;
 
-export default function CreateUserPage() {
+export default function EditUserPage() {
   const router = useRouter();
+  const { user, accessToken } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [avatarPreview, setAvatarPreview] = useState<string>('');
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setValue,
   } = useForm<FormData>({
-    resolver: zodResolver(setupSchema),
+    resolver: zodResolver(editProfileSchema),
   });
 
-  const { user, accessToken } = useAuth();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user?._id || !accessToken) {
+        router.push('/auth/login');
+        return;
+      }
+
+      try {
+        const response = await http.get(`/users/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.data) {
+          const userData = response.data;
+          setValue('name', userData.name || '');
+          setValue('username', userData.username || '');
+          setValue('email', userData.email || '');
+          setValue('bio', userData.bio || '');
+          setValue('location', userData.location || '');
+          setValue('website', userData.website || '');
+          setValue('twitter', userData.twitter || '');
+          setValue('category', userData.category || '');
+          setAvatarPreview(userData.avatar || '');
+        }
+      } catch (err) {
+        toast.error('Failed to load user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user?._id, accessToken, router, setValue]);
 
   const onSubmit = async (data: FormData) => {
-    const { avatar, ...tempdata } = data;
+    const { avatar, ...updateData } = data;
 
     try {
-      const response = await http.patch(`/users/${user?._id}`, tempdata, {
+      const response = await http.patch(`/users/${user?._id}`, updateData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
       if (response.data) {
-        toast.success('Profile created successfully!');
+        toast.success('Profile updated successfully!');
         router.push(`/user/me`);
       } else {
-        toast.error(
-          `Failed with error: ${response.statusText} - ${response.status}`
-        );
+        toast.error(`Failed to update profile`);
       }
     } catch (err) {
-      toast.error('Failed to create profile. Please try again.');
+      toast.error('Failed to update profile. Please try again.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-5">
@@ -73,21 +125,25 @@ export default function CreateUserPage() {
               <div className="mb-6">
                 <div className="relative mx-auto w-32 h-32 mb-4">
                   <div className="w-32 h-32 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden">
-                    <img
-                      src="/placeholder-avatar.jpg"
-                      alt="Avatar preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        const sibling =
-                          target.nextElementSibling as HTMLElement;
-                        target.style.display = 'none';
-                        if (sibling) {
-                          sibling.style.display = 'flex';
-                        }
-                      }}
-                    />
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                    {avatarPreview ? (
+                      <img
+                        src={avatarPreview}
+                        alt="Avatar preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          target.style.display = 'none';
+                          const sibling = target.nextElementSibling as HTMLElement;
+                          if (sibling) {
+                            sibling.style.display = 'flex';
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400"
+                      style={{ display: avatarPreview ? 'none' : 'flex' }}
+                    >
                       <Camera className="w-12 h-12" />
                     </div>
                   </div>
@@ -103,10 +159,20 @@ export default function CreateUserPage() {
                     accept="image/*"
                     className="hidden"
                     {...register('avatar')}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setAvatarPreview(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
                   />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                  Upload Your Photo
+                  Update Your Photo
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   Choose a photo that represents you best
@@ -119,15 +185,78 @@ export default function CreateUserPage() {
           <div className="p-8">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                Create Your Profile
+                Edit Your Profile
               </h2>
               <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
-                Set up your account information
+                Update your account information
               </p>
             </div>
 
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Full Name
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Your full name"
+                    {...register('name')}
+                  />
+                  {errors.name && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Your username"
+                    {...register('username')}
+                  />
+                  {errors.username && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors.username.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                    placeholder="your@email.com"
+                    {...register('email')}
+                  />
+                  {errors.email && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+
                 <div>
                   <label
                     htmlFor="bio"
@@ -236,13 +365,22 @@ export default function CreateUserPage() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
-              </button>
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Updating Profile...' : 'Update Profile'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         </div>

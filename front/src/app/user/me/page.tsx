@@ -245,6 +245,9 @@ export default function UserPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <Link href={'/user/me/edit'}>Edit Profile</Link>
+                </DropdownMenuItem>
                 <DropdownMenuLabel>
                   <Link href={'/auth/change-password'}>Change Password</Link>
                 </DropdownMenuLabel>
