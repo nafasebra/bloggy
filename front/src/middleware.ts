@@ -14,77 +14,77 @@ import { NextRequest, NextResponse } from 'next/server';
  * - Public routes: /, /blog/*, /post/*, /user/[id] (specific user profiles)
  */
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // const { pathname } = request.nextUrl;
   
-  // Check for refresh_token cookie to determine if user is logged in
-  const refreshToken = request.cookies.get('refresh_token')?.value;
-  const isLoggedIn = !!refreshToken;
+  // // Check for refresh_token cookie to determine if user is logged in
+  // const refreshToken = request.cookies.get('refresh_token')?.value;
+  // const isLoggedIn = !!refreshToken;
   
-  // Routes that logged-in users should NOT access (redirect to home)
-  const authRoutesForLoggedOut = [
-    '/auth/login',
-    '/auth/signup',
-    '/auth/forget-password',
-  ];
+  // // Routes that logged-in users should NOT access (redirect to home)
+  // const authRoutesForLoggedOut = [
+  //   '/auth/login',
+  //   '/auth/signup',
+  //   '/auth/forget-password',
+  // ];
   
-  // Routes that require authentication (redirect to login if not logged in)
-  const protectedRoutes = [
-    '/dashboard',
-    '/auth/change-password',
-    '/user/me',
-  ];
+  // // Routes that require authentication (redirect to login if not logged in)
+  // const protectedRoutes = [
+  //   '/dashboard',
+  //   '/auth/change-password',
+  //   '/user/me',
+  // ];
   
-  // Public routes that anyone can access
-  // const publicRoutes = ['/', '/blog', '/post', '/user', '/about'];
-  const privateRoutes = ['/user/me', '/blog/new'];
+  // // Public routes that anyone can access
+  // // const publicRoutes = ['/', '/blog', '/post', '/user', '/about'];
+  // const privateRoutes = ['/user/me', '/blog/new'];
 
-  // Always allow API routes
-  if (pathname.startsWith('/api/')) {
-    return NextResponse.next();
-  }
+  // // Always allow API routes
+  // if (pathname.startsWith('/api/')) {
+  //   return NextResponse.next();
+  // }
   
-  // Allow static files and Next.js internal routes
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon.ico') ||
-    pathname.includes('.')
-  ) {
-    return NextResponse.next();
-  }
+  // // Allow static files and Next.js internal routes
+  // if (
+  //   pathname.startsWith('/_next') ||
+  //   pathname.startsWith('/favicon.ico') ||
+  //   pathname.includes('.')
+  // ) {
+  //   return NextResponse.next();
+  // }
   
-  // If user is logged in and trying to access auth routes (login, signup, etc.)
-  // Redirect to home page
-  if (isLoggedIn && authRoutesForLoggedOut.includes(pathname)) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // // If user is logged in and trying to access auth routes (login, signup, etc.)
+  // // Redirect to home page
+  // if (isLoggedIn && authRoutesForLoggedOut.includes(pathname)) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
   
-  // If user is not logged in and trying to access protected routes
-  // Redirect to login page
-  if (!isLoggedIn) {
-    // Check exact match first for /user/me before checking /user/[id]
-    if (privateRoutes.includes(pathname)) {
-      const loginUrl = new URL('/auth/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+  // // If user is not logged in and trying to access protected routes
+  // // Redirect to login page
+  // if (!isLoggedIn) {
+  //   // Check exact match first for /user/me before checking /user/[id]
+  //   if (privateRoutes.includes(pathname)) {
+  //     const loginUrl = new URL('/auth/login', request.url);
+  //     loginUrl.searchParams.set('redirect', pathname);
+  //     return NextResponse.redirect(loginUrl);
+  //   }
     
-    // Check if the pathname starts with any other protected route
-    const isProtectedRoute = protectedRoutes.some((route) =>
-      pathname.startsWith(route) && !privateRoutes.includes(pathname)
-    );
+  //   // Check if the pathname starts with any other protected route
+  //   const isProtectedRoute = protectedRoutes.some((route) =>
+  //     pathname.startsWith(route) && !privateRoutes.includes(pathname)
+  //   );
     
-    if (isProtectedRoute) {
-      // Store the original URL to redirect back after login
-      const loginUrl = new URL('/auth/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-  }
+  //   if (isProtectedRoute) {
+  //     // Store the original URL to redirect back after login
+  //     const loginUrl = new URL('/auth/login', request.url);
+  //     loginUrl.searchParams.set('redirect', pathname);
+  //     return NextResponse.redirect(loginUrl);
+  //   }
+  // }
   
-  // Allow all other routes
-  return NextResponse.next();
+  // // Allow all other routes
+  // return NextResponse.next();
 }
 
-export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-};
+// export const config = {
+//   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+// };
