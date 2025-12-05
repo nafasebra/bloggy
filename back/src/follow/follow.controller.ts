@@ -1,8 +1,6 @@
 import {
   Controller,
   Post,
-  Delete,
-  Patch,
   Get,
   Param,
   UseGuards,
@@ -32,20 +30,20 @@ export class FollowController {
   @Post(':id/follow')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Follow a user or toggle follow status' })
+  @ApiOperation({ summary: 'Follow or unfollow a user' })
   @ApiParam({
     name: 'id',
-    description: 'User ID to follow',
+    description: 'User ID to follow/unfollow',
     example: '507f1f77bcf86cd799439011',
   })
   @ApiResponse({
-    status: 201,
-    description: 'Follow relationship created successfully',
+    status: 200,
+    description: 'Follow relationship toggled successfully',
     schema: { example: { isFollowing: true } },
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request - cannot follow yourself or already following',
+    description: 'Bad request - cannot follow yourself',
   })
   @ApiResponse({
     status: 404,
@@ -54,84 +52,6 @@ export class FollowController {
   @HttpCode(HttpStatus.OK)
   async toggleFollow(@Param('id') followingId: string, @Request() req: any) {
     return this.followService.toggleFollow(req.user.userId, followingId);
-  }
-
-  /**
-   * Get all followers of a user
-   * GET /users/:id/followers
-   */
-  @Get(':id/followers')
-  @ApiOperation({ summary: 'Get all followers of a user' })
-  @ApiParam({
-    name: 'id',
-    description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Followers retrieved successfully',
-    schema: {
-      example: [
-        {
-          _id: '507f1f77bcf86cd799439011',
-          followerId: {
-            _id: '507f1f77bcf86cd799439012',
-            name: 'John Doe',
-            username: 'johndoe',
-            avatar: 'https://example.com/avatar.jpg',
-            bio: 'Software developer',
-          },
-          followingId: '507f1f77bcf86cd799439011',
-          createdAt: '2025-12-05T10:00:00Z',
-        },
-      ],
-    },
-  })
-  async getFollowers(@Param('id') userId: string) {
-    const followers = await this.followService.getFollowers(userId);
-    return {
-      count: followers.length,
-      data: followers,
-    };
-  }
-
-  /**
-   * Get all users that a user is following
-   * GET /users/:id/following
-   */
-  @Get(':id/following')
-  @ApiOperation({ summary: 'Get all users that a user is following' })
-  @ApiParam({
-    name: 'id',
-    description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Following list retrieved successfully',
-    schema: {
-      example: [
-        {
-          _id: '507f1f77bcf86cd799439012',
-          followerId: '507f1f77bcf86cd799439011',
-          followingId: {
-            _id: '507f1f77bcf86cd799439013',
-            name: 'Jane Smith',
-            username: 'janesmith',
-            avatar: 'https://example.com/avatar2.jpg',
-            bio: 'Designer',
-          },
-          createdAt: '2025-12-05T10:00:00Z',
-        },
-      ],
-    },
-  })
-  async getFollowing(@Param('id') userId: string) {
-    const following = await this.followService.getFollowing(userId);
-    return {
-      count: following.length,
-      data: following,
-    };
   }
 
   /**

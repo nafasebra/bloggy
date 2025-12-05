@@ -22,6 +22,7 @@ import { PostService } from '@/services/post.services';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-provider';
 import { useParams } from 'next/navigation';
+import http from '@/lib/http';
 
 export default function UserPage() {
   const { accessToken } = useAuth();
@@ -37,6 +38,22 @@ export default function UserPage() {
     queryKey: ['user-posts', id],
     queryFn: () => PostService.getPostsByUserId(id),
     enabled: !!accessToken,
+  });
+
+  const { data: followerCountData } = useQuery({
+    queryKey: ['follower-count', id],
+    queryFn: async () => {
+      const response = await http.get(`/users/${id}/follower-count`);
+      return response.data;
+    },
+  });
+
+  const { data: followingCountData } = useQuery({
+    queryKey: ['following-count', id],
+    queryFn: async () => {
+      const response = await http.get(`/users/${id}/following-count`);
+      return response.data;
+    },
   });
 
   if (isLoadingUser) {
@@ -194,7 +211,7 @@ export default function UserPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {userData.followers || 0}
+                {followerCountData?.count || 0}
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Followers
@@ -202,7 +219,7 @@ export default function UserPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {userData.following || 0}
+                {followingCountData?.count || 0}
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Following
