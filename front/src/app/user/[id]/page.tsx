@@ -192,7 +192,7 @@ export default function UserPage() {
                 Posts
               </div>
             </div>
-            {/* <div className="text-center">
+            <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {userData.followers || 0}
               </div>
@@ -207,9 +207,9 @@ export default function UserPage() {
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Following
               </div>
-            </div> */}
-            {/* Follow/Following Button */}
-            {/* <FollowButton userId={userData._id} initialFollowing={false} /> */}
+            </div>
+            Follow/Following Button
+            <FollowButton userId={userData._id} initialFollowing={false} />
           </div>
         </div>
       </div>
