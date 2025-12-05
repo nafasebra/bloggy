@@ -125,4 +125,78 @@ export class FollowController {
   ) {
     return this.followService.isFollowing(userId, targetId);
   }
+
+  /**
+   * Get list of followers for a user
+   * GET /users/:id/followers
+   */
+  @Get(':id/followers')
+  @ApiOperation({ summary: 'Get list of followers for a user' })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Followers list retrieved successfully',
+    schema: {
+      example: {
+        followers: [
+          {
+            _id: '507f1f77bcf86cd799439010',
+            name: 'John Doe',
+            bio: 'Software developer',
+            avatar: 'avatar_url',
+            email: 'john@example.com',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  async getFollowers(@Param('id') userId: string) {
+    const followers = await this.followService.getFollowers(userId);
+    return { followers };
+  }
+
+  /**
+   * Get list of users that a user is following
+   * GET /users/:id/following
+   */
+  @Get(':id/following')
+  @ApiOperation({ summary: 'Get list of users that a user is following' })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Following list retrieved successfully',
+    schema: {
+      example: {
+        following: [
+          {
+            _id: '507f1f77bcf86cd799439012',
+            name: 'Jane Smith',
+            bio: 'Product designer',
+            avatar: 'avatar_url',
+            email: 'jane@example.com',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  async getFollowing(@Param('id') userId: string) {
+    const following = await this.followService.getFollowing(userId);
+    return { following };
+  }
 }
