@@ -27,7 +27,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -43,6 +42,8 @@ export default function UserPage() {
     queryKey: ['user-me'],
     queryFn: () => UserService.getCurrentUser(accessToken as string),
   });
+
+  console.log("userData", userData);
 
   const { data: postsData, isLoading: isLoadingPosts } = useQuery({
     queryKey: ['user-posts'],
@@ -292,7 +293,7 @@ export default function UserPage() {
                     No posts yet
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    {userData.name} hasn't published any articles yet.
+                    {userData.name} hasn&apos;t published any articles yet.
                   </p>
                 </div>
               )}
