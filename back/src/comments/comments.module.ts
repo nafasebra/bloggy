@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './schemas/comment.schema';
 import { AuthModule } from '../auth/auth.module';
 import { CommentLike, CommentLikeSchema } from './schemas/comment-like.schema';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CommentLike, CommentLikeSchema } from './schemas/comment-like.schema';
       { name: CommentLike.name, schema: CommentLikeSchema },
     ]),
     AuthModule,
+    NotificationsModule,
   ],
   controllers: [CommentsController],
   providers: [CommentsService],

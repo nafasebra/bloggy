@@ -6,6 +6,7 @@ export type NotificationDocument = Notification & Document;
 export enum NotificationType {
   FOLLOW = 'follow',
   LIKE = 'like',
+  COMMENT = 'comment',
 }
 
 @Schema({ timestamps: true })
@@ -21,6 +22,9 @@ export class Notification {
 
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Post' })
   relatedPostId?: ObjectId;
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Comment' })
+  relatedCommentId?: ObjectId;
 
   @Prop({ default: false })
   read: boolean;

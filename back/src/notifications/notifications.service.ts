@@ -24,13 +24,15 @@ export class NotificationsService {
     relatedUserId: string,
     message: string,
     link?: string,
-    relatedPostId?: string
+    relatedPostId?: string,
+    relatedCommentId?: string
   ): Promise<Notification> {
     const notification = new this.notificationModel({
       userId,
       type,
       relatedUserId,
       relatedPostId,
+      relatedCommentId,
       message,
       link,
     });
@@ -41,6 +43,7 @@ export class NotificationsService {
       .findById(savedNotification._id)
       .populate('relatedUserId', 'name username avatar')
       .populate('relatedPostId', 'title')
+      .populate('relatedCommentId', 'content')
       .exec();
 
     // Emit notification via WebSocket
@@ -63,6 +66,7 @@ export class NotificationsService {
       .find({ userId })
       .populate('relatedUserId', 'name username avatar')
       .populate('relatedPostId', 'title')
+      .populate('relatedCommentId', 'content')
       .sort({ createdAt: -1 })
       .exec();
   }

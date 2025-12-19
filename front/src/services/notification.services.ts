@@ -3,7 +3,7 @@ import http from '@/lib/http';
 export interface Notification {
   _id: string;
   userId: string;
-  type: 'follow' | 'like';
+  type: 'follow' | 'like' | 'comment';
   relatedUserId: {
     _id: string;
     name: string;
@@ -13,6 +13,10 @@ export interface Notification {
   relatedPostId?: {
     _id: string;
     title: string;
+  };
+  relatedCommentId?: {
+    _id: string;
+    content: string;
   };
   read: boolean;
   message: string;

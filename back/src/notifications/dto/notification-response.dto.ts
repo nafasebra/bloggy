@@ -25,6 +25,12 @@ export class NotificationResponseDto {
     title: string;
   };
 
+  @ApiProperty({ required: false })
+  relatedCommentId?: {
+    _id: string;
+    content: string;
+  };
+
   @ApiProperty()
   read: boolean;
 

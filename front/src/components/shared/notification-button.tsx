@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Bell, ExternalLink, UserPlus, Heart } from 'lucide-react';
+import { Bell, ExternalLink, UserPlus, Heart, MessageCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,23 +23,27 @@ const typeColors = {
   error: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
-const getNotificationTypeColor = (type: 'follow' | 'like') => {
+const getNotificationTypeColor = (type: 'follow' | 'like' | 'comment') => {
   switch (type) {
     case 'follow':
       return typeColors.success;
     case 'like':
       return typeColors.info;
+    case 'comment':
+      return typeColors.warning;
     default:
       return typeColors.info;
   }
 };
 
-const getNotificationIcon = (type: 'follow' | 'like') => {
+const getNotificationIcon = (type: 'follow' | 'like' | 'comment') => {
   switch (type) {
     case 'follow':
       return <UserPlus className="h-4 w-4" />;
     case 'like':
       return <Heart className="h-4 w-4" />;
+    case 'comment':
+      return <MessageCircle className="h-4 w-4" />;
     default:
       return <ExternalLink className="h-4 w-4" />;
   }
@@ -235,7 +239,11 @@ function NotificationButton() {
                           !notification.read ? 'font-semibold' : ''
                         }`}
                       >
-                        {notification.type === 'follow' ? 'New Follower' : 'Post Liked'}
+                        {notification.type === 'follow'
+                          ? 'New Follower'
+                          : notification.type === 'like'
+                            ? 'Post Liked'
+                            : 'New Comment'}
                       </h4>
                       {!notification.read && (
                         <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0" />
