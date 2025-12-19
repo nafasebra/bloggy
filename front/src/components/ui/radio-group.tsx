@@ -6,30 +6,76 @@ import { CircleIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
+export interface RadioGroupProps
+  extends React.ComponentProps<typeof RadioGroupPrimitive.Root> {
+  /**
+   * Orientation of the radio group.
+   * - 'horizontal': Items arranged in a row
+   * - 'vertical': Items arranged in a column (default)
+   */
+  orientation?: 'horizontal' | 'vertical';
+}
+
+/**
+ * RadioGroup component for selecting a single option from a group.
+ * 
+ * Built on Radix UI RadioGroup primitive with full keyboard navigation and accessibility.
+ * Supports horizontal and vertical orientations.
+ * 
+ * @example
+ * ```tsx
+ * <RadioGroup>
+ *   <div className="flex items-center gap-2">
+ *     <RadioGroupItem value="option1" id="option1" />
+ *     <Label htmlFor="option1">Option 1</Label>
+ *   </div>
+ * </RadioGroup>
+ * ```
+ */
 function RadioGroup({
   className,
+  orientation = 'vertical',
   ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
+}: RadioGroupProps) {
   return (
     <RadioGroupPrimitive.Root
       data-slot="radio-group"
-      className={cn('grid gap-3', className)}
+      className={cn(
+        'grid gap-3',
+        orientation === 'horizontal' && 'grid-flow-col',
+        className
+      )}
+      orientation={orientation}
       {...props}
     />
   );
 }
 
+export interface RadioGroupItemProps
+  extends React.ComponentProps<typeof RadioGroupPrimitive.Item> {
+  /**
+   * Accessible label for the radio item.
+   * Required when radio is not associated with a visible label.
+   */
+  'aria-label'?: string;
+}
+
+/**
+ * RadioGroupItem component for individual radio options.
+ */
 function RadioGroupItem({
   className,
+  'aria-label': ariaLabel,
   ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
+}: RadioGroupItemProps) {
   return (
-    <RadioGroupPrimitive.Item
+      <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
         'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
+      aria-label={ariaLabel}
       {...props}
     >
       <RadioGroupPrimitive.Indicator

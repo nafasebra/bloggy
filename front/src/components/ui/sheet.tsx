@@ -6,6 +6,26 @@ import { XIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
+/**
+ * Sheet root component for displaying content from the side of the screen.
+ * 
+ * Built on Radix UI Dialog primitive with full accessibility support.
+ * Supports all four sides: top, right, bottom, and left.
+ * 
+ * @example
+ * ```tsx
+ * <Sheet>
+ *   <SheetTrigger>Open</SheetTrigger>
+ *   <SheetContent side="right">
+ *     <SheetHeader>
+ *       <SheetTitle>Title</SheetTitle>
+ *       <SheetDescription>Description</SheetDescription>
+ *     </SheetHeader>
+ *     Content here
+ *   </SheetContent>
+ * </Sheet>
+ * ```
+ */
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }

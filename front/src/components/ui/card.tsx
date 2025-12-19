@@ -2,21 +2,61 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'rounded-lg border bg-card text-card-foreground shadow-sm',
-      className
-    )}
-    {...props}
-  />
-));
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Enable hover effects on the card.
+   * Adds subtle shadow and scale effects on hover.
+   */
+  hover?: boolean;
+  /**
+   * Make the card clickable/interactive.
+   * Adds cursor pointer and focus styles.
+   */
+  clickable?: boolean;
+}
+
+/**
+ * Card component container with optional hover and clickable states.
+ * 
+ * Provides a consistent container for content with optional interactive states.
+ * Fully accessible with proper focus management.
+ * 
+ * @example
+ * ```tsx
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>Title</CardTitle>
+ *   </CardHeader>
+ *   <CardContent>Content</CardContent>
+ * </Card>
+ * 
+ * <Card hover clickable onClick={handleClick}>
+ *   <CardContent>Clickable card</CardContent>
+ * </Card>
+ * ```
+ */
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, hover, clickable, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'rounded-lg border bg-card text-card-foreground shadow-sm',
+        hover && 'transition-all hover:shadow-md hover:-translate-y-0.5',
+        clickable &&
+          'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        className
+      )}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      {...props}
+    />
+  )
+);
 Card.displayName = 'Card';
 
+/**
+ * Card header component for title and description.
+ */
 const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -29,6 +69,9 @@ const CardHeader = React.forwardRef<
 ));
 CardHeader.displayName = 'CardHeader';
 
+/**
+ * Card title component.
+ */
 const CardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.ComponentPropsWithoutRef<'h3'>
@@ -44,6 +87,9 @@ const CardTitle = React.forwardRef<
 ));
 CardTitle.displayName = 'CardTitle';
 
+/**
+ * Card description component for subtitle or additional information.
+ */
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.ComponentPropsWithoutRef<'p'>
@@ -56,6 +102,9 @@ const CardDescription = React.forwardRef<
 ));
 CardDescription.displayName = 'CardDescription';
 
+/**
+ * Card content component for main content area.
+ */
 const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -64,6 +113,9 @@ const CardContent = React.forwardRef<
 ));
 CardContent.displayName = 'CardContent';
 
+/**
+ * Card footer component for actions or additional information.
+ */
 const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>

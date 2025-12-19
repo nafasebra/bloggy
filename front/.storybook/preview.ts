@@ -1,4 +1,7 @@
 import type { Preview } from '@storybook/nextjs-vite';
+import { withThemeByClassName } from '@storybook/addon-themes';
+import * as React from 'react';
+import '../src/app/globals.css';
 
 const preview: Preview = {
   parameters: {
@@ -16,11 +19,11 @@ const preview: Preview = {
       test: 'todo',
     },
 
-    themes: {
-      default: 'dark',
-      list: [
-        { name: 'light', class: '', color: '#ffffff' },
-        { name: 'dark', class: 'dark', color: '#1f2937' },
+    backgrounds: {
+      default: 'light',
+      values: [
+        { name: 'light', value: '#ffffff' },
+        { name: 'dark', value: '#0a0a0a' },
       ],
     },
 
@@ -31,6 +34,28 @@ const preview: Preview = {
       },
     },
   },
+
+  decorators: [
+    withThemeByClassName({
+      themes: {
+        light: '',
+        dark: 'dark',
+      },
+      defaultTheme: 'light',
+    }),
+    // Wrapper decorator for styling context
+    (Story) =>
+      React.createElement(
+        'div',
+        {
+          style: {
+            fontFamily:
+              'var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif)',
+          },
+        },
+        React.createElement(Story)
+      ),
+  ],
 
   tags: ['autodocs'],
 };

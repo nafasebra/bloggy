@@ -14,6 +14,12 @@ const badgeVariants = cva(
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+        success:
+          'border-transparent bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700',
+        warning:
+          'border-transparent bg-yellow-500 text-white hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700',
+        info:
+          'border-transparent bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700',
         outline: 'text-foreground',
       },
     },
@@ -25,11 +31,47 @@ const badgeVariants = cva(
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+    VariantProps<typeof badgeVariants> {
+  /**
+   * Show a dot indicator instead of text.
+   * When true, displays a small dot without text content.
+   */
+  dot?: boolean;
+}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+/**
+ * Badge component for displaying status, labels, or counts.
+ * 
+ * Supports multiple variants including success, warning, and info.
+ * Can display as a dot indicator or with text content.
+ * 
+ * @example
+ * ```tsx
+ * <Badge>Default</Badge>
+ * <Badge variant="success">Success</Badge>
+ * <Badge variant="destructive">Error</Badge>
+ * <Badge dot variant="success" />
+ * ```
+ */
+function Badge({ className, variant, dot, children, ...props }: BadgeProps) {
+  if (dot) {
+    return (
+      <div
+        className={cn(
+          badgeVariants({ variant }),
+          'size-2 p-0 border-0',
+          className
+        )}
+        aria-label={typeof children === 'string' ? children : 'Badge'}
+        {...props}
+      />
+    );
+  }
+
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div className={cn(badgeVariants({ variant }), className)} {...props}>
+      {children}
+    </div>
   );
 }
 

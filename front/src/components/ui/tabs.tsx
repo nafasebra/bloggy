@@ -5,19 +5,55 @@ import * as TabsPrimitive from '@radix-ui/react-tabs';
 
 import { cn } from '@/lib/utils';
 
+export interface TabsProps extends React.ComponentProps<typeof TabsPrimitive.Root> {
+  /**
+   * Orientation of the tabs.
+   * - 'horizontal': Tabs arranged horizontally (default)
+   * - 'vertical': Tabs arranged vertically
+   */
+  orientation?: 'horizontal' | 'vertical';
+}
+
+/**
+ * Tabs root component for creating tabbed interfaces.
+ * 
+ * Built on Radix UI Tabs primitive with full keyboard navigation and accessibility.
+ * Supports horizontal and vertical orientations.
+ * 
+ * @example
+ * ```tsx
+ * <Tabs defaultValue="tab1">
+ *   <TabsList>
+ *     <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+ *     <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+ *   </TabsList>
+ *   <TabsContent value="tab1">Content 1</TabsContent>
+ *   <TabsContent value="tab2">Content 2</TabsContent>
+ * </Tabs>
+ * ```
+ */
 function Tabs({
   className,
+  orientation = 'horizontal',
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+}: TabsProps) {
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
-      className={cn('flex flex-col gap-2', className)}
+      className={cn(
+        'flex gap-2',
+        orientation === 'vertical' ? 'flex-row' : 'flex-col',
+        className
+      )}
+      orientation={orientation}
       {...props}
     />
   );
 }
 
+/**
+ * TabsList component that contains the tab triggers.
+ */
 function TabsList({
   className,
   ...props
@@ -34,6 +70,10 @@ function TabsList({
   );
 }
 
+/**
+ * TabsTrigger component for individual tab buttons.
+ * Supports icons and text content.
+ */
 function TabsTrigger({
   className,
   ...props
@@ -50,6 +90,9 @@ function TabsTrigger({
   );
 }
 
+/**
+ * TabsContent component for tab panel content.
+ */
 function TabsContent({
   className,
   ...props

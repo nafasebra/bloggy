@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Loader2Icon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -35,24 +36,72 @@ const buttonVariants = cva(
   }
 );
 
+export interface ButtonProps
+  extends React.ComponentProps<'button'>,
+    VariantProps<typeof buttonVariants> {
+  /**
+   * Render as a child element instead of a button.
+   * Useful for composing with other components like Link.
+   */
+  asChild?: boolean;
+  /**
+   * Show loading state with spinner.
+   * When true, the button is disabled and shows a loading spinner.
+   */
+  loading?: boolean;
+  /**
+   * Accessible label for the button.
+   * Used for screen readers when button text is not descriptive enough.
+   */
+  'aria-label'?: string;
+}
+
+/**
+ * Button component with multiple variants and sizes.
+ * 
+ * Built on top of Radix UI Slot for composition and CVA for variant management.
+ * Fully accessible with keyboard navigation and screen reader support.
+ * 
+ * @example
+ * ```tsx
+ * <Button variant="default" size="lg">Click me</Button>
+ * <Button variant="destructive" loading>Delete</Button>
+ * <Button variant="outline" asChild>
+ *   <Link href="/about">About</Link>
+ * </Button>
+ * ```
+ */
 function Button({
   className,
   variant,
   size,
   asChild = false,
+  loading = false,
+  disabled,
+  children,
+  'aria-label': ariaLabel,
   ...props
-}: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : 'button';
+  const isDisabled = disabled || loading;
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={isDisabled}
+      aria-label={ariaLabel}
+      aria-busy={loading}
       {...props}
-    />
+    >
+      {loading && (
+        <Loader2Icon
+          className="animate-spin"
+          aria-hidden="true"
+        />
+      )}
+      {children}
+    </Comp>
   );
 }
 

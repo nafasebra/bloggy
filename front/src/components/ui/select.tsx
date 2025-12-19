@@ -6,24 +6,53 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
+/**
+ * Select root component.
+ * 
+ * Wraps the Radix UI Select primitive with proper data attributes.
+ * Manages the open/closed state and value of the select.
+ * 
+ * @example
+ * ```tsx
+ * <Select>
+ *   <SelectTrigger>
+ *     <SelectValue placeholder="Select an option" />
+ *   </SelectTrigger>
+ *   <SelectContent>
+ *     <SelectItem value="option1">Option 1</SelectItem>
+ *   </SelectContent>
+ * </Select>
+ * ```
+ */
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
+/**
+ * Select group component for grouping related options.
+ */
 function SelectGroup({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />;
 }
 
+/**
+ * Select value component that displays the selected value or placeholder.
+ */
 function SelectValue({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
+/**
+ * Select trigger component that opens/closes the select menu.
+ * 
+ * @param size - Size variant: 'sm' or 'default'
+ */
 function SelectTrigger({
   className,
   size = 'default',
@@ -50,6 +79,11 @@ function SelectTrigger({
   );
 }
 
+/**
+ * Select content component that contains the dropdown menu.
+ * 
+ * @param position - Positioning strategy: 'popper' or 'item-aligned'
+ */
 function SelectContent({
   className,
   children,
@@ -85,6 +119,9 @@ function SelectContent({
   );
 }
 
+/**
+ * Select label component for labeling groups of options.
+ */
 function SelectLabel({
   className,
   ...props
@@ -98,6 +135,9 @@ function SelectLabel({
   );
 }
 
+/**
+ * Select item component for individual options in the dropdown.
+ */
 function SelectItem({
   className,
   children,
