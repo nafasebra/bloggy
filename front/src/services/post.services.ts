@@ -45,23 +45,41 @@ export class PostService {
     return response.data;
   }
 
-  static async toggleLikePost(id: string): Promise<{
+  static async toggleLikePost(
+    id: string,
+    accessToken?: string | null
+  ): Promise<{
     post: Post;
     isLiked: boolean;
     action: 'liked' | 'unliked';
     message: string;
   }> {
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+    
     const response = await http.post<{
       post: Post;
       isLiked: boolean;
       action: 'liked' | 'unliked';
       message: string;
-    }>(`/posts/${id}/like`);
+    }>(`/posts/${id}/like`, {}, { headers });
     return response.data;
   }
 
-  static async checkIfPostLiked(id: string): Promise<{ isLiked: boolean }> {
-    const response = await http.get<{ isLiked: boolean }>(`/posts/${id}/liked`);
+  static async checkIfPostLiked(
+    id: string,
+    accessToken?: string | null
+  ): Promise<{ isLiked: boolean }> {
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+    
+    const response = await http.get<{ isLiked: boolean }>(`/posts/${id}/liked`, {
+      headers,
+    });
     return response.data;
   }
 

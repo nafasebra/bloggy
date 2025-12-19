@@ -3,12 +3,17 @@ import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable Socket.IO adapter
+  app.useWebSocketAdapter(new IoAdapter(app));
+
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
   });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -30,4 +35,4 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3030);
 }
-bootstrap();
+void bootstrap();

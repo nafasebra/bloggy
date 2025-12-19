@@ -7,13 +7,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Follow, FollowDocument } from './schemas/follow.schema';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/schemas/notification.schema';
 
 @Injectable()
 export class FollowService {
   constructor(
     @InjectModel(Follow.name)
     private readonly followModel: Model<FollowDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly notificationsService: NotificationsService
   ) {}
 
   async validateUser(userId: string): Promise<User> {
@@ -60,6 +63,24 @@ export class FollowService {
         followingId,
       });
       await newFollow.save();
+
+      // Create notification for the followed user
+      try {
+        const follower = await this.userModel.findById(followerId).exec();
+        if (follower) {
+          await this.notificationsService.create(
+            followingId,
+            NotificationType.FOLLOW,
+            followerId,
+            `${follower.name || follower.username} started following you`,
+            `/user/${followerId}`
+          );
+        }
+      } catch (error) {
+        // Don't fail the follow operation if notification creation fails
+        console.error('Failed to create notification:', error);
+      }
+
       return { isFollowing: true };
     }
   }

@@ -5,6 +5,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '@/services/post.services';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/auth-provider';
 
 interface LikeButtonProps {
   postId: string;
@@ -13,17 +14,18 @@ interface LikeButtonProps {
 
 function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
 
   // Query to check if the post is liked
   const { data: likeStatus, isLoading: isCheckingLikeStatus } = useQuery({
     queryKey: ['postLiked', postId],
-    queryFn: () => PostService.checkIfPostLiked(postId),
+    queryFn: () => PostService.checkIfPostLiked(postId, accessToken),
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   // Mutation to toggle like
   const toggleLikeMutation = useMutation({
-    mutationFn: () => PostService.toggleLikePost(postId),
+    mutationFn: () => PostService.toggleLikePost(postId, accessToken),
     onSuccess: (response) => {
       queryClient.setQueryData(['postLiked', postId], {
         isLiked: response.isLiked,

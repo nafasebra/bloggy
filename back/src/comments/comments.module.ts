@@ -9,7 +9,9 @@ import { CommentLike, CommentLikeSchema } from './schemas/comment-like.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
-    MongooseModule.forFeature([{ name: CommentLike.name, schema: CommentLikeSchema }]),
+    MongooseModule.forFeature([
+      { name: CommentLike.name, schema: CommentLikeSchema },
+    ]),
     AuthModule,
   ],
   controllers: [CommentsController],

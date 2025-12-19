@@ -16,6 +16,29 @@ export interface Post {
   updatedAt: string;
 }
 
+// ==================== Notification Types ====================
+
+export interface Notification {
+  _id: string;
+  userId: string;
+  type: 'follow' | 'like';
+  relatedUserId: {
+    _id: string;
+    name: string;
+    username: string;
+    avatar?: string;
+  };
+  relatedPostId?: {
+    _id: string;
+    title: string;
+  };
+  read: boolean;
+  message: string;
+  link?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface CreatePostData {
   title: string;
   content: string;

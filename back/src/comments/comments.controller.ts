@@ -12,11 +12,8 @@ import {
 import {
   CreateCommentDto,
   ReplyCommentDto,
-  LikeCommentDto,
-  CommentResponseDto,
   CommentsResponseDto,
   SingleCommentResponseDto,
-  ErrorResponseDto,
 } from './dto';
 import { CommentsService } from './comments.service';
 import { Comment } from './schemas/comment.schema';
@@ -109,11 +106,7 @@ export class CommentsController {
       req.connection.remoteAddress ||
       ip;
 
-    const realIP = Array.isArray(clientIP)
-      ? clientIP[0]
-      : clientIP.split(',')[0];
-
-    return this.commentsService.like(commentId, realIP);
+    return this.commentsService.like(commentId, clientIP);
   }
 
   // get state of like
@@ -136,11 +129,10 @@ export class CommentsController {
       req.connection.remoteAddress ||
       ip;
 
-    const realIP = Array.isArray(clientIP)
-      ? clientIP[0]
-      : clientIP.split(',')[0];
-
-    const isLiked = await this.commentsService.checkIfLiked(commentId, realIP);
+    const isLiked = await this.commentsService.checkIfLiked(
+      commentId,
+      clientIP
+    );
 
     return { isLiked };
   }

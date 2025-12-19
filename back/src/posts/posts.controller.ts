@@ -17,13 +17,13 @@ import { Post as PostEntity } from './schemas/post.schema';
 import {
   CreatePostDto,
   UpdatePostDto,
-  PostResponseDto,
   PostsResponseDto,
   SinglePostResponseDto,
   ErrorResponseDto,
   ViewPostResponseDto,
 } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -34,6 +34,14 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LikePostResponseDto } from './dto/like-post.dto';
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    email?: string;
+    username?: string;
+  };
+}
 
 @ApiTags('posts')
 @Controller('posts')
@@ -178,7 +186,11 @@ export class PostsController {
   }
 
   @Post(':id/like')
-  @ApiOperation({ summary: 'Toggle like on a post (tracks IP-based likes)' })
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiOperation({
+    summary:
+      'Toggle like on a post (tracks IP-based likes, optional user-based for authenticated users)',
+  })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
   @ApiResponse({
     status: 200,
@@ -193,7 +205,7 @@ export class PostsController {
   async toggleLikePost(
     @Param('id') id: string,
     @Ip() ip: string,
-    @Req() req: Request
+    @Req() req: AuthenticatedRequest
   ): Promise<{ post: PostEntity; isLiked: boolean; message: string }> {
     const clientIP =
       (req.headers['x-forwarded-for'] as string) ||
@@ -204,8 +216,12 @@ export class PostsController {
     const realIP = Array.isArray(clientIP)
       ? clientIP[0]
       : clientIP.split(',')[0];
-    const result = await this.postsService.toggleLikePost(id, realIP);
-    const isLiked = await this.postsService.checkIfLiked(id, realIP);
+
+    // Extract userId if user is authenticated (optional)
+    const userId = req.user?.userId;
+
+    const result = await this.postsService.toggleLikePost(id, realIP, userId);
+    const isLiked = await this.postsService.checkIfLiked(id, realIP, userId);
 
     return {
       ...result,
@@ -214,7 +230,10 @@ export class PostsController {
   }
 
   @Get(':id/liked')
-  @ApiOperation({ summary: 'Check if post is liked by current IP' })
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiOperation({
+    summary: 'Check if post is liked by current IP or authenticated user',
+  })
   @ApiParam({ name: 'id', type: 'string', description: 'Post id' })
   @ApiResponse({
     status: 200,
@@ -224,7 +243,7 @@ export class PostsController {
   async checkIfPostLiked(
     @Param('id') id: string,
     @Ip() ip: string,
-    @Req() req: Request
+    @Req() req: AuthenticatedRequest
   ): Promise<{ isLiked: boolean }> {
     const clientIP =
       (req.headers['x-forwarded-for'] as string) ||
@@ -235,7 +254,11 @@ export class PostsController {
     const realIP = Array.isArray(clientIP)
       ? clientIP[0]
       : clientIP.split(',')[0];
-    const isLiked = await this.postsService.checkIfLiked(id, realIP);
+
+    // Extract userId if user is authenticated (optional)
+    const userId = req.user?.userId;
+
+    const isLiked = await this.postsService.checkIfLiked(id, realIP, userId);
 
     return { isLiked };
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { AuthProvider } from '@/contexts/auth-provider';
+import { SocketProvider } from '@/contexts/socket-provider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import Footer from './layout/footer';
@@ -22,8 +23,10 @@ function Wrapper({ children }: WrapperProps) {
     <>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          {!isDashboard && <Navigation />}
-          <main>{children}</main>
+          <SocketProvider>
+            {!isDashboard && <Navigation />}
+            <main>{children}</main>
+          </SocketProvider>
         </AuthProvider>
       </QueryClientProvider>
       <Footer />
