@@ -16,7 +16,7 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
+  tags: ['!autodocs'],
   argTypes: {
     required: {
       control: 'boolean',
