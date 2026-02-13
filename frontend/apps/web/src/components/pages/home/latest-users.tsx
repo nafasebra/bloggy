@@ -53,9 +53,9 @@ async function getLatestUsers() {
 }
 
 export default async function LatestUsers() {
-  const latestUsers = await getLatestUsers();
+  // const latestUsers = await getLatestUsers();
 
-  console.log(latestUsers);
+  // console.log(latestUsers);
 
   return (
     <section className="py-16 bg-white dark:bg-gray-800">

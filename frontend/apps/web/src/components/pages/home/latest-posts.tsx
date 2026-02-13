@@ -52,9 +52,9 @@ async function getLatestPosts() {
 }
 
 export default async function LatestPosts() {
-  const latestPosts = await getLatestPosts();
+  // const latestPosts = await getLatestPosts();
 
-  console.log(latestPosts);
+  // console.log(latestPosts);
 
   return (
     <section className="py-16 bg-white dark:bg-gray-800">

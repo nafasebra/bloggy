@@ -6,9 +6,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from '@repo/ui/dropdown-menu';
+import { Button } from '@repo/ui/button';
+import { Badge } from '@repo/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { NotificationService } from '@/services/notification.services';
 import { useAuth } from '@/contexts/auth-provider';

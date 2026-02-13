@@ -6,8 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import Footer from './layout/footer';
 import Navigation from './layout/navigation';
-import { usePathname } from 'next/navigation';
-import { Toaster } from 'sonner';
+import { useTheme } from 'next-themes';
+import { Toaster } from '@repo/ui/sonner';
 
 const queryClient = new QueryClient();
 
@@ -16,21 +16,20 @@ interface WrapperProps {
 }
 
 function Wrapper({ children }: WrapperProps) {
-  const pathname = usePathname();
-  const isDashboard = pathname.startsWith('/dashboard');
+  const { resolvedTheme } = useTheme();
 
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <SocketProvider>
-            {!isDashboard && <Navigation />}
+            <Navigation />
             <main>{children}</main>
           </SocketProvider>
         </AuthProvider>
       </QueryClientProvider>
       <Footer />
-      <Toaster />
+      <Toaster theme={resolvedTheme as 'light' | 'dark' | 'system'} />
     </>
   );
 }

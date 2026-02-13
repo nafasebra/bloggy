@@ -45,10 +45,14 @@ export default function LoginPage() {
         const result = await response.json();
         if (result.access_token) {
           setAccessToken(result.access_token);
-          const { isNew, ...userWithoutIsNew } = result.user;
-          setUser(userWithoutIsNew);
-          if (isNew) {
-            router.push('/auth/setup');
+          if (result.user) {
+            const { isNew, ...userWithoutIsNew } = result.user;
+            setUser(userWithoutIsNew);
+            if (isNew) {
+              router.push('/auth/setup');
+            } else {
+              router.push('/');
+            }
           } else {
             router.push('/');
           }
@@ -146,7 +150,7 @@ export default function LoginPage() {
                 href="/auth/signup"
                 className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
-                Don't have an account? Sign up
+                Don&apos;t have an account? Sign up
               </Link>
             </div>
           </form>

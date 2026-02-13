@@ -2,17 +2,17 @@
 
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
-import { Button } from '../ui/button';
+import { Button } from '@repo/ui/button';
 import ThemeButton from '../shared/theme-button';
 import NotificationButton from '../shared/notification-button';
-import { Menu, User } from 'lucide-react';
+import { Menu, User, LayoutDashboard } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@repo/ui/sheet';
 import { useAuth } from '@/contexts/auth-provider';
 
 export default function Navigation() {
@@ -41,6 +41,17 @@ export default function Navigation() {
           {accessToken && <NotificationButton />}
           <ThemeButton />
           <div className="flex items-center gap-4">
+            {accessToken && (
+              <a
+                href={process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:5173'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </a>
+            )}
             {!accessToken && (
               <>
                 <Link href="/auth/login">
@@ -91,12 +102,23 @@ export default function Navigation() {
               </Sheet>
             </div>
           ) : (
-            <Link href={`/user/me`}>
-              <Button>
-                <User />
-                <span className="hidden md:flex">My Account</span>
-              </Button>
-            </Link>
+            <>
+              <a
+                href={process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:5173'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="md:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </a>
+              <Link href={`/user/me`}>
+                <Button>
+                  <User />
+                  <span className="hidden md:flex">My Account</span>
+                </Button>
+              </Link>
+            </>
           )}
         </div>
       </div>

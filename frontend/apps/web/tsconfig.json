@@ -19,7 +19,7 @@
     "next-env.d.ts",
     "next.config.js",
     ".next/types/**/*.ts"
-  ],
+, "../../packages/ui/src/alert-dialog.stories.tsx", "../../packages/ui/src/badge.stories.tsx", "../../packages/ui/src/button.stories.tsx", "../../packages/ui/src/card.stories.tsx", "../../packages/ui/src/checkbox.stories.tsx", "../../packages/ui/src/dropdown-menu.stories.tsx", "../../packages/ui/src/input.stories.tsx", "../../packages/ui/src/label.stories.tsx", "../../packages/ui/src/radio-group.stories.tsx", "../../packages/ui/src/select.stories.tsx", "../../packages/ui/src/sheet.stories.tsx", "../../packages/ui/src/sonner.stories.tsx", "../../packages/ui/src/table.stories.tsx", "../../packages/ui/src/tabs.stories.tsx", "../../packages/ui/src/textarea.stories.tsx"  ],
   "exclude": [
     "node_modules",
     "**/*.stories.tsx",

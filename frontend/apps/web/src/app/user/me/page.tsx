@@ -10,8 +10,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@repo/ui/dropdown-menu';
+import { Button } from '@repo/ui/button';
 import { LocateIcon, MoreVertical, XSquare } from 'lucide-react';
 import { UserService } from '@/services/user.services';
 import { PostService } from '@/services/post.services';
@@ -27,9 +27,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@repo/ui/alert-dialog';
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import FollowerList from '@/components/pages/user/follower-list';
 import FollowingList from '@/components/pages/user/following-list';
 

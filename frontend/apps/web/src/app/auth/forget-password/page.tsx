@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 const forgetPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -15,7 +16,7 @@ export default function ForgetPasswordPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors , isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm<ForgetPasswordFormData>({
     resolver: zodResolver(forgetPasswordSchema),
   });
@@ -49,7 +50,7 @@ export default function ForgetPasswordPage() {
               Forgot your password?
             </h2>
             <p className="text-center text-gray-600 dark:text-gray-300 mt-2 text-sm">
-              Enter your email address and we'll send you a link to reset your
+              Enter your email address and we&apos;ll send you a link to reset your
               password.
             </p>
           </div>
@@ -87,12 +88,12 @@ export default function ForgetPasswordPage() {
             </button>
 
             <div className="text-center pt-4">
-              <a
+              <Link
                 href="/auth/login"
                 className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
               >
                 Back to login
-              </a>
+              </Link>
             </div>
           </form>
         </div>
