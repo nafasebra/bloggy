@@ -66,8 +66,8 @@ export default function NewBlogPost() {
         tags: data.tags
           ? data.tags
               .split(',')
-              .map((tag) => tag.trim())
-              .filter((tag) => tag)
+              .map((tag: string) => tag.trim())
+              .filter((tag: string) => tag)
           : [],
         authorId: user._id,
         authorName: user.name,
@@ -204,7 +204,7 @@ export default function NewBlogPost() {
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">Select a category</option>
-                        {categories.map((category) => (
+                        {categories.map((category: string) => (
                           <option key={category} value={category}>
                             {category}
                           </option>
@@ -262,13 +262,13 @@ export default function NewBlogPost() {
                 <Controller
                   name="content"
                   control={form.control}
-                  render={({ field }) => (
-                    <MarkdownEditor
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Write your blog post content here using Markdown..."
-                    />
-                  )}
+                    render={({ field }: { field: { value: string; onChange: (value: string) => void } }) => (
+                      <MarkdownEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Write your blog post content here using Markdown..."
+                      />
+                    )}
                 />
                 {form.formState.errors.content && (
                   <p className="text-sm text-red-600 dark:text-red-400 mt-1">
@@ -342,7 +342,7 @@ export default function NewBlogPost() {
                     {form
                       .watch('tags')!
                       .split(',')
-                      .map((tag, index) => (
+                      .map((tag: string, index: number) => (
                         <span
                           key={index}
                           className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"

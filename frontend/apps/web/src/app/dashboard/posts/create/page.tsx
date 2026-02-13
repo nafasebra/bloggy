@@ -76,7 +76,7 @@ export default function CreatePostPage() {
 
       const postData = {
         ...data,
-        tags: data.tags ? data.tags.split(',').map((tag) => tag.trim()) : [],
+        tags: data.tags ? data.tags.split(',').map((tag: string) => tag.trim()) : [],
         authorId,
         createdAt: new Date().toISOString(),
       };
@@ -158,7 +158,7 @@ export default function CreatePostPage() {
                     <Controller
                       name="category"
                       control={form.control}
-                      render={({ field }) => (
+                      render={({ field }: { field: { value: string; onChange: (value: string) => void } }) => (
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
@@ -167,7 +167,7 @@ export default function CreatePostPage() {
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                           <SelectContent>
-                            {categories.map((category) => (
+                            {categories.map((category: string) => (
                               <SelectItem key={category} value={category}>
                                 {category}
                               </SelectItem>
@@ -203,7 +203,7 @@ export default function CreatePostPage() {
                   <Controller
                     name="content"
                     control={form.control}
-                    render={({ field }) => (
+                    render={({ field }: { field: { value: string; onChange: (value: string) => void } }) => (
                       <MarkdownEditor
                         value={field.value}
                         onChange={field.onChange}
@@ -287,7 +287,7 @@ export default function CreatePostPage() {
                       {form
                         .watch('tags')!
                         .split(',')
-                        .map((tag, index) => (
+                        .map((tag: string, index: number) => (
                           <span
                             key={index}
                             className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
