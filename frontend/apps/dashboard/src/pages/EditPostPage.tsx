@@ -13,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import { useAuth } from '@/contexts/auth-provider';
 import { categories } from '@/data';
 import http from '@/lib/http';
-import MarkdownEditor from '@/components/shared/MarkdownEditor';
-import MarkdownPreview from '@/components/shared/MarkdownPreview';
+import { MarkdownEditor } from '@repo/ui/markdown-editor';
+import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { toast } from 'sonner';
 
 const schema = z.object({

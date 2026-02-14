@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import { Badge } from '@repo/ui/badge';
 
 export interface BlogPost {
   id: string | number;
@@ -31,9 +32,9 @@ const BlogCard: React.FC<BlogCardProps> = ({
     >
       <div className="p-6">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
+          <Badge variant="info">
             {post.category}
-          </span>
+          </Badge>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {post.readTime}
           </span>

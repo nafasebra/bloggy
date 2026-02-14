@@ -8,6 +8,10 @@ import { z } from 'zod';
 import CommentCard from '@/components/shared/comment-card';
 import { CommentWithAuthor, CreateCommentData } from '@/types';
 import { CommentService } from '@/services/comment.services';
+import { Button } from '@repo/ui/button';
+import { Textarea } from '@repo/ui/textarea';
+import { Label } from '@repo/ui/label';
+import { Card, CardContent } from '@repo/ui/card';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -70,7 +74,8 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+    <Card>
+      <CardContent className="pt-8">
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
         Comments ({comments.length})
       </h3>
@@ -81,39 +86,31 @@ export default function CommentSection({ postId }: CommentSectionProps) {
           className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4"
         >
           <div className="flex flex-col gap-2">
-            <label
-              htmlFor="comment"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Comment
-            </label>
-            <textarea
+            <Label htmlFor="comment">Comment</Label>
+            <Textarea
               id="comment"
               rows={4}
               {...register('comment')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               placeholder="Share your thoughts..."
+              className="resize-none"
             />
             {errors.comment && (
               <p className="text-red-500 text-sm">{errors.comment.message}</p>
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={createCommentMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50"
           >
             {createCommentMutation.isPending ? 'Posting...' : 'Post Comment'}
-          </button>
+          </Button>
         </form>
       ) : (
         <div className="bg-gray-50 dark:bg-gray-700 flex flex-col gap-3 border border-gray-300 dark:border-gray-600 py-5 px-3 rounded-lg text-center items-center justify-center ">
           <p>Please login to write your thoughts</p>
           <Link href="/auth/login">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200">
-              Login
-            </button>
+            <Button>Login</Button>
           </Link>
         </div>
       )}
@@ -141,6 +138,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
           </p>
         </div>
       )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

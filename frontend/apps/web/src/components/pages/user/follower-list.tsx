@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import http from '@/lib/http';
+import { Badge } from '@repo/ui/badge';
 
 type FollowerUser = {
   _id: string;
@@ -109,9 +110,9 @@ const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Followers
         </h2>
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+        <Badge variant="secondary">
           {followers.length} {followers.length === 1 ? 'follower' : 'followers'}
-        </span>
+        </Badge>
       </div>
       
       {followers.length === 0 ? (

@@ -9,11 +9,28 @@ import { z } from 'zod';
 import { PostService } from '@/services/post.services';
 import { useAuth } from '@/contexts/auth-provider';
 import { ArrowLeft } from 'lucide-react';
-import MarkdownEditor from '@/components/shared/markdown-editor';
-import MarkdownPreview from '@/components/shared/markdown-preview';
+import dynamic from 'next/dynamic';
+import { MarkdownPreview } from '@repo/ui/markdown-preview';
+
+const MarkdownEditor = dynamic(
+  () => import('@repo/ui/markdown-editor').then((m) => ({ default: m.MarkdownEditor })),
+  { ssr: false }
+);
 import { getReadTime } from '@/lib/utils';
 import { categories } from '@/data';
 import { toast } from 'sonner';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { Textarea } from '@repo/ui/textarea';
+import { Label } from '@repo/ui/label';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@repo/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/select';
 
 const createPostSchema = z.object({
   title: z
@@ -110,50 +127,27 @@ export default function NewBlogPost() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-          {/* Form Tabs */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <div className="flex">
-              <button
-                onClick={() => setIsPreview(false)}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                  !isPreview
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
+          <Tabs value={isPreview ? 'preview' : 'write'} onValueChange={(v) => setIsPreview(v === 'preview')}>
+            <TabsList className="w-full justify-start rounded-none border-b border-gray-200 dark:border-gray-700 bg-transparent p-0 h-auto">
+              <TabsTrigger value="write" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:shadow-none">
                 Write
-              </button>
-              <button
-                onClick={() => setIsPreview(true)}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                  isPreview
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="preview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:shadow-none">
                 Preview
-              </button>
-            </div>
-          </div>
+              </TabsTrigger>
+            </TabsList>
 
-          {!isPreview ? (
+          <TabsContent value="write" className="mt-0">
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
               className="p-6 space-y-6"
             >
               {/* Title */}
               <div>
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Title *
-                </label>
-                <input
-                  type="text"
+                <Label htmlFor="title">Title *</Label>
+                <Input
                   id="title"
                   {...form.register('title')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="Enter your post title..."
                 />
                 {form.formState.errors.title && (
@@ -165,17 +159,11 @@ export default function NewBlogPost() {
 
               {/* Excerpt */}
               <div>
-                <label
-                  htmlFor="excerpt"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Excerpt *
-                </label>
-                <textarea
+                <Label htmlFor="excerpt">Excerpt *</Label>
+                <Textarea
                   id="excerpt"
-                  {...form.register('excerpt')}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  {...form.register('excerpt')}
                   placeholder="Write a brief summary of your post..."
                 />
                 {form.formState.errors.excerpt && (
@@ -188,28 +176,23 @@ export default function NewBlogPost() {
               {/* Category and Read Time */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label
-                    htmlFor="category"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Category *
-                  </label>
+                  <Label htmlFor="category">Category *</Label>
                   <Controller
                     name="category"
                     control={form.control}
                     render={({ field }) => (
-                      <select
-                        id="category"
-                        {...field}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">Select a category</option>
-                        {categories.map((category: string) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
-                      </select>
+                      <Select value={field.value || ''} onValueChange={field.onChange}>
+                        <SelectTrigger id="category" className="w-full">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category: string) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     )}
                   />
                   {form.formState.errors.category && (
@@ -220,32 +203,22 @@ export default function NewBlogPost() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Read Time (minutes)
-                  </label>
-                  <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                    {getReadTime(form.watch('content'))}
-                    min
+                  <Label>Read Time (minutes)</Label>
+                  <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                    {getReadTime(form.watch('content'))} min
                   </div>
                 </div>
               </div>
 
               {/* Tags */}
               <div>
-                <label
-                  htmlFor="tags"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Tags
-                </label>
-                <input
-                  type="text"
+                <Label htmlFor="tags">Tags</Label>
+                <Input
                   id="tags"
                   {...form.register('tags')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="Enter tags separated by commas..."
                 />
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Separate tags with commas (e.g., "Web Development, AI,
                   Frameworks")
                 </p>
@@ -253,12 +226,7 @@ export default function NewBlogPost() {
 
               {/* Content */}
               <div>
-                <label
-                  htmlFor="content"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Content * (Markdown supported)
-                </label>
+                <Label htmlFor="content">Content * (Markdown supported)</Label>
                 <Controller
                   name="content"
                   control={form.control}
@@ -287,26 +255,26 @@ export default function NewBlogPost() {
 
               {/* Submit Buttons */}
               <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => setIsPreview(true)}
-                  className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   Preview
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={form.formState.isSubmitting}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {form.formState.isSubmitting
                     ? 'Publishing...'
                     : 'Publish Post'}
-                </button>
+                </Button>
               </div>
             </form>
-          ) : (
-            /* Preview Mode */
+          </TabsContent>
+
+          <TabsContent value="preview" className="mt-0">
             <div className="p-6">
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -357,15 +325,17 @@ export default function NewBlogPost() {
               <MarkdownPreview content={form.watch('content') || ''} />
 
               <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
-                <button
+                <Button
+                  type="button"
+                  variant="secondary"
                   onClick={() => setIsPreview(false)}
-                  className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   Back to Edit
-                </button>
+                </Button>
               </div>
             </div>
-          )}
+          </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

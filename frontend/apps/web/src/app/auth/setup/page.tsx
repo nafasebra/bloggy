@@ -8,6 +8,10 @@ import { useAuth } from '@/contexts/auth-provider';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { Textarea } from '@repo/ui/textarea';
+import { Label } from '@repo/ui/label';
 
 const setupSchema = z.object({
   bio: z.string().optional(),
@@ -129,16 +133,10 @@ export default function CreateUserPage() {
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-4">
                 <div>
-                  <label
-                    htmlFor="bio"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Bio
-                  </label>
-                  <textarea
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
                     id="bio"
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Tell us about yourself"
                     {...register('bio')}
                   />
@@ -151,16 +149,10 @@ export default function CreateUserPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label
-                      htmlFor="location"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Location
-                    </label>
-                    <input
+                    <Label htmlFor="location">Location</Label>
+                    <Input
                       id="location"
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="Your location"
                       {...register('location')}
                     />
@@ -172,16 +164,10 @@ export default function CreateUserPage() {
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Category
-                    </label>
-                    <input
+                    <Label htmlFor="category">Category</Label>
+                    <Input
                       id="category"
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Technology"
                       {...register('category')}
                     />
@@ -194,16 +180,10 @@ export default function CreateUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="website"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Website
-                  </label>
-                  <input
+                  <Label htmlFor="website">Website</Label>
+                  <Input
                     id="website"
                     type="url"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="https://"
                     {...register('website')}
                   />
@@ -215,16 +195,10 @@ export default function CreateUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="twitter"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Twitter Account
-                  </label>
-                  <input
+                  <Label htmlFor="twitter">Twitter Account</Label>
+                  <Input
                     id="twitter"
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="@username"
                     {...register('twitter')}
                   />
@@ -236,13 +210,13 @@ export default function CreateUserPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full"
               >
                 {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
-              </button>
+              </Button>
             </form>
           </div>
         </div>

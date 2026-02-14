@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table';
+import { Button } from '@repo/ui/button';
+import { Badge } from '@repo/ui/badge';
 
 const users = [
   { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', joinedAt: '2023-01-15' },
@@ -41,23 +43,19 @@ export default function UsersPage() {
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
                     <TableCell>
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          user.role === 'Admin' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        }`}
-                      >
+                      <Badge variant={user.role === 'Admin' ? 'destructive' : 'secondary'}>
                         {user.role}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">{user.joinedAt}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <button type="button" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">
+                        <Button type="button" variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 h-auto py-1 px-2">
                           Edit
-                        </button>
-                        <button type="button" className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm hidden sm:inline">
+                        </Button>
+                        <Button type="button" variant="ghost" size="sm" className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm hidden sm:inline-flex h-auto py-1 px-2">
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

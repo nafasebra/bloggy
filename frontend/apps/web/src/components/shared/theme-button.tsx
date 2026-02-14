@@ -1,16 +1,9 @@
-import React from 'react';
-import { Button } from '@repo/ui/button';
+'use client';
+
+import { ThemeToggle } from '@repo/ui/theme-toggle';
 import { useTheme } from '@/hooks/useTheme';
-import { Moon, Sun } from 'lucide-react';
 
-function ThemeButton() {
+export default function ThemeButton() {
   const { theme, toggleTheme } = useTheme();
-
-  return (
-    <Button onClick={toggleTheme} variant="outline">
-      {theme === 'light' ? <Moon /> : <Sun />}
-    </Button>
-  );
+  return <ThemeToggle theme={theme} onToggle={toggleTheme} />;
 }
-
-export default ThemeButton;

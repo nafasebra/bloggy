@@ -6,7 +6,9 @@ import CommentSection from '@/components/pages/blog/comment-section';
 import { ChevronLeft } from 'lucide-react';
 import http from '@/lib/http';
 import { Post } from '@/types';
-import MarkdownPreview from '@/components/shared/markdown-preview';
+import { MarkdownPreview } from '@repo/ui/markdown-preview';
+import { Badge } from '@repo/ui/badge';
+import { Card, CardContent } from '@repo/ui/card';
 import { getReadTime } from '@/lib/utils';
 import { Eye, Heart } from 'lucide-react';
 import LikeButton from '@/components/pages/blog/like-button';
@@ -63,9 +65,9 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
 
           <div className="flex items-center space-x-2 mb-4">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
+            <Badge variant="info">
               {post.category}
-            </span>
+            </Badge>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {getReadTime(post.content)}
             </span>
@@ -108,25 +110,23 @@ export default async function PostPage({ params }: PostPageProps) {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
-          <MarkdownPreview content={post.content} />
+        <Card className="mb-8">
+          <CardContent className="pt-8">
+            <MarkdownPreview content={post.content} />
 
-          {/* Tags */}
-          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-              Tags:
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+            {/* Tags */}
+            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                Tags:
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag, index) => (
+                  <Badge key={index} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          </div>
 
           {/* View and Like Counts */}
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
@@ -138,7 +138,8 @@ export default async function PostPage({ params }: PostPageProps) {
               <LikeButton postId={post._id} />
             </div>
           </div>
-        </article>
+          </CardContent>
+        </Card>
 
         {/* Comments Section */}
         <CommentSection postId={post._id} />

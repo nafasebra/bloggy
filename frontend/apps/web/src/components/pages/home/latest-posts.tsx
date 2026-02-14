@@ -4,6 +4,7 @@ import Link from 'next/link';
 import http from '@/lib/http';
 import BlogCard from '@/components/shared/blog-card';
 import { ArrowRight } from 'lucide-react';
+import { Button } from '@repo/ui/button';
 
 // Mock data for latest posts
 const mockLatestPosts = [
@@ -75,13 +76,12 @@ export default async function LatestPosts() {
         </div>
 
         <div className="text-center mt-12">
-          <Link
-            href="/blog"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
-          >
-            View All Posts
-            <ArrowRight className="ml-2 -mr-1 w-5 h-5" />
-          </Link>
+          <Button asChild size="lg">
+            <Link href="/blog" className="inline-flex items-center">
+              View All Posts
+              <ArrowRight className="ml-2 -mr-1 w-5 h-5" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

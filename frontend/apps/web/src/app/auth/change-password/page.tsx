@@ -10,6 +10,9 @@ import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-provider';
 import http from '@/lib/http';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { Label } from '@repo/ui/label';
 
 const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, 'Old password is required'),
@@ -70,31 +73,29 @@ export default function ChangePasswordPage() {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="oldPassword"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Old Password
-                </label>
+                <Label htmlFor="oldPassword">Old Password</Label>
                 <div className="relative">
-                  <input
+                  <Input
                     id="oldPassword"
                     type={showOldPassword ? 'text' : 'password'}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your old password"
+                    className="pr-10"
                     {...register('oldPassword')}
                   />
-                  <button
+                  <Button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowOldPassword(!showOldPassword)}
+                    aria-label={showOldPassword ? 'Hide password' : 'Show password'}
                   >
                     {showOldPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+                      <Eye className="h-5 w-5" />
                     )}
-                  </button>
+                  </Button>
                 </div>
                 {errors.oldPassword && (
                   <p className="mt-2 text-sm text-red-600">
@@ -104,31 +105,29 @@ export default function ChangePasswordPage() {
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  New Password
-                </label>
+                <Label htmlFor="password">New Password</Label>
                 <div className="relative">
-                  <input
+                  <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your new password"
+                    className="pr-10"
                     {...register('password')}
                   />
-                  <button
+                  <Button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+                      <Eye className="h-5 w-5" />
                     )}
-                  </button>
+                  </Button>
                 </div>
                 {errors.password && (
                   <p className="mt-2 text-sm text-red-600">
@@ -138,13 +137,13 @@ export default function ChangePasswordPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full"
             >
               {isSubmitting ? 'Changing...' : 'Change Password'}
-            </button>
+            </Button>
 
             <div className="text-center pt-4">
               <Link

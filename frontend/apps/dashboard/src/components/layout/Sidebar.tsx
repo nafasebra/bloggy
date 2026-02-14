@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Menu, X, LayoutDashboard, FileText, PlusCircle, Users } from 'lucide-react';
+import { Button } from '@repo/ui/button';
 
 const items = [
   { title: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -16,14 +17,16 @@ export default function Sidebar() {
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon"
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
         aria-label="Toggle menu"
       >
         {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+      </Button>
       {mobileOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/50 z-30"

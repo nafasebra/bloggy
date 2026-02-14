@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Button } from '@repo/ui/button';
 
 export default function Hero() {
   return (
@@ -17,18 +18,12 @@ export default function Hero() {
             inspire, and be inspired through the power of words.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/blog"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
-            >
-              Explore Stories
-            </Link>
-            <Link
-              href="/blog"
-              className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
-            >
-              Start Writing
-            </Link>
+            <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:scale-105">
+              <Link href="/blog">Explore Stories</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/blog">Start Writing</Link>
+            </Button>
           </div>
         </div>
       </div>

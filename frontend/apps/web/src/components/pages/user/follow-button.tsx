@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-provider';
 import http from '@/lib/http';
 import { toast } from 'sonner';
+import { Button } from '@repo/ui/button';
 
 interface FollowButtonProps {
   userId: string;
@@ -85,17 +86,15 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   };
 
   return (
-    <button
+    <Button
+      type="button"
       onClick={handleClick}
       disabled={loading}
-      className={`w-[130px] font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-        isFollowing
-          ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-      }`}
+      variant={isFollowing ? 'secondary' : 'default'}
+      className="w-[130px]"
     >
       {loading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
-    </button>
+    </Button>
   );
 };
 

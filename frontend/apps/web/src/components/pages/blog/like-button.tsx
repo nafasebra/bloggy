@@ -2,6 +2,7 @@
 
 import { Heart } from 'lucide-react';
 import React from 'react';
+import { Button } from '@repo/ui/button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '@/services/post.services';
 import { toast } from 'sonner';
@@ -55,14 +56,17 @@ function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
 
   return (
     <div className="relative">
-      <button
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
         onClick={handleToggleLike}
         disabled={isLoading || isCheckingLikeStatus}
-        className={`cursor-pointer flex items-center gap-2 p-2 rounded-lg transition-all duration-200 ${
+        className={`gap-2 ${
           isLiked
-            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+            ? 'text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30'
             : 'text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-gray-50 dark:hover:bg-gray-700'
-        } ${isLoading || isCheckingLikeStatus ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+        } ${isLoading || isCheckingLikeStatus ? 'opacity-50' : 'hover:scale-105'}`}
       >
         <Heart
           className={`w-4 h-4 transition-all duration-200 ${
@@ -70,7 +74,7 @@ function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
           } ${isLoading ? 'animate-pulse' : ''}`}
         />
         <span className="text-sm font-medium">{likes}</span>
-      </button>
+      </Button>
     </div>
   );
 }

@@ -9,6 +9,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { Textarea } from '@repo/ui/textarea';
+import { Label } from '@repo/ui/label';
 
 const editProfileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
@@ -195,16 +199,10 @@ export default function EditUserPage() {
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-4">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Full Name
-                  </label>
-                  <input
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
                     id="name"
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Your full name"
                     {...register('name')}
                   />
@@ -216,16 +214,10 @@ export default function EditUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="username"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Username
-                  </label>
-                  <input
+                  <Label htmlFor="username">Username</Label>
+                  <Input
                     id="username"
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Your username"
                     {...register('username')}
                   />
@@ -237,16 +229,10 @@ export default function EditUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Email
-                  </label>
-                  <input
+                  <Label htmlFor="email">Email</Label>
+                  <Input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="your@email.com"
                     {...register('email')}
                   />
@@ -258,16 +244,10 @@ export default function EditUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="bio"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Bio
-                  </label>
-                  <textarea
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
                     id="bio"
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Tell us about yourself"
                     {...register('bio')}
                   />
@@ -280,16 +260,10 @@ export default function EditUserPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label
-                      htmlFor="location"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Location
-                    </label>
-                    <input
+                    <Label htmlFor="location">Location</Label>
+                    <Input
                       id="location"
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="Your location"
                       {...register('location')}
                     />
@@ -301,16 +275,10 @@ export default function EditUserPage() {
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Category
-                    </label>
-                    <input
+                    <Label htmlFor="category">Category</Label>
+                    <Input
                       id="category"
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Technology"
                       {...register('category')}
                     />
@@ -323,16 +291,10 @@ export default function EditUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="website"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Website
-                  </label>
-                  <input
+                  <Label htmlFor="website">Website</Label>
+                  <Input
                     id="website"
                     type="url"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="https://"
                     {...register('website')}
                   />
@@ -344,16 +306,10 @@ export default function EditUserPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="twitter"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Twitter Account
-                  </label>
-                  <input
+                  <Label htmlFor="twitter">Twitter Account</Label>
+                  <Input
                     id="twitter"
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="@username"
                     {...register('twitter')}
                   />
@@ -366,20 +322,21 @@ export default function EditUserPage() {
               </div>
 
               <div className="flex gap-4">
-                <button
+                <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1"
                 >
                   {isSubmitting ? 'Updating Profile...' : 'Update Profile'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => router.back()}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  className="flex-1"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>

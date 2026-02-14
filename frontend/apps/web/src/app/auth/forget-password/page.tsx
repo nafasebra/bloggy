@@ -5,6 +5,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { Label } from '@repo/ui/label';
 
 const forgetPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -58,16 +61,10 @@ export default function ForgetPasswordPage() {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Email address
-                </label>
-                <input
+                <Label htmlFor="email">Email address</Label>
+                <Input
                   id="email"
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your email address"
                   {...register('email')}
                 />
@@ -79,13 +76,13 @@ export default function ForgetPasswordPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full"
             >
               {isSubmitting ? 'Sending...' : 'Send reset link'}
-            </button>
+            </Button>
 
             <div className="text-center pt-4">
               <Link

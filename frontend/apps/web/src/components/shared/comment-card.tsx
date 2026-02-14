@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { CommentWithAuthor } from '@/types';
 import { Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CommentService } from '@/services/comment.services';
 import { UserService } from '@/services/user.services';
@@ -101,24 +104,30 @@ const CommentCard: React.FC<CommentCardProps> = ({
         </p>
 
         <div className="flex items-center space-x-4 mt-3">
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setIsReply(!isReply)}
-            className={`cursor-pointer text-xs transition-colors ${
+            className={`cursor-pointer text-xs h-auto py-0 px-0 ${
               isReply
                 ? 'text-blue-600 dark:text-blue-400'
                 : 'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
             }`}
           >
             Reply
-          </button>
-          <button
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleLike}
             disabled={likeMutation.isPending}
-            className={`cursor-pointer text-xs ${
+            className={`cursor-pointer text-xs h-auto py-0 px-0 ${
               likeStatus?.isLiked
                 ? 'text-red-600 dark:text-red-400'
                 : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
-            } transition-colors flex items-center`}
+            } flex items-center`}
           >
             <Heart
               className="mr-1"
@@ -127,7 +136,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
               color={likeStatus?.isLiked ? 'red' : 'currentColor'}
             />
             {likeMutation.isPending ? 'Liking...' : `Like (${comment.likes || 0})`}
-          </button>
+          </Button>
         </div>
 
         {/* Reply Input */}
@@ -135,29 +144,32 @@ const CommentCard: React.FC<CommentCardProps> = ({
           <>
             {accessToken ? (
               <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                <input
+                <Input
                   type="text"
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Add a reply..."
-                  className="w-full p-2 border rounded-md text-sm focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="flex-1"
                 />
-                <button
+                <Button
+                  type="button"
+                  size="sm"
                   onClick={handleReply}
                   disabled={replyMutation.isPending}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs disabled:opacity-50"
                 >
                   {replyMutation.isPending ? 'Replying...' : 'Reply'}
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="text-center mt-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg py-3">
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   You should be logged in to reply.
                 </p>
-                <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs">
-                  Login
-                </button>
+                <Link href="/auth/login">
+                  <Button type="button" size="sm" className="mt-2">
+                    Login
+                  </Button>
+                </Link>
               </div>
             )}
           </>

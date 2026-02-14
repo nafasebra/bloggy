@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { categories } from '@/data';
+import { Button } from '@repo/ui/button';
 
 const CategoryButtons: React.FC = () => {
   const searchParams = useSearchParams();
@@ -11,10 +12,8 @@ const CategoryButtons: React.FC = () => {
   const handleCategoryClick = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (selectedCategory === category) {
-      // If clicking the same category, remove the filter
       params.delete('category');
     } else {
-      // Set the new category filter
       params.set('category', category);
     }
     router.push(`?${params.toString()}`);
@@ -23,17 +22,20 @@ const CategoryButtons: React.FC = () => {
   return (
     <div className="flex flex-wrap gap-2">
       {categories.map((category) => (
-        <button
+        <Button
           key={category}
+          type="button"
+          variant={selectedCategory === category ? 'default' : 'secondary'}
+          size="sm"
           onClick={() => handleCategoryClick(category)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={
             selectedCategory === category
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
+              ? 'rounded-full'
+              : 'rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+          }
         >
           {category}
-        </button>
+        </Button>
       ))}
     </div>
   );

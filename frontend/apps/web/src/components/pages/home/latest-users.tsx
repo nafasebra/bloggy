@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import http from '@/lib/http';
+import { Badge } from '@repo/ui/badge';
 
 // Mock data for latest users
 const mockLatestUsers = [
@@ -103,9 +104,9 @@ export default async function LatestUsers() {
                 </span>
               </div>
 
-              <span className="inline-block text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
+              <Badge variant="info" className="text-xs">
                 {user.category}
-              </span>
+              </Badge>
             </div>
           ))}
         </div>

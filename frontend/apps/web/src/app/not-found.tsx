@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Home, Search, BookOpen, Users } from 'lucide-react';
+import { Button } from '@repo/ui/button';
 
 export default function NotFound() {
   const router = useRouter();
@@ -47,21 +48,22 @@ export default function NotFound() {
 
         {/* Action Buttons */}
         <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center sm:items-center">
-          <button
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => router.back()}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+            className="w-full sm:w-auto"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Go Back
-          </button>
+          </Button>
 
-          <Link
-            href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            <Home className="w-5 h-5 mr-2" />
-            Back to Home
-          </Link>
+          <Button asChild className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+            <Link href="/">
+              <Home className="w-5 h-5 mr-2" />
+              Back to Home
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

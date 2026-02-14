@@ -9,6 +9,9 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-provider';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { Label } from '@repo/ui/label';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -82,16 +85,10 @@ export default function LoginPage() {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Username
-                </label>
-                <input
+                <Label htmlFor="username">Username</Label>
+                <Input
                   id="username"
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your username"
                   {...register('username')}
                 />
@@ -103,31 +100,29 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Password
-                </label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <input
+                  <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your password"
+                    className="pr-10"
                     {...register('password')}
                   />
-                  <button
+                  <Button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+                      <Eye className="h-5 w-5" />
                     )}
-                  </button>
+                  </Button>
                 </div>
                 {errors.password && (
                   <p className="mt-2 text-sm text-red-600">
@@ -137,13 +132,13 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full"
             >
               {isSubmitting ? 'Signing in...' : 'Sign in'}
-            </button>
+            </Button>
 
             <div className="text-center pt-4">
               <Link
