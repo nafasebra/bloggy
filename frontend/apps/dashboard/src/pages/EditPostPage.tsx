@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -78,15 +78,21 @@ export default function EditPostPage() {
     }
   };
 
-  if (loading) return <div className="py-8 text-center">Loading post...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="text-muted-foreground">Loading post...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Edit Post</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Update your blog post</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Edit Post</h1>
+        <p className="text-muted-foreground mt-1">Update your blog post</p>
       </div>
-      <Card>
+      <Card className="border-border shadow-sm">
         <CardHeader>
           <CardTitle>Post Details</CardTitle>
         </CardHeader>
@@ -101,12 +107,12 @@ export default function EditPostPage() {
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="title">Title *</Label>
                   <Input id="title" {...form.register('title')} placeholder="Enter post title" />
-                  {form.formState.errors.title && <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>}
+                  {form.formState.errors.title && <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>}
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="excerpt">Excerpt *</Label>
-                  <Textarea id="excerpt" {...form.register('excerpt')} rows={3} />
-                  {form.formState.errors.excerpt && <p className="text-sm text-red-600">{form.formState.errors.excerpt.message}</p>}
+                  <Textarea id="excerpt" {...form.register('excerpt')} rows={3} placeholder="Brief summary..." />
+                  {form.formState.errors.excerpt && <p className="text-sm text-destructive">{form.formState.errors.excerpt.message}</p>}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
@@ -140,7 +146,7 @@ export default function EditPostPage() {
                     control={form.control}
                     render={({ field }) => <MarkdownEditor value={field.value} onChange={field.onChange} />}
                   />
-                  {form.formState.errors.content && <p className="text-sm text-red-600">{form.formState.errors.content.message}</p>}
+                  {form.formState.errors.content && <p className="text-sm text-destructive">{form.formState.errors.content.message}</p>}
                 </div>
                 <div className="flex gap-3">
                   <Button type="submit" disabled={form.formState.isSubmitting}>Update Post</Button>
@@ -150,7 +156,7 @@ export default function EditPostPage() {
             </TabsContent>
             <TabsContent value="preview">
               <MarkdownPreview content={form.watch('content') || ''} />
-              <div className="flex gap-3 pt-6 border-t">
+              <div className="flex gap-3 pt-6 border-t border-border">
                 <Button type="button" variant="outline" onClick={() => setActiveTab('write')}>Back to Edit</Button>
                 <Button type="button" onClick={form.handleSubmit(onSubmit)}>Update Post</Button>
               </div>

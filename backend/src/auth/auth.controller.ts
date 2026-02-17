@@ -13,7 +13,7 @@ import {
   ApiUnauthorizedResponse,
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
-import { ErrorResponseDto } from '../users/dto/error-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { ChangePasswordDto } from './dto';
 
 @ApiTags('Authentication')

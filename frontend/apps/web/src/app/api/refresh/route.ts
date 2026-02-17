@@ -5,15 +5,13 @@ export async function POST(request: NextRequest) {
   const refreshToken = cookieStore.get('refresh_token')?.value;
 
   if (!refreshToken) {
-    return NextResponse.json(
-      { error: 'No refresh token found' },
-      { status: 401 }
-    );
+    return NextResponse.json({ access_token: null }, { status: 200 });
   }
 
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      `${apiUrl}/auth/refresh`,
       {
         method: 'POST',
         headers: {

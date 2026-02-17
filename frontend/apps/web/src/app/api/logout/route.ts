@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 
 export async function POST() {
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+      `${apiUrl}/auth/logout`,
       {
         method: 'POST',
         headers: {

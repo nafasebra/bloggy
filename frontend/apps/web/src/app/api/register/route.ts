@@ -13,9 +13,14 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(data);
   } catch (error: any) {
+    const status = error.response?.status ?? 500;
+    const message =
+      error.response?.data?.message ??
+      error.response?.data?.error ??
+      error.message;
     return NextResponse.json(
-      { error: 'Registration failed: ' + error.message },
-      { status: 500 }
+      { error: typeof message === 'string' ? message : 'Registration failed' },
+      { status }
     );
   }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import type { Post } from '@/types';
 import {
   Table,
@@ -43,18 +43,20 @@ export default function PostTable({ posts, onDelete }: PostTableProps) {
   };
 
   return (
-    <div className="overflow-x-auto -mx-4 sm:mx-0">
+    <div className="overflow-x-auto -mx-4 sm:mx-0 rounded-md border border-border">
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete post?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete this post. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -65,7 +67,7 @@ export default function PostTable({ posts, onDelete }: PostTableProps) {
             <TableHead className="min-w-[200px]">Title</TableHead>
             <TableHead className="hidden md:table-cell">Author</TableHead>
             <TableHead className="hidden lg:table-cell">Created</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-right w-[120px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -73,25 +75,25 @@ export default function PostTable({ posts, onDelete }: PostTableProps) {
             <TableRow key={post._id}>
               <TableCell className="font-medium">
                 <div>
-                  <div className="line-clamp-2">{post.title}</div>
-                  <div className="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="line-clamp-2 text-foreground">{post.title}</div>
+                  <div className="md:hidden text-xs text-muted-foreground mt-1">
                     {new Date(post.createdAt).toLocaleDateString()}
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="hidden md:table-cell">{post.authorName}</TableCell>
-              <TableCell className="hidden lg:table-cell">
+              <TableCell className="hidden md:table-cell text-muted-foreground">{post.authorName}</TableCell>
+              <TableCell className="hidden lg:table-cell text-muted-foreground">
                 {new Date(post.createdAt).toLocaleDateString()}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Link to={`/posts/edit/${post._id}`}>
-                    <Button variant="outline" size="sm">
-                      <Edit />
-                    </Button>
-                  </Link>
-                  <Button variant="outline" size="sm" onClick={() => handleDeleteClick(post._id)}>
-                    <Trash />
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={`/posts/edit/${post._id}`}>
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteClick(post._id)}>
+                    <Trash className="w-4 h-4" />
                   </Button>
                 </div>
               </TableCell>

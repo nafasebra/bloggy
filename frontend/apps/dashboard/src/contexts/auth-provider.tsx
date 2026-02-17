@@ -8,6 +8,7 @@ interface User {
   name: string;
   username: string;
   email: string;
+  role?: 'admin' | 'user';
 }
 
 interface AuthContextType {
@@ -31,6 +32,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessTokenState] = useState<string | null>(() => localStorage.getItem(AUTH_TOKEN_KEY));
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Read token from URL hash on initial load (when redirected from web login)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#token=')) {
+      const token = hash.slice(7); // Remove '#token='
+      if (token) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+        setAccessTokenState(token);
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+  }, []);
 
   const setAccessToken = useCallback((token: string | null) => {
     if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);

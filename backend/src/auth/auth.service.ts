@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -24,7 +28,16 @@ export class AuthService {
       password: hashed_password,
     };
     const newUser = new this.userModel(user);
-    return newUser.save();
+    try {
+      return await newUser.save();
+    } catch (err: any) {
+      if (err.code === 11000) {
+        throw new ConflictException(
+          'Username or email is already taken'
+        );
+      }
+      throw err;
+    }
   }
 
   async login(loginDto: LoginDto) {
@@ -60,6 +73,7 @@ export class AuthService {
         username: user.username,
         email: user.email,
         isNew: user.isNew,
+        role: user.role ?? 'user',
       },
     };
   }

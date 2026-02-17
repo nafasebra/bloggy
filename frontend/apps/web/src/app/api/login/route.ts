@@ -2,8 +2,9 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      `${apiUrl}/auth/login`,
       {
         method: 'POST',
         headers: {

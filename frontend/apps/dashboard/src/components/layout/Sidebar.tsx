@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { cn } from '@/lib/utils';
 import { Menu, X, LayoutDashboard, FileText, PlusCircle, Users } from 'lucide-react';
 import { Button } from '@repo/ui/button';
@@ -22,28 +22,28 @@ export default function Sidebar() {
         variant="outline"
         size="icon"
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 bg-card border-border shadow-md"
         aria-label="Toggle menu"
       >
         {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </Button>
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
           aria-hidden
         />
       )}
       <aside
         className={cn(
-          'fixed lg:static inset-y-0 left-0 z-40 flex h-full w-64 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300',
+          'fixed lg:static inset-y-0 left-0 z-40 flex h-full w-64 flex-col border-r border-border bg-card transition-transform duration-300 shadow-lg lg:shadow-none',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
-        <div className="flex h-16 items-center border-b border-gray-200 dark:border-gray-700 px-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Admin Dashboard</h2>
+        <div className="flex h-16 items-center border-b border-border px-6">
+          <h2 className="text-lg font-semibold text-foreground">Admin</h2>
         </div>
-        <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
+        <nav className="flex-1 space-y-0.5 p-4 overflow-y-auto">
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href));
@@ -53,13 +53,13 @@ export default function Sidebar() {
                 to={item.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 )}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-5 h-5 shrink-0" />
                 {item.title}
               </Link>
             );

@@ -47,6 +47,15 @@ export default function LoginPage() {
       if (response.ok) {
         const result = await response.json();
         if (result.access_token) {
+          const dashboardUrl =
+            process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
+          const isAdmin = result.user?.role === 'admin';
+
+          if (isAdmin) {
+            window.location.href = `${dashboardUrl}#token=${result.access_token}`;
+            return;
+          }
+
           setAccessToken(result.access_token);
           if (result.user) {
             const { isNew, ...userWithoutIsNew } = result.user;

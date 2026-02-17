@@ -11,12 +11,12 @@ const users = [
 
 export default function UsersPage() {
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Users</h1>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">Manage your users</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Users</h1>
+        <p className="text-muted-foreground mt-1">Manage your users</p>
       </div>
-      <Card>
+      <Card className="border-border shadow-sm">
         <CardHeader>
           <CardTitle>All Users</CardTitle>
         </CardHeader>
@@ -37,23 +37,23 @@ export default function UsersPage() {
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">
                       <div>
-                        <div>{user.name}</div>
-                        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">{user.email}</div>
+                        <div className="text-foreground">{user.name}</div>
+                        <div className="sm:hidden text-xs text-muted-foreground mt-1">{user.email}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground">{user.email}</TableCell>
                     <TableCell>
                       <Badge variant={user.role === 'Admin' ? 'destructive' : 'secondary'}>
                         {user.role}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">{user.joinedAt}</TableCell>
+                    <TableCell className="hidden lg:table-cell text-muted-foreground">{user.joinedAt}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 h-auto py-1 px-2">
+                        <Button type="button" variant="ghost" size="sm">
                           Edit
                         </Button>
-                        <Button type="button" variant="ghost" size="sm" className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm hidden sm:inline-flex h-auto py-1 px-2">
+                        <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
                           Delete
                         </Button>
                       </div>

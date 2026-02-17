@@ -111,6 +111,15 @@ export class UserResponseDto {
   isNew?: boolean;
 
   @ApiPropertyOptional({
+    description: "The user's role (admin or user)",
+    example: 'user',
+    enum: ['admin', 'user'],
+  })
+  @IsOptional()
+  @IsString()
+  role?: 'admin' | 'user';
+
+  @ApiPropertyOptional({
     description: 'Array of post IDs created by the user',
     example: ['507f1f77bcf86cd799439012', '507f1f77bcf86cd799439013'],
   })

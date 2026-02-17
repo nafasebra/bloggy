@@ -47,7 +47,8 @@ export default function SignupPage() {
         toast.success('Account created successfully! Please log in.');
         router.push('/auth/login');
       } else {
-        toast.error('The username or email is already taken');
+        const data = await response.json().catch(() => ({}));
+        toast.error(data.error || 'The username or email is already taken');
       }
     } catch (err) {
       toast.error('Signup failed. Please try again.');

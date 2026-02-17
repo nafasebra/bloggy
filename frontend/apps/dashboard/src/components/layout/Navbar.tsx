@@ -20,12 +20,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
+    <nav className="sticky top-0 z-10 border-b border-border bg-card shadow-sm px-4 sm:px-6 py-3 sm:py-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">Bloggy Dashboard</h1>
-        <div className="flex items-center gap-2 sm:gap-4">
+        <h1 className="text-base sm:text-xl font-bold text-foreground tracking-tight">Bloggy Dashboard</h1>
+        <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle theme={theme} onToggle={handleToggle} />
-          <Button type="button" variant="outline" size="icon" aria-label="User profile">
+          <Button type="button" variant="ghost" size="icon" aria-label="User profile">
             <User className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         </div>

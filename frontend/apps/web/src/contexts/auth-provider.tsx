@@ -11,11 +11,23 @@ import { UserService } from '@/services/user.services';
 
 interface AuthContextType {
   accessToken: string | null;
-  user: { _id: string; name: string; username: string; email: string } | null;
+  user: {
+    _id: string;
+    name: string;
+    username: string;
+    email: string;
+    role?: string;
+  } | null;
   refreshToken: () => Promise<void>;
   setAccessToken: (token: string | null) => void;
   setUser: (
-    user: { _id: string; name: string; username: string; email: string } | null
+    user: {
+      _id: string;
+      name: string;
+      username: string;
+      email: string;
+      role?: string;
+    } | null
   ) => void;
   logout: () => void;
 }
@@ -41,6 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     name: string;
     username: string;
     email: string;
+    role?: string;
   } | null>(null);
 
   const setAccessToken = (token: string | null) => {
@@ -50,7 +63,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const setUser = (
-    user: { _id: string; name: string; username: string; email: string } | null
+    user: {
+      _id: string;
+      name: string;
+      username: string;
+      email: string;
+      role?: string;
+    } | null
   ) => {
     setUserState(user);
   };
@@ -72,17 +91,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
-      if (response.ok) {
-        const data = await response.json();
-        const token = data.access_token;
-        setAccessTokenState(token);
-        setAccessToken(token);
-        await fetchUser(data.access_token);
+      const data = await response.json();
+      const token = data.access_token ?? null;
+      setAccessTokenState(token);
+      setAccessToken(token);
+      if (token) {
+        await fetchUser(token);
       } else {
-        // Handle refresh failure, e.g., logout
-        setAccessTokenState(null);
-        setAccessToken(null);
         setUser(null);
       }
     } catch (error) {

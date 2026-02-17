@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
-import { Toaster } from 'sonner';
+import { Toaster } from '@repo/ui/sonner';
 import { AuthProvider, useAuth } from '@/contexts/auth-provider';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import DashboardPage from '@/pages/DashboardPage';
@@ -7,19 +8,46 @@ import PostsPage from '@/pages/PostsPage';
 import CreatePostPage from '@/pages/CreatePostPage';
 import EditPostPage from '@/pages/EditPostPage';
 import UsersPage from '@/pages/UsersPage';
-import LoginPage from '@/pages/LoginPage';
+
+const WEB_LOGIN_URL =
+  import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
+
+function LoginRedirectPage() {
+  useEffect(() => {
+    window.location.href = `${WEB_LOGIN_URL}/auth/login`;
+  }, []);
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse text-muted-foreground">
+        Redirecting to login...
+      </div>
+    </div>
+  );
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { accessToken, isLoading } = useAuth();
-  if (isLoading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  if (!accessToken) return <Navigate to="/login" replace />;
+  const { accessToken, user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!accessToken || (user && user.role !== 'admin')) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <>{children}</>;
 }
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<LoginRedirectPage />} />
       <Route
         path="/"
         element={

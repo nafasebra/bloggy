@@ -3,19 +3,19 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ErrorResponseDto {
   @ApiProperty({
     description: 'HTTP status code',
-    example: 404,
+    example: 400,
   })
   statusCode: number;
 
   @ApiProperty({
     description: 'Error message',
-    example: 'Post not found',
+    example: 'Bad Request',
   })
   message: string;
 
   @ApiProperty({
     description: 'Error type',
-    example: 'Not Found',
+    example: 'Bad Request',
   })
   error: string;
 
@@ -27,7 +27,7 @@ export class ErrorResponseDto {
 
   @ApiProperty({
     description: 'Request path',
-    example: '/posts/507f1f77bcf86cd799439011',
+    example: '/api/endpoint',
   })
   path: string;
 }
