@@ -1,11 +1,29 @@
 'use server';
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import SearchBar from '@/components/pages/home/search-bar';
 import BlogCard from '@/components/pages/blog/blog-card';
 import CategoryButtons from '@/components/pages/blog/category-buttons';
 import http from '@/lib/http';
 import { Plus, Search } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Blog',
+  description:
+    'Discover stories, insights, and knowledge from our community of writers.',
+  openGraph: {
+    title: 'Blog | Bloggy',
+    description:
+      'Discover stories, insights, and knowledge from our community of writers.',
+    url: '/blog',
+  },
+  twitter: {
+    title: 'Blog | Bloggy',
+    description:
+      'Discover stories, insights, and knowledge from our community of writers.',
+  },
+};
 
 async function getAllPosts(query: string) {
   try {

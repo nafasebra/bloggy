@@ -14,9 +14,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Bloggy - Modern Blog Platform',
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  ),
+  title: {
+    default: 'Bloggy - Modern Blog Platform',
+    template: '%s | Bloggy',
+  },
   description:
-    'A modern blog platform for sharing stories and connecting with readers',
+    'A modern blog platform for sharing stories and connecting with readers.',
+  keywords: ['blog', 'writing', 'stories', 'community', 'articles', 'readers'],
+  authors: [{ name: 'Bloggy' }],
+  creator: 'Bloggy',
+  openGraph: {
+    type: 'website',
+    siteName: 'Bloggy',
+    title: 'Bloggy - Modern Blog Platform',
+    description:
+      'A modern blog platform for sharing stories and connecting with readers.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bloggy - Modern Blog Platform',
+    description:
+      'A modern blog platform for sharing stories and connecting with readers.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

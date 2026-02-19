@@ -1,5 +1,6 @@
 'use server';
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CommentSection from '@/components/pages/blog/comment-section';
@@ -35,6 +36,38 @@ async function getPostViewCountByIP(postId: string) {
   } catch (error) {
     console.log('Failed to fetch post view count by IP:', error);
   }
+}
+
+export async function generateMetadata({
+  params,
+}: PostPageProps): Promise<Metadata> {
+  const post = await getPostById(params.id);
+
+  if (!post) {
+    return {
+      title: 'Post Not Found',
+      description: 'The requested post could not be found.',
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    keywords: post.tags,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: 'article',
+      publishedTime: post.createdAt,
+      authors: [post.authorName || post.authorId],
+      tags: post.tags,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+    },
+  };
 }
 
 export default async function PostPage({ params }: PostPageProps) {
