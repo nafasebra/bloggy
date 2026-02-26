@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { cn } from '@/lib/utils';
-import { Menu, X, LayoutDashboard, FileText, Users } from 'lucide-react';
+import { X, LayoutDashboard, FileText, Users } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 
 const items = [
@@ -10,32 +9,21 @@ const items = [
   { title: 'Users', href: '/users', icon: Users },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen: boolean;
+  onClose: () => void;
+}
+
+export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
-      {/* Mobile open button (hamburger) */}
-      {!mobileOpen && (
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => setMobileOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-50 bg-card border-border shadow-md"
-          aria-label="Open menu"
-          aria-expanded={mobileOpen}
-        >
-          <Menu className="w-6 h-6" />
-        </Button>
-      )}
-
       {/* Backdrop when sidebar is open on mobile */}
       {mobileOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
+          onClick={onClose}
           aria-hidden
         />
       )}
@@ -54,7 +42,7 @@ export default function Sidebar() {
             variant="ghost"
             size="icon"
             className="lg:hidden"
-            onClick={() => setMobileOpen(false)}
+            onClick={onClose}
             aria-label="Close menu"
           >
             <X className="w-5 h-5" />
@@ -70,7 +58,7 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 to={item.href}
-                onClick={() => setMobileOpen(false)}
+                onClick={onClose}
                 className={cn(
                   'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                   isActive
