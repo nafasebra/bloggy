@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router';
 import { cn } from '@/lib/utils';
-import { X, LayoutDashboard, FileText, Users } from 'lucide-react';
+import { X, LayoutDashboard, FileText, Users, MessageSquare } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 
 const items = [
   { title: 'Dashboard', href: '/', icon: LayoutDashboard },
   { title: 'Posts', href: '/posts', icon: FileText },
   { title: 'Users', href: '/users', icon: Users },
+  { title: 'Comments', href: '/comments', icon: MessageSquare },
 ];
 
 interface SidebarProps {

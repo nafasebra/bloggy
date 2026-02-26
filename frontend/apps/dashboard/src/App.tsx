@@ -10,6 +10,7 @@ import EditPostPage from '@/pages/EditPostPage';
 import UsersPage from '@/pages/UsersPage';
 import CreateUserPage from '@/pages/CreateUserPage';
 import EditUserPage from '@/pages/EditUserPage';
+import CommentsPage from '@/pages/CommentsPage';
 
 const WEB_LOGIN_URL =
   import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
@@ -65,6 +66,7 @@ function AppRoutes() {
         <Route path="users" element={<UsersPage />} />
         <Route path="users/create" element={<CreateUserPage />} />
         <Route path="users/edit/:id" element={<EditUserPage />} />
+        <Route path="comments" element={<CommentsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

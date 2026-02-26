@@ -20,3 +20,15 @@ export interface User {
   email: string;
   role?: string;
 }
+
+export interface Comment {
+  _id: string;
+  content: string;
+  postId: string;
+  authorId: string;
+  authorName: string;
+  likes?: number;
+  parentId?: string;
+  createdAt: string;
+  updatedAt: string;
+}

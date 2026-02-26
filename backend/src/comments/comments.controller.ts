@@ -8,6 +8,7 @@ import {
   Put,
   Req,
   Ip,
+  Delete,
 } from '@nestjs/common';
 import {
   CreateCommentDto,
@@ -135,5 +136,19 @@ export class CommentsController {
     );
 
     return { isLiked };
+  }
+
+  @Delete(':commentId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a comment by id' })
+  @ApiParam({ name: 'commentId', type: 'string', description: 'Comment id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Comment deleted successfully',
+  })
+  async deleteComment(@Param('commentId') commentId: string): Promise<{ message: string }> {
+    await this.commentsService.delete(commentId);
+    return { message: 'Comment deleted successfully' };
   }
 }
