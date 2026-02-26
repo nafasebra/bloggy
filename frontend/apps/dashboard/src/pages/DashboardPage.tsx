@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
-import { Badge } from '@repo/ui/badge';
-import { FileText, Users, MessageSquare, TrendingUp } from 'lucide-react';
+import { FileText, Users, MessageSquare } from 'lucide-react';
 
 const stats = [
   { title: 'Total Posts', value: '42', icon: FileText, trend: '+12%', trendUp: true },
@@ -29,10 +28,6 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="flex items-end justify-between gap-4">
                   <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">{stat.value}</p>
-                  <Badge variant={stat.trendUp ? 'default' : 'secondary'} className="gap-1 shrink-0">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    {stat.trend}
-                  </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">vs last month</p>
               </CardContent>

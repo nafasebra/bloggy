@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Plus } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table';
 import PostTable from '@/components/dashboard/PostTable';
 import http from '@/lib/http';
 import { useAuth } from '@/contexts/auth-provider';
@@ -37,14 +38,6 @@ export default function PostsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <p className="text-muted-foreground">Loading posts...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -64,7 +57,30 @@ export default function PostsPage() {
           <CardTitle>All Posts</CardTitle>
         </CardHeader>
         <CardContent>
-          {posts.length ? (
+          {loading ? (
+            <div className="overflow-x-auto -mx-4 sm:mx-0 rounded-md border border-border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[200px]">Title</TableHead>
+                    <TableHead className="hidden md:table-cell">Author</TableHead>
+                    <TableHead className="hidden lg:table-cell">Created</TableHead>
+                    <TableHead className="text-right w-[120px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <TableRow key={i}>
+                      <TableCell><div className="h-5 max-w-[240px] bg-muted rounded animate-pulse" /></TableCell>
+                      <TableCell className="hidden md:table-cell"><div className="h-5 w-24 bg-muted rounded animate-pulse" /></TableCell>
+                      <TableCell className="hidden lg:table-cell"><div className="h-5 w-20 bg-muted rounded animate-pulse" /></TableCell>
+                      <TableCell className="text-right"><div className="h-8 w-16 ml-auto bg-muted rounded animate-pulse" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : posts.length ? (
             <PostTable posts={posts} onDelete={handleDelete} />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">

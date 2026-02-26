@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import '../styles/markdown-editor.css';
 
+/* So Tailwind scans the shared UI package and includes its classes (required in monorepos) */
+@source "../../../../../packages/ui/src";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -198,11 +201,16 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring/50;
   }
 }
 

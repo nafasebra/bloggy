@@ -8,6 +8,8 @@ import PostsPage from '@/pages/PostsPage';
 import CreatePostPage from '@/pages/CreatePostPage';
 import EditPostPage from '@/pages/EditPostPage';
 import UsersPage from '@/pages/UsersPage';
+import CreateUserPage from '@/pages/CreateUserPage';
+import EditUserPage from '@/pages/EditUserPage';
 
 const WEB_LOGIN_URL =
   import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
@@ -61,6 +63,8 @@ function AppRoutes() {
         <Route path="posts/create" element={<CreatePostPage />} />
         <Route path="posts/edit/:id" element={<EditPostPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="users/create" element={<CreateUserPage />} />
+        <Route path="users/edit/:id" element={<EditUserPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
