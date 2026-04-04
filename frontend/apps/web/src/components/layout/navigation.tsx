@@ -28,7 +28,7 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">B</span>
             </div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">
@@ -73,7 +73,7 @@ export default function Navigation() {
                 </SheetTrigger>
                 <SheetContent
                   side="left"
-                  className="w-[300px] sm:w-[400px] bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700"
+                  className="w-75 sm:w-100 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700"
                 >
                   <SheetHeader className="pb-4">
                     <SheetTitle className="text-left text-lg font-semibold text-gray-900 dark:text-white">
