@@ -18,7 +18,7 @@ export default function Hero() {
             inspire, and be inspired through the power of words.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:scale-105">
+            <Button asChild size="lg">
               <Link href="/blog">Explore Stories</Link>
             </Button>
             <Button asChild variant="outline" size="lg">

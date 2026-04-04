@@ -2,7 +2,7 @@
 @import '../styles/markdown-editor.css';
 
 /* So Tailwind scans the shared UI package and includes its classes (required in monorepos) */
-@source "../../../../../packages/ui/src";
+@source "../../../../packages/ui/src";
 
 @custom-variant dark (&:is(.dark *));
 
