@@ -99,6 +99,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+              
               <div>
                 <Label htmlFor="email">Email address</Label>
                 <Input

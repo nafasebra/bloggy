@@ -72,7 +72,7 @@ export default function CreateUserPage() {
       <div className="w-full max-w-5xl bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left Column - Avatar Upload */}
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-8 flex items-center justify-center">
+          <div className="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-8 flex items-center justify-center">
             <div className="text-center">
               <div className="mb-6">
                 <div className="relative mx-auto w-32 h-32 mb-4">

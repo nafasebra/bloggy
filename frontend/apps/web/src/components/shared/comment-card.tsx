@@ -77,7 +77,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
 
   return (
     <div key={comment._id} className="flex space-x-4">
-      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+      <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
         <span className="text-white text-sm font-medium">
           {comment.author?.name?.charAt(0).toUpperCase() || 'U'}
         </span>

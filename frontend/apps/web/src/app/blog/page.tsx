@@ -1,5 +1,3 @@
-'use server';
-
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import SearchBar from '@/components/pages/home/search-bar';
@@ -7,6 +5,7 @@ import BlogCard from '@/components/pages/blog/blog-card';
 import CategoryButtons from '@/components/pages/blog/category-buttons';
 import http from '@/lib/http';
 import { Plus, Search } from 'lucide-react';
+import { Button } from '@repo/ui/button';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -75,15 +74,12 @@ export default async function BlogPage({
               writers
             </p>
           </div>
-          <div>
-            <Link
-              href="/blog/new"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
+          <Button asChild>
+            <Link href="/blog/new" className="flex items-center gap-3">
               <Plus />
               Create New Post
             </Link>
-          </div>
+          </Button>
         </div>
       </div>
 
@@ -109,12 +105,14 @@ export default async function BlogPage({
                 {query && ` for "${query}"`}
                 {selectedCategory && ` in ${selectedCategory}`}
                 {(query || selectedCategory) && ' • '}
-                <Link
-                  href="/blog"
-                  className="px-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-                >
-                  Clear filters
-                </Link>
+                {(query || selectedCategory) && (
+                  <Link
+                    href="/blog"
+                    className="px-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                  >
+                    Clear filters
+                  </Link>
+                )}
               </p>
             </div>
 

@@ -163,7 +163,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
                       />
                     </div>
                   ) : (
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 via-blue-500 to-purple-600 rounded-full flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-purple-500 transition-all duration-200">
+                    <div className="w-14 h-14 bg-linear-to-br from-purple-500 via-blue-500 to-purple-600 rounded-full flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-purple-500 transition-all duration-200">
                       <span className="text-white text-xl font-bold">
                         {initials}
                       </span>

@@ -67,7 +67,7 @@ const FollowingList: React.FC<FollowingListProps> = ({ userId }) => {
               className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300"
             >
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-linear-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white text-lg font-bold">
                     {user.avatar || user.name.charAt(0)}
                   </span>

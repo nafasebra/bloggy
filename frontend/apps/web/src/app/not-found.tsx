@@ -9,13 +9,13 @@ export default function NotFound() {
   const router = useRouter();
 
   return (
-    <section className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <section className="min-h-[calc(100vh-8rem)] bg-linear-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full text-center">
         {/* 404 Animation */}
         <div className="mb-8">
           <div className="relative">
             {/* Large 404 Text */}
-            <h1 className="text-8xl sm:text-9xl lg:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 select-none">
+            <h1 className="text-8xl sm:text-9xl lg:text-[12rem] font-black text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 select-none">
               404
             </h1>
 
@@ -58,7 +58,7 @@ export default function NotFound() {
             Go Back
           </Button>
 
-          <Button asChild className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+          <Button asChild>
             <Link href="/">
               <Home className="w-5 h-5 mr-2" />
               Back to Home
