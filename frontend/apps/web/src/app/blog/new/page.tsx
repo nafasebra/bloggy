@@ -54,7 +54,7 @@ type BlogPostForm = z.infer<typeof createPostSchema>;
 export default function NewBlogPost() {
   const [isPreview, setIsPreview] = useState(false);
 
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const form = useForm<BlogPostForm>({
@@ -91,7 +91,7 @@ export default function NewBlogPost() {
         createdAt: new Date().toISOString(),
       };
 
-      await PostService.createPost(postData, accessToken);
+      await PostService.createPost(postData);
 
       toast.success('Post created successfully!');
       router.push('/blog');

@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 type CommentRow = Comment & { postTitle: string };
 
 export default function CommentsPage() {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const [comments, setComments] = useState<CommentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -20,14 +20,13 @@ export default function CommentsPage() {
     let cancelled = false;
 
     async function load() {
-      if (!accessToken) {
+      if (!user?._id) {
         setLoading(false);
         return;
       }
 
       try {
-        const headers = { Authorization: `Bearer ${accessToken}` };
-        const postsRes = await http.get<Post[]>('/posts', { headers });
+        const postsRes = await http.get<Post[]>('/posts');
         const posts = Array.isArray(postsRes.data) ? postsRes.data : [];
 
         if (!posts.length) {
@@ -78,19 +77,17 @@ export default function CommentsPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [user?._id]);
 
   const handleDelete = async (id: string) => {
-    if (!accessToken) return;
+    if (!user?._id) return;
 
     const confirmed = window.confirm('Are you sure you want to delete this comment?');
     if (!confirmed) return;
 
     try {
       setDeletingId(id);
-      await http.delete(`/comments/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await http.delete(`/comments/${id}`);
       setComments((prev) => prev.filter((c) => c._id !== id));
       toast.success('Comment deleted');
     } catch {
@@ -126,7 +123,7 @@ export default function CommentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[220px]">Comment</TableHead>
+                    <TableHead className="min-w-55">Comment</TableHead>
                     <TableHead className="hidden sm:table-cell">Post</TableHead>
                     <TableHead className="hidden md:table-cell">Author</TableHead>
                     <TableHead className="hidden lg:table-cell">Created</TableHead>
@@ -167,7 +164,7 @@ export default function CommentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[220px]">Comment</TableHead>
+                    <TableHead className="min-w-55">Comment</TableHead>
                     <TableHead className="hidden sm:table-cell">Post</TableHead>
                     <TableHead className="hidden md:table-cell">Author</TableHead>
                     <TableHead className="hidden lg:table-cell">Created</TableHead>

@@ -29,7 +29,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function CreatePostPage() {
   const navigate = useNavigate();
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
 
   const form = useForm<FormData>({
@@ -38,7 +38,7 @@ export default function CreatePostPage() {
   });
 
   const onSubmit = async (data: FormData) => {
-    if (!accessToken || !user) {
+    if (!user) {
       toast.error('You must be logged in to create a post');
       return;
     }
@@ -50,7 +50,7 @@ export default function CreatePostPage() {
         authorName: user.name,
         createdAt: new Date().toISOString(),
       };
-      await http.post('/posts', postData, { headers: { Authorization: `Bearer ${accessToken}` } });
+      await http.post('/posts', postData);
       toast.success('Post created successfully!');
       navigate('/posts');
     } catch {

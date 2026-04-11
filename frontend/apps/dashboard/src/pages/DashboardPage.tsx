@@ -14,7 +14,7 @@ const STAT_CONFIG: { key: StatKey; title: string; icon: React.ComponentType<{ cl
 ];
 
 export default function DashboardPage() {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const [counts, setCounts] = useState<Record<StatKey, number>>({
     posts: 0,
     users: 0,
@@ -27,13 +27,9 @@ export default function DashboardPage() {
 
     async function load() {
       try {
-        const headers = accessToken
-          ? { Authorization: `Bearer ${accessToken}` }
-          : undefined;
-
         const [postsRes, usersRes] = await Promise.all([
-          http.get<Post[]>('/posts', { headers }),
-          http.get<User[]>('/users', { headers }),
+          http.get<Post[]>('/posts'),
+          http.get<User[]>('/users'),
         ]);
 
         const posts = Array.isArray(postsRes.data) ? postsRes.data : [];
@@ -72,7 +68,7 @@ export default function DashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [user?._id]);
 
   return (
     <div className="space-y-8">

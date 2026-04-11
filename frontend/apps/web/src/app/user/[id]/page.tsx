@@ -25,7 +25,7 @@ import { useParams } from 'next/navigation';
 import http from '@/lib/http';
 
 export default function UserPage() {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const params = useParams();
   const id = params.id as string;
 
@@ -37,7 +37,7 @@ export default function UserPage() {
   const { data: postsData, isLoading: isLoadingPosts } = useQuery({
     queryKey: ['user-posts', id],
     queryFn: () => PostService.getPostsByUserId(id),
-    enabled: !!accessToken,
+    enabled: !!user?._id,
   });
 
   const { data: followerCountData } = useQuery({

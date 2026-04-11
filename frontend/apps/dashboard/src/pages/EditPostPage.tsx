@@ -30,7 +30,7 @@ type FormData = z.infer<typeof schema>;
 export default function EditPostPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
   const [loading, setLoading] = useState(true);
 
@@ -40,12 +40,12 @@ export default function EditPostPage() {
   });
 
   useEffect(() => {
-    if (!id || !accessToken) {
+    if (!id || !user) {
       setLoading(false);
       return;
     }
     http
-      .get(`/posts/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+      .get(`/posts/${id}`)
       .then((res) => {
         const post = res.data;
         form.reset({
@@ -58,10 +58,10 @@ export default function EditPostPage() {
       })
       .catch(() => toast.error('Failed to load post'))
       .finally(() => setLoading(false));
-  }, [id, accessToken, form]);
+  }, [id, form]);
 
   const onSubmit = async (data: FormData) => {
-    if (!accessToken || !user || !id) return;
+    if (!user || !id) return;
     try {
       const postData = {
         ...data,
@@ -70,7 +70,7 @@ export default function EditPostPage() {
         authorName: user.name,
         updatedAt: new Date().toISOString(),
       };
-      await http.patch(`/posts/${id}`, postData, { headers: { Authorization: `Bearer ${accessToken}` } });
+      await http.patch(`/posts/${id}`, postData);
       toast.success('Post updated!');
       navigate('/posts');
     } catch {

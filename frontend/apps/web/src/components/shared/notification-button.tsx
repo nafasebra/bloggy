@@ -83,28 +83,28 @@ const formatTimestamp = (timestamp: string): string => {
 };
 
 function NotificationButton() {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const { socket, isConnected } = useSocket();
   const queryClient = useQueryClient();
 
   // Fetch notifications (initial load)
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
-    queryFn: () => NotificationService.getNotifications(accessToken),
-    enabled: !!accessToken,
+    queryFn: () => NotificationService.getNotifications(),
+    enabled: !!user?._id,
   });
 
   // Fetch unread count (initial load)
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['notifications-unread-count'],
-    queryFn: () => NotificationService.getUnreadCount(accessToken),
-    enabled: !!accessToken,
+    queryFn: () => NotificationService.getUnreadCount(),
+    enabled: !!user?._id,
   });
 
   // Mark as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: (notificationId: string) =>
-      NotificationService.markAsRead(notificationId, accessToken),
+      NotificationService.markAsRead(notificationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
@@ -113,7 +113,7 @@ function NotificationButton() {
 
   // Mark all as read mutation
   const markAllAsReadMutation = useMutation({
-    mutationFn: () => NotificationService.markAllAsRead(accessToken),
+    mutationFn: () => NotificationService.markAllAsRead(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
@@ -162,7 +162,7 @@ function NotificationButton() {
     markAllAsReadMutation.mutate();
   };
 
-  if (!accessToken) {
+  if (!user?._id) {
     return null;
   }
 

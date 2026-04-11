@@ -17,7 +17,7 @@ import { useAuth } from '@/contexts/auth-provider';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
 
   const changeMenuState = useCallback((state: boolean) => {
     setIsMenuOpen(state);
@@ -38,12 +38,15 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-3">
-          {accessToken && <NotificationButton />}
+          {user?._id && <NotificationButton />}
           <ThemeButton />
           <div className="flex items-center gap-4">
-            {accessToken && (
+            {user?._id ? (
               <a
-                href={process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:5173'}
+                href={
+                  process.env.NEXT_PUBLIC_DASHBOARD_URL ||
+                  'http://localhost:3001'
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -51,8 +54,7 @@ export default function Navigation() {
                 <LayoutDashboard className="w-4 h-4" />
                 Dashboard
               </a>
-            )}
-            {!accessToken && (
+            ) : (
               <>
                 <Link href="/auth/login">
                   <Button>Login</Button>
@@ -63,7 +65,7 @@ export default function Navigation() {
               </>
             )}
           </div>
-          {!accessToken ? (
+          {!user?._id ? (
             <div className="md:hidden flex">
               <Sheet open={isMenuOpen} onOpenChange={changeMenuState}>
                 <SheetTrigger asChild>
@@ -104,7 +106,10 @@ export default function Navigation() {
           ) : (
             <>
               <a
-                href={process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:5173'}
+                href={
+                  process.env.NEXT_PUBLIC_DASHBOARD_URL ||
+                  'http://localhost:3001'
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="md:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"

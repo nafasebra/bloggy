@@ -31,7 +31,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function CreateUserPage() {
   const navigate = useNavigate();
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -45,7 +45,7 @@ export default function CreateUserPage() {
   });
 
   const onSubmit = async (data: FormData) => {
-    if (!accessToken) {
+    if (!user) {
       toast.error('You must be logged in as admin to create a user');
       return;
     }
@@ -59,8 +59,7 @@ export default function CreateUserPage() {
           email: data.email,
           role: data.role,
           password: data.password,
-        },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+        }
       );
       toast.success('User created successfully');
       navigate('/users');

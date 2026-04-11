@@ -19,7 +19,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
 }) => {
   const [isReply, setIsReply] = useState(false);
   const [replyText, setReplyText] = useState('');
-  const { accessToken } = useAuth();
+  const {user} = useAuth()
   const queryClient = useQueryClient();
 
   const { data: likeStatus } = useQuery({
@@ -41,7 +41,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
 
   const replyMutation = useMutation({
     mutationFn: async () => {
-      const user = await UserService.getCurrentUser(accessToken!);
+      const user = await UserService.getCurrentUser();
       const replyData = {
         content: replyText,
         authorId: user._id,
@@ -49,7 +49,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
         postId: comment.postId,
         parentId: comment._id,
       };
-      return CommentService.replyToComment(replyData, comment.postId, accessToken);
+      return CommentService.replyToComment(replyData, comment.postId);
     },
     onSuccess: () => {
       setReplyText('');
@@ -67,7 +67,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
   };
 
   const handleReply = () => {
-    if (!accessToken) {
+    if (!user?._id) {
       toast.error('You must be logged in to reply');
       return;
     }
@@ -142,7 +142,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
         {/* Reply Input */}
         {isReply && (
           <>
-            {accessToken ? (
+            {user?._id ? (
               <div className="flex flex-col sm:flex-row gap-2 mt-4">
                 <Input
                   type="text"

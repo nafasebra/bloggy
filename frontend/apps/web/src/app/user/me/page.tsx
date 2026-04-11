@@ -35,12 +35,12 @@ import FollowingList from '@/components/pages/user/following-list';
 
 export default function UserPage() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const { user, accessToken, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user-me'],
-    queryFn: () => UserService.getCurrentUser(accessToken as string),
+    queryFn: () => UserService.getCurrentUser(),
   });
 
   console.log("userData", userData);
@@ -48,7 +48,7 @@ export default function UserPage() {
   const { data: postsData, isLoading: isLoadingPosts } = useQuery({
     queryKey: ['user-posts'],
     queryFn: () => PostService.getPostsByUserId(user?._id as string),
-    enabled: !!accessToken,
+    enabled: !!user?._id,
   });
 
   const handleLogout = () => {

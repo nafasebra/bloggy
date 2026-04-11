@@ -30,12 +30,12 @@ interface SocketProviderProps {
 }
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!accessToken) {
+    if (user === null) {
       // Disconnect if no token
       if (socket) {
         socket.disconnect();
@@ -47,13 +47,11 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
     const newSocket = io(`${apiUrl}/notifications`, {
-      auth: {
-        token: accessToken,
-      },
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
+      withCredentials: true,
     });
 
     newSocket.on('connect', () => {
@@ -76,7 +74,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     return () => {
       newSocket.close();
     };
-  }, [accessToken]);
+  }, [user?._id]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

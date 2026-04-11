@@ -35,7 +35,7 @@ type FormData = z.infer<typeof schema>;
 export default function EditUserPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -49,14 +49,12 @@ export default function EditUserPage() {
   });
 
   useEffect(() => {
-    if (!id || !accessToken) {
+    if (!id || !user) {
       return;
     }
 
     http
-      .get<User>(`/users/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      .get<User>(`/users/${id}`)
       .then((res) => {
         const user = res.data;
         form.reset({
@@ -71,10 +69,10 @@ export default function EditUserPage() {
         toast.error('Failed to load user');
         navigate('/users');
       });
-  }, [id, accessToken, form, navigate]);
+  }, [id, form, navigate]);
 
   const onSubmit = async (data: FormData) => {
-    if (!accessToken || !id) {
+    if (!user || !id) {
       return;
     }
 
@@ -90,9 +88,7 @@ export default function EditUserPage() {
         payload.password = data.password;
       }
 
-      await http.patch(`/users/${id}`, payload, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await http.patch(`/users/${id}`, payload);
 
       toast.success('User updated successfully');
       navigate('/users');

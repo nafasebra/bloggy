@@ -15,18 +15,17 @@ interface LikeButtonProps {
 
 function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
   const queryClient = useQueryClient();
-  const { accessToken } = useAuth();
 
   // Query to check if the post is liked
   const { data: likeStatus, isLoading: isCheckingLikeStatus } = useQuery({
     queryKey: ['postLiked', postId],
-    queryFn: () => PostService.checkIfPostLiked(postId, accessToken),
+    queryFn: () => PostService.checkIfPostLiked(postId),
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   // Mutation to toggle like
   const toggleLikeMutation = useMutation({
-    mutationFn: () => PostService.toggleLikePost(postId, accessToken),
+    mutationFn: () => PostService.toggleLikePost(postId),
     onSuccess: (response) => {
       queryClient.setQueryData(['postLiked', postId], {
         isLiked: response.isLiked,
@@ -40,7 +39,7 @@ function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
 
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
     },
-    onError: (error) => {
+    onError: () => {
       toast.error('Failed to toggle like');
     },
   });

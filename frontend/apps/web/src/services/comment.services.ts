@@ -5,13 +5,8 @@ export class CommentService {
   static async createComment(
     data: CreateCommentData,
     postId: string,
-    accessToken: string | null
   ): Promise<Comment> {
-    const response = await http.post<Comment>(`/comments/${postId}`, data, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await http.post<Comment>(`/comments/${postId}`, data);
     return response.data;
   }
 
@@ -23,13 +18,8 @@ export class CommentService {
   static async replyToComment(
     data: CreateCommentData,
     postId: string,
-    accessToken: string | null
   ): Promise<Comment> {
-    const response = await http.put<Comment>(`/comments/reply/${postId}`, data, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await http.put<Comment>(`/comments/reply/${postId}`, data);
     return response.data;
   }
 

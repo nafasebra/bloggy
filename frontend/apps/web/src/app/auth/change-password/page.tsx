@@ -26,7 +26,7 @@ export default function ChangePasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
 
   const {
     register,
@@ -44,11 +44,7 @@ export default function ChangePasswordPage() {
     };
 
     try {
-      await http.post('/auth/change-password', tempData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      await http.post('/auth/change-password', tempData);
 
       toast.success('Password changed successfully!');
       router.push('/user/' + user?._id);

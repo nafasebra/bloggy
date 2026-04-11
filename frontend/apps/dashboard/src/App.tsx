@@ -30,7 +30,7 @@ function LoginRedirectPage() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { accessToken, user, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -40,7 +40,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!accessToken || (user && user.role !== 'admin')) {
+  if ((user && user.role !== 'admin')) {
     return <Navigate to="/login" replace />;
   }
 

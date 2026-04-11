@@ -4,31 +4,15 @@ import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
+  useEffect,
 } from 'react';
 import { UserService } from '@/services/user.services';
+import { User } from '@/types';
 
 interface AuthContextType {
-  accessToken: string | null;
-  user: {
-    _id: string;
-    name: string;
-    username: string;
-    email: string;
-    role?: string;
-  } | null;
-  refreshToken: () => Promise<void>;
-  setAccessToken: (token: string | null) => void;
-  setUser: (
-    user: {
-      _id: string;
-      name: string;
-      username: string;
-      email: string;
-      role?: string;
-    } | null
-  ) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   logout: () => void;
 }
 
@@ -47,66 +31,23 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [accessToken, setAccessTokenState] = useState<string | null>(null);
-  const [user, setUserState] = useState<{
-    _id: string;
-    name: string;
-    username: string;
-    email: string;
-    role?: string;
-  } | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
 
-  const setAccessToken = (token: string | null) => {
-    if (!accessToken) {
-      setAccessTokenState(token);
-    }
-  };
-
-  const setUser = (
-    user: {
-      _id: string;
-      name: string;
-      username: string;
-      email: string;
-      role?: string;
-    } | null
-  ) => {
+  const setUser = (user: User | null) => {
     setUserState(user);
   };
 
-  const fetchUser = async (token: string | null) => {
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
     try {
-      const userData = await UserService.getCurrentUser(token as string);
+      const userData = await UserService.getCurrentUser();
       setUser(userData);
     } catch (error) {
       console.error('Error fetching user:', error);
       setUser(null);
-    }
-  };
-
-  const refreshToken = async () => {
-    try {
-      const response = await fetch('/api/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-      const data = await response.json();
-      const token = data.access_token ?? null;
-      setAccessTokenState(token);
-      setAccessToken(token);
-      if (token) {
-        await fetchUser(token);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      setAccessTokenState(null);
-      setAccessToken(null);
-      setUser(null);
-      console.error('Error refreshing token:', error);
     }
   };
 
@@ -117,31 +58,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {
-      // Clear local state regardless of API call success
-      setAccessTokenState(null);
-      setAccessToken(null);
       setUser(null);
     }
   };
 
-  useEffect(() => {
-    refreshToken();
-
-    // Set up interval to refresh every 1 hour (3600000 ms)
-    const interval = setInterval(() => {
-      refreshToken();
-    }, 3600000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <AuthContext.Provider
       value={{
-        accessToken,
         user,
-        refreshToken,
-        setAccessToken,
         setUser,
         logout,
       }}

@@ -16,21 +16,16 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 }) => {
   const [isFollowing, setIsFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
 
   // Check initial follow status
   useEffect(() => {
     const checkFollowStatus = async () => {
-      if (!accessToken || !user?._id) return;
+      if (!user?._id) return;
 
       try {
         const response = await http.get(
-          `/users/${user._id}/is-following/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
+          `/users/${user._id}/is-following/${userId}`
         );
         setIsFollowing(response.data.isFollowing);
       } catch (error) {
@@ -39,16 +34,11 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     };
 
     checkFollowStatus();
-  }, [userId, accessToken, user?._id]);
+  }, [userId, user?._id]);
 
   const handleClick = async () => {
-    if (!accessToken) {
-      toast.error('Please log in to follow users');
-      return;
-    }
-
     if (!user?._id) {
-      toast.error('User information not available');
+      toast.error('User information not available. Please login again!');
       return;
     }
 
@@ -62,12 +52,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     try {
       const response = await http.post(
         `/users/${userId}/follow`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
       );
 
       setIsFollowing(response.data.isFollowing);
@@ -91,7 +75,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       onClick={handleClick}
       disabled={loading}
       variant={isFollowing ? 'secondary' : 'default'}
-      className="w-[130px]"
+      className="w-32.5"
     >
       {loading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
     </Button>

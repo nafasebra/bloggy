@@ -11,26 +11,26 @@ import type { Post } from '@/types';
 import { toast } from 'sonner';
 
 export default function PostsPage() {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!accessToken) {
+    if (!user) {
       setLoading(false);
       return;
     }
     http
-      .get<Post[]>('/posts', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .get<Post[]>('/posts')
       .then((res) => setPosts(Array.isArray(res.data) ? res.data : []))
       .catch(() => setPosts([]))
       .finally(() => setLoading(false));
-  }, [accessToken]);
+  }, [user?._id]);
 
   const handleDelete = async (id: string) => {
-    if (!accessToken) return;
+    if (!user) return;
     try {
-      await http.delete(`/posts/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+      await http.delete(`/posts/${id}`);
       setPosts((prev) => prev.filter((p) => p._id !== id));
       toast.success('Post deleted');
     } catch {

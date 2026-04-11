@@ -4,13 +4,8 @@ import type { Post, CreatePostData, UpdatePostData } from '@/types';
 export class PostService {
   static async createPost(
     data: CreatePostData,
-    accessToken: string | null
   ): Promise<Post> {
-    const response = await http.post<Post>('/posts', data, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await http.post<Post>('/posts', data);
     return response.data;
   }
 
@@ -46,40 +41,26 @@ export class PostService {
   }
 
   static async toggleLikePost(
-    id: string,
-    accessToken?: string | null
+    id: string
   ): Promise<{
     post: Post;
     isLiked: boolean;
     action: 'liked' | 'unliked';
     message: string;
-  }> {
-    const headers: Record<string, string> = {};
-    if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`;
-    }
-    
+  }> {    
     const response = await http.post<{
       post: Post;
       isLiked: boolean;
       action: 'liked' | 'unliked';
       message: string;
-    }>(`/posts/${id}/like`, {}, { headers });
+    }>(`/posts/${id}/like`, {});
     return response.data;
   }
 
   static async checkIfPostLiked(
     id: string,
-    accessToken?: string | null
-  ): Promise<{ isLiked: boolean }> {
-    const headers: Record<string, string> = {};
-    if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`;
-    }
-    
-    const response = await http.get<{ isLiked: boolean }>(`/posts/${id}/liked`, {
-      headers,
-    });
+  ): Promise<{ isLiked: boolean }> {    
+    const response = await http.get<{ isLiked: boolean }>(`/posts/${id}/liked`);
     return response.data;
   }
 

@@ -31,7 +31,7 @@ const commentSchema = z.object({
 type CommentFormData = z.infer<typeof commentSchema>;
 
 export default function CommentSection({ postId }: CommentSectionProps) {
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: comments = [], isLoading } = useQuery<CommentWithAuthor[]>({
@@ -42,7 +42,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
 
   const createCommentMutation = useMutation({
     mutationFn: (data: CreateCommentData) =>
-      CommentService.createComment(data, postId, accessToken),
+      CommentService.createComment(data, postId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       reset();
@@ -80,7 +80,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         Comments ({comments.length})
       </h3>
 
-      {accessToken ? (
+      {user?._id ? (
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col gap-4"

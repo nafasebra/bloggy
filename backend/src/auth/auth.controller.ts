@@ -1,7 +1,7 @@
-import { Controller, UseGuards, Res } from '@nestjs/common';
+import { Controller, Res } from '@nestjs/common';
 import { Post, Body, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
-import { RegisterDto, LoginDto, AuthResponseDto, RefreshDto } from './dto';
+import { RegisterDto, LoginDto, AuthResponseDto } from './dto';
 import { AuthService } from './auth.service';
 import {
   ApiBody,
@@ -91,8 +91,8 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
 
-    // Set http-only cookie with refresh_token
-    res.cookie('refresh_token', result.refresh_token, {
+    // Set http-only cookie with session_token
+    res.cookie('session_token', result.session_token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
@@ -102,35 +102,6 @@ export class AuthController {
       status: 'success',
       message: 'User logged in successfully',
       user: result.user,
-      access_token: result.access_token,
-    };
-  }
-
-  @Post('refresh')
-  @ApiOperation({
-    summary: 'Refresh access token',
-    description: 'Refreshes the access token using a valid refresh token.',
-    tags: ['Authentication'],
-  })
-  @ApiBody({
-    type: RefreshDto,
-    description: 'Refresh token data',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Tokens refreshed successfully',
-    type: AuthResponseDto,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid refresh token',
-    type: ErrorResponseDto,
-  })
-  async refresh(@Body() refreshDto: RefreshDto) {
-    const result = await this.authService.refresh(refreshDto.refresh_token);
-    return {
-      status: 'success',
-      message: 'Tokens refreshed successfully',
-      ...result,
     };
   }
 
@@ -152,8 +123,8 @@ export class AuthController {
     },
   })
   async logout(@Res({ passthrough: true }) res: Response) {
-    // Clear the http-only refresh_token cookie
-    res.clearCookie('refresh_token', {
+    // Clear the http-only session_token cookie
+    res.clearCookie('session_token', {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',

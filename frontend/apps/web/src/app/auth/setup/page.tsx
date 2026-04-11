@@ -43,17 +43,13 @@ export default function CreateUserPage() {
     resolver: zodResolver(setupSchema),
   });
 
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
 
   const onSubmit = async (data: FormData) => {
     const { avatar, ...tempdata } = data;
 
     try {
-      const response = await http.patch(`/users/${user?._id}`, tempdata, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await http.patch(`/users/${user?._id}`, tempdata);
       if (response.data) {
         toast.success('Profile created successfully!');
         router.push(`/user/me`);

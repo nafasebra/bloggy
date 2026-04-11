@@ -34,59 +34,26 @@ export interface UnreadCountResponse {
 }
 
 export class NotificationService {
-  static async getNotifications(
-    accessToken: string | null
-  ): Promise<Notification[]> {
-    const response = await http.get<NotificationsResponse>('/notifications', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  static async getNotifications(): Promise<Notification[]> {
+    const response = await http.get<NotificationsResponse>('/notifications');
     return response.data.notifications;
   }
 
-  static async markAsRead(
-    notificationId: string,
-    accessToken: string | null
-  ): Promise<Notification> {
+  static async markAsRead(notificationId: string): Promise<Notification> {
     const response = await http.put<Notification>(
-      `/notifications/${notificationId}/read`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+      `/notifications/${notificationId}/read`
     );
     return response.data;
   }
 
-  static async markAllAsRead(
-    accessToken: string | null
-  ): Promise<void> {
-    await http.put(
-      '/notifications/read-all',
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+  static async markAllAsRead(): Promise<void> {
+    await http.put('/notifications/read-all');
   }
 
-  static async getUnreadCount(
-    accessToken: string | null
-  ): Promise<number> {
+  static async getUnreadCount(): Promise<number> {
     const response = await http.get<UnreadCountResponse>(
-      '/notifications/unread-count',
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+      '/notifications/unread-count'
     );
     return response.data.count;
   }
 }
-

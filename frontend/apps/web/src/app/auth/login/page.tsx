@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
+import http from '@/lib/http';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -23,7 +24,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { setAccessToken, setUser } = useAuth();
+  const { setUser } = useAuth();
 
   const {
     register,
@@ -35,43 +36,35 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await http.post('/api/login', {
         body: JSON.stringify(data),
-        credentials: 'include',
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.access_token) {
-          const dashboardUrl =
-            process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
-          const isAdmin = result.user?.role === 'admin';
+      const result = response.data;
 
-          if (isAdmin) {
-            window.location.href = `${dashboardUrl}#token=${result.access_token}`;
-            return;
-          }
+      if (result.user) {
+        const dashboardUrl =
+          process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
+        const { isNew, role, ...userWithoutIsNew } = result.user;
+        const isAdmin = role === 'admin';
 
-          setAccessToken(result.access_token);
-          if (result.user) {
-            const { isNew, ...userWithoutIsNew } = result.user;
-            setUser(userWithoutIsNew);
-            if (isNew) {
-              router.push('/auth/setup');
-            } else {
-              router.push('/');
-            }
-          } else {
-            router.push('/');
-          }
+        if (isAdmin) {
+          window.location.replace(dashboardUrl);
+          return;
+        }
+
+        setUser(userWithoutIsNew);
+
+        if (isNew) {
+          router.push('/auth/setup');
+        } else {
+          router.push('/');
         }
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.error || 'The Username or Password is incorrect');
+        toast.error(
+          response.status + ' ' + response.statusText ||
+            'The Username or Password is incorrect'
+        );
       }
     } catch (err) {
       toast.error('Login failed. Please try again.');
@@ -124,7 +117,9 @@ export default function LoginPage() {
                     size="icon"
                     className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -141,11 +136,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full"
-            >
+            <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
 

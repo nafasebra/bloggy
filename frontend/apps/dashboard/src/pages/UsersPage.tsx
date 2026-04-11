@@ -11,36 +11,32 @@ import type { User } from '@/types';
 import { toast } from 'sonner';
 
 export default function UsersPage() {
-  const { accessToken } = useAuth();
+  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [promoteId, setPromoteId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!accessToken) {
+    if (!user) {
       setLoading(false);
       return;
     }
 
     http
-      .get<User[]>('/users', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      .get<User[]>('/users')
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
-  }, [accessToken]);
+  }, [user?._id]);
 
   const handleDelete = async (id: string) => {
-    if (!accessToken) return;
+    if (!user) return;
 
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
 
     try {
-      await http.delete(`/users/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await http.delete(`/users/${id}`);
       setUsers((prev) => prev.filter((u) => u._id !== id));
       toast.success('User deleted');
     } catch {
@@ -48,18 +44,17 @@ export default function UsersPage() {
     }
   };
 
-  const handlePromote = async (user: User) => {
-    if (!accessToken) return;
+  const handlePromote = async (theUser: User) => {
+    if (!user) return;
 
-    setPromoteId(user._id);
+    setPromoteId(theUser._id);
     try {
       await http.patch(
-        `/users/${user._id}`,
+        `/users/${theUser._id}`,
         { role: 'admin' },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
       setUsers((prev) =>
-        prev.map((u) => (u._id === user._id ? { ...u, role: 'admin' } : u))
+        prev.map((u) => (u._id === theUser._id ? { ...u, role: 'admin' } : u))
       );
       toast.success('User promoted to admin');
     } catch {

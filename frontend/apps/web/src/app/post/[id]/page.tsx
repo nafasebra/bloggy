@@ -74,8 +74,6 @@ export default async function PostPage({ params }: PostPageProps) {
     getPostViewCountByIP(params.id),
   ]);
 
-  console.log(post)
-
   if (!post) {
     notFound();
   }

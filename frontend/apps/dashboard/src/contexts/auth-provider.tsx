@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import http from '@/lib/http';
-
-const AUTH_TOKEN_KEY = 'bloggy_dashboard_token';
+import { meta } from 'zod/v4/core';
 
 interface User {
   _id: string;
@@ -12,12 +11,10 @@ interface User {
 }
 
 interface AuthContextType {
-  accessToken: string | null;
   user: User | null;
-  setAccessToken: (token: string | null) => void;
+  isLoading: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,61 +26,34 @@ export function useAuth(): AuthContextType {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [accessToken, setAccessTokenState] = useState<string | null>(() => localStorage.getItem(AUTH_TOKEN_KEY));
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Read token from URL hash on initial load (when redirected from web login)
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#token=')) {
-      const token = hash.slice(7); // Remove '#token='
-      if (token) {
-        localStorage.setItem(AUTH_TOKEN_KEY, token);
-        setAccessTokenState(token);
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-    }
-  }, []);
-
-  const setAccessToken = useCallback((token: string | null) => {
-    if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);
-    else localStorage.removeItem(AUTH_TOKEN_KEY);
-    setAccessTokenState(token);
-  }, []);
 
   const setUser = useCallback((u: User | null) => {
     setUserState(u);
   }, []);
 
   useEffect(() => {
-    if (!accessToken) {
-      setUserState(null);
-      setIsLoading(false);
-      return;
-    }
     http
-      .get('/users/me', { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((res) => setUserState(res.data))
+      .get('/users/me')
+      .then((res) => {
+        setUserState(res.data)
+      })
       .catch(() => {
-        setAccessToken(null);
         setUserState(null);
       })
       .finally(() => setIsLoading(false));
-  }, [accessToken, setAccessToken]);
+  }, []);
 
   const logout = useCallback(() => {
-    setAccessToken(null);
     setUserState(null);
-  }, [setAccessToken]);
+  }, []);
 
   const value: AuthContextType = {
-    accessToken,
     user,
-    setAccessToken,
+    isLoading,
     setUser,
     logout,
-    isLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
