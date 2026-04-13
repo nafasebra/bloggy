@@ -1,37 +1,36 @@
-import { NextResponse } from 'next/server';
+import axios from "axios";
 
 export async function POST() {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
-    const response = await fetch(
-      `${apiUrl}/auth/logout`,
+    const response = await axios.post(
+      `/auth/logout`,
+      {},
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        withCredentials: true,
       }
     );
 
-    const data = await response.json();
+    const data = response.data;
 
     const res = new Response(JSON.stringify(data), {
       status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
 
-    // Copy set-cookie headers to clear the cookie
-    const setCookie = response.headers.get('set-cookie');
-    if (setCookie) {
-      res.headers.set('set-cookie', setCookie);
+    const setCookieHeader = response.headers["set-cookie"];
+    if (setCookieHeader) {
+      if (Array.isArray(setCookieHeader)) {
+        setCookieHeader.forEach((cookie) => {
+          res.headers.append("set-cookie", cookie);
+        });
+      } else {
+        res.headers.append("set-cookie", setCookieHeader);
+      }
     }
 
     return res;
   } catch (error: any) {
     return Response.json(
-      { error: 'Logout failed: ' + error.message },
+      { error: "Logout failed: " + error.message },
       { status: 500 }
     );
   }

@@ -13,6 +13,7 @@ import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
 import http from '@/lib/http';
+import axios from 'axios';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -36,9 +37,16 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await http.post('/api/login', {
-        body: JSON.stringify(data),
-      });
+      const response = await axios.post(
+        'http://localhost:3000/api/login',
+        {
+          username: data.username,
+          password: data.password
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       const result = response.data;
 

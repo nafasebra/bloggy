@@ -12,22 +12,7 @@ import CreateUserPage from '@/pages/CreateUserPage';
 import EditUserPage from '@/pages/EditUserPage';
 import CommentsPage from '@/pages/CommentsPage';
 
-const WEB_LOGIN_URL =
-  import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
-
-function LoginRedirectPage() {
-  useEffect(() => {
-    window.location.href = `${WEB_LOGIN_URL}/auth/login`;
-  }, []);
-  
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse text-muted-foreground">
-        Redirecting to login...
-      </div>
-    </div>
-  );
-}
+const WEB_LOGIN_URL = import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -40,8 +25,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if ((user && user.role !== 'admin')) {
-    return <Navigate to="/login" replace />;
+  if (!user || !user._id) {
+    window.location.href = `${WEB_LOGIN_URL}/auth/login`;
   }
 
   return <>{children}</>;
@@ -50,7 +35,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginRedirectPage />} />
       <Route
         path="/"
         element={

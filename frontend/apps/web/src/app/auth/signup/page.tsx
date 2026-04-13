@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
+import axios from 'axios';
 
 const signupSchema = z.object({
   username: z.string().min(2, 'Username must be at least 2 characters'),
@@ -35,20 +36,24 @@ export default function SignupPage() {
 
   const onSubmit = async (data: signupFormData) => {
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        '/api/register',
+        {
+          ...data
         },
-        body: JSON.stringify(data),
-      });
+        {
+          withCredentials: true,
+        }
+      );
 
-      if (response.ok) {
+      if (response.data) {
         toast.success('Account created successfully! Please log in.');
         router.push('/auth/login');
       } else {
-        const data = await response.json().catch(() => ({}));
-        toast.error(data.error || 'The username or email is already taken');
+        toast.error(
+          response.status + ' ' + response.statusText ||
+            'The username or email is already taken'
+        );
       }
     } catch (err) {
       toast.error('Signup failed. Please try again.');
@@ -99,7 +104,7 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <Label htmlFor="email">Email address</Label>
                 <Input
@@ -131,7 +136,9 @@ export default function SignupPage() {
                     size="icon"
                     className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -148,11 +155,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full"
-            >
+            <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Signing up...' : 'Sign up'}
             </Button>
 

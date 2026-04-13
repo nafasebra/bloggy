@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { UserService } from '@/services/user.services';
 import { User } from '@/types';
+import axios from 'axios';
 
 interface AuthContextType {
   user: User | null;
@@ -54,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       // Call logout API to clear the refresh_token cookie
-      await fetch('/api/logout', { method: 'POST' });
+      axios.post('/api/logout');
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {

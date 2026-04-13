@@ -1,39 +1,41 @@
+import http from '@/lib/http';
+
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
-    const response = await fetch(
-      `${apiUrl}/auth/login`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      }
+    console.log(username, password)
+
+    const response = await http.post(
+      '/auth/login',
+      { username, password },
+      { withCredentials: true }
     );
 
-    const data = await response.json();
-
-    const res = new Response(JSON.stringify(data), {
+    const res = new Response(JSON.stringify(response.data), {
       status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
 
-    // Copy set-cookie headers from backend response
-    const setCookie = response.headers.get('set-cookie');
-    if (setCookie) {
-      res.headers.set('set-cookie', setCookie);
+    const setCookieHeader = response.headers['set-cookie'];
+    if (setCookieHeader) {
+      if (Array.isArray(setCookieHeader)) {
+        setCookieHeader.forEach((cookie) =>
+          res.headers.append('set-cookie', cookie),
+        );
+      } else {
+        res.headers.append('set-cookie', setCookieHeader);
+      }
     }
 
     return res;
   } catch (error: any) {
+    console.error('LOGIN ERROR:', error.response?.data || error);
     return Response.json(
-      { error: 'Login failed: ' + error.message },
-      { status: 500 }
+      {
+        error: 'Login failed',
+        detail: error.response?.data,
+      },
+      { status: error.response?.status || 500 },
     );
   }
 }

@@ -188,10 +188,6 @@ export interface AuthResponse {
   };
 }
 
-export interface RefreshTokenData {
-  refresh_token: string;
-}
-
 export interface ChangePasswordData {
   userId: string;
   old_password: string;
