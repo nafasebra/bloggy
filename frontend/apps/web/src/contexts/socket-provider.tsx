@@ -45,7 +45,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       return;
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
+    const apiUrl = process.env.API_URL;
     const newSocket = io(`${apiUrl}/notifications`, {
       transports: ['websocket', 'polling'],
       reconnection: true,

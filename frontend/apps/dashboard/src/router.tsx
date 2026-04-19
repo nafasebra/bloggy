@@ -2,8 +2,9 @@ import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { useAuth } from "@/contexts/auth-provider";
+import RouteError from "./components/RouteError";
 
-const LazyWrapper = lazy(() => import("./LazyWrapper"));
+const LazyWrapper = lazy(() => import("./components/LazyWrapper"));
 
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const PostsPage = lazy(() => import("./pages/post/PostsPage"));
@@ -39,6 +40,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: <RouteError />,
     element: (
       <ProtectedRoute>
         <DashboardLayout />
