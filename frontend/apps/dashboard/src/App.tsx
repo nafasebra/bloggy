@@ -3,7 +3,7 @@ import { router } from './router';
 import { AuthProvider } from '@/contexts/auth-provider';
 import { Toaster } from '@repo/ui/sonner';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from './lib/react-query';
+import { queryClient } from './lib/query-client';
 
 
 export default function App() {
