@@ -1,100 +1,33 @@
-import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@repo/ui/table';
 import { Button } from '@repo/ui/button';
-import { MessageSquare, Trash } from 'lucide-react';
-import http from '@/lib/http';
+import { CircleX, MessageSquare, Trash } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
-import type { Post, Comment } from '@/types';
-import { toast } from 'sonner';
-
-type CommentRow = Comment & { postTitle: string };
+import { useDeleteComment } from '@/hooks/mutations/delete-comment'; 
+import { useComments } from '@/hooks/queries/all-comments'; 
 
 export default function CommentsPage() {
   const { user } = useAuth();
-  const [comments, setComments] = useState<CommentRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  const { data: comments = [], isLoading } = useComments(!!user?._id);
+  const { mutate: deleteComment, isPending: isDeleting, variables: deletingId } = useDeleteComment();
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      if (!user?._id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const postsRes = await http.get<Post[]>('/posts');
-        const posts = Array.isArray(postsRes.data) ? postsRes.data : [];
-
-        if (!posts.length) {
-          if (!cancelled) {
-            setComments([]);
-          }
-          return;
-        }
-
-        const commentResponses = await Promise.all(
-          posts.map((post) => http.get<Comment[]>(`/comments/${post._id}`))
-        );
-
-        const rows: CommentRow[] = [];
-        posts.forEach((post, index) => {
-          const postComments = Array.isArray(commentResponses[index].data)
-            ? commentResponses[index].data
-            : [];
-          postComments.forEach((comment) => {
-            rows.push({
-              ...comment,
-              postTitle: post.title,
-            });
-          });
-        });
-
-        rows.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
-        if (!cancelled) {
-          setComments(rows);
-        }
-      } catch {
-        if (!cancelled) {
-          setComments([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?._id]);
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!user?._id) return;
 
-    const confirmed = window.confirm('Are you sure you want to delete this comment?');
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this comment?'
+    );
     if (!confirmed) return;
 
-    try {
-      setDeletingId(id);
-      await http.delete(`/comments/${id}`);
-      setComments((prev) => prev.filter((c) => c._id !== id));
-      toast.success('Comment deleted');
-    } catch {
-      toast.error('Failed to delete comment');
-    } finally {
-      setDeletingId(null);
-    }
+    deleteComment(id);
   };
 
   return (
@@ -118,7 +51,7 @@ export default function CommentsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <Table>
                 <TableHeader>
@@ -131,23 +64,13 @@ export default function CommentsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <div className="h-5 w-40 bg-muted rounded animate-pulse" />
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <div className="h-5 w-32 bg-muted rounded animate-pulse" />
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <div className="h-5 w-24 bg-muted rounded animate-pulse" />
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <div className="h-5 w-20 bg-muted rounded animate-pulse" />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="h-8 w-20 ml-auto bg-muted rounded animate-pulse" />
-                      </TableCell>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={index}>
+                      {Array.from({ length: 5 }).map((_, cellIndex) => (
+                        <TableCell key={cellIndex}>
+                          <div className="h-5 w-40 bg-muted rounded animate-pulse" />
+                        </TableCell>
+                      ))}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -155,6 +78,7 @@ export default function CommentsPage() {
             </div>
           ) : comments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
+              <CircleX size={30} />
               <p className="text-muted-foreground">
                 No comments found across your posts.
               </p>
@@ -188,17 +112,18 @@ export default function CommentsPage() {
                       <TableCell className="hidden lg:table-cell text-muted-foreground">
                         {new Date(comment.createdAt).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right flex justify-end gap-2">
+                        <Button>Accept</Button>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          disabled={deletingId === comment._id}
+                          disabled={isDeleting && deletingId === comment._id}
                           onClick={() => handleDelete(comment._id)}
                         >
                           <Trash className="w-4 h-4 mr-1" />
-                          Delete
+                          {isDeleting && deletingId === comment._id ? 'Deleting...' : 'Delete'}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -212,4 +137,3 @@ export default function CommentsPage() {
     </div>
   );
 }
-
