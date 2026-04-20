@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import { useAuth } from '@/contexts/auth-provider';
 import { categories } from '@/data';
-import http from '@/lib/http';
 import { MarkdownEditor } from '@repo/ui/markdown-editor';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { toast } from 'sonner';
+import { usePost, useUpdatePost } from '@/hooks/use-posts';
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -32,45 +32,41 @@ export default function EditPostPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
-  const [loading, setLoading] = useState(true);
+
+  const { data: post, isLoading: isFetching } = usePost(id);
+  const { mutateAsync: updatePost } = useUpdatePost();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { title: '', excerpt: '', content: '', category: '', tags: '' },
   });
 
+  // پر کردن فرم بعد از لود شدن دیتا
   useEffect(() => {
-    if (!id || !user) {
-      setLoading(false);
-      return;
+    if (post) {
+      form.reset({
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        category: post.category,
+        tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
+      });
     }
-    http
-      .get(`/posts/${id}`)
-      .then((res) => {
-        const post = res.data;
-        form.reset({
-          title: post.title,
-          excerpt: post.excerpt,
-          content: post.content,
-          category: post.category,
-          tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
-        });
-      })
-      .catch(() => toast.error('Failed to load post'))
-      .finally(() => setLoading(false));
-  }, [id, form]);
+  }, [post, form]);
 
   const onSubmit = async (data: FormData) => {
     if (!user || !id) return;
+    
+    const postData = {
+      ...data,
+      tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
+      authorId: user._id,
+      authorName: user.name,
+      updatedAt: new Date().toISOString(),
+    };
+
     try {
-      const postData = {
-        ...data,
-        tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
-        authorId: user._id,
-        authorName: user.name,
-        updatedAt: new Date().toISOString(),
-      };
-      await http.patch(`/posts/${id}`, postData);
+      await updatePost({ id, data: postData });
       toast.success('Post updated!');
       navigate('/posts');
     } catch {
@@ -78,7 +74,7 @@ export default function EditPostPage() {
     }
   };
 
-  if (loading) {
+  if (isFetching) {
     return (
       <div className="flex items-center justify-center py-16">
         <p className="text-muted-foreground">Loading post...</p>

@@ -1,41 +1,25 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Plus } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table';
 import PostTable from '@/components/dashboard/PostTable';
-import http from '@/lib/http';
 import { useAuth } from '@/contexts/auth-provider';
-import type { Post } from '@/types';
+import { usePosts, useDeletePost } from '@/hooks/use-posts';
 import { toast } from 'sonner';
 
 export default function PostsPage() {
   const { user } = useAuth();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  const { data: posts = [], isLoading } = usePosts(!!user?._id);
+  const { mutate: deletePost } = useDeletePost();
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    http
-      .get<Post[]>('/posts')
-      .then((res) => setPosts(Array.isArray(res.data) ? res.data : []))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false));
-  }, [user?._id]);
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!user) return;
-    try {
-      await http.delete(`/posts/${id}`);
-      setPosts((prev) => prev.filter((p) => p._id !== id));
-      toast.success('Post deleted');
-    } catch {
-      toast.error('Failed to delete post');
-    }
+    deletePost(id, {
+      onSuccess: () => toast.success('Post deleted'),
+      onError: () => toast.error('Failed to delete post'),
+    });
   };
 
   return (
@@ -52,12 +36,13 @@ export default function PostsPage() {
           </Link>
         </Button>
       </div>
+
       <Card className="border-border shadow-sm">
         <CardHeader>
           <CardTitle>All Posts</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             <div className="overflow-x-auto -mx-4 sm:mx-0 rounded-md border border-border">
               <Table>
                 <TableHeader>

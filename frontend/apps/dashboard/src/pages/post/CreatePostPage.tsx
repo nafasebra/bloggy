@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import { useAuth } from '@/contexts/auth-provider';
 import { categories } from '@/data';
-import http from '@/lib/http';
 import { MarkdownEditor } from '@repo/ui/markdown-editor';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { toast } from 'sonner';
+import { useCreatePost } from '@/hooks/use-posts';
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -31,6 +31,8 @@ export default function CreatePostPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
+  
+  const { mutateAsync: createPost } = useCreatePost();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -42,15 +44,17 @@ export default function CreatePostPage() {
       toast.error('You must be logged in to create a post');
       return;
     }
+    
+    const postData = {
+      ...data,
+      tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
+      authorId: user._id,
+      authorName: user.name,
+      createdAt: new Date().toISOString(),
+    };
+
     try {
-      const postData = {
-        ...data,
-        tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
-        authorId: user._id,
-        authorName: user.name,
-        createdAt: new Date().toISOString(),
-      };
-      await http.post('/posts', postData);
+      await createPost(postData);
       toast.success('Post created successfully!');
       navigate('/posts');
     } catch {
