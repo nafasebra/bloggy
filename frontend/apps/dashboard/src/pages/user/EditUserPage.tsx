@@ -2,21 +2,13 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@repo/ui/button';
+import * as z from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
+import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@repo/ui/select';
-import http from '@/lib/http';
 import { useAuth } from '@/contexts/auth-provider';
-import type { User } from '@/types';
+import { useUser, useUpdateUser } from '@/hooks/use-users';
 import { toast } from 'sonner';
 
 const schema = z.object({
@@ -26,7 +18,6 @@ const schema = z.object({
   role: z.enum(['admin', 'user'], {
     required_error: 'Role is required',
   }),
-  // Optional: leave blank to keep current password
   password: z.string().optional(),
 });
 
@@ -35,175 +26,105 @@ type FormData = z.infer<typeof schema>;
 export default function EditUserPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user: currentUser } = useAuth();
+
+  const { data: userToEdit, isLoading } = useUser(id);
+  const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      name: '',
-      username: '',
-      email: '',
-      role: 'user',
-      password: '',
-    },
+    defaultValues: { name: '', username: '', email: '', role: 'user', password: '' },
   });
 
   useEffect(() => {
-    if (!id || !user) {
-      return;
-    }
-
-    http
-      .get<User>(`/users/${id}`)
-      .then((res) => {
-        const user = res.data;
-        form.reset({
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          role: (user.role as 'admin' | 'user') ?? 'user',
-          password: '',
-        });
-      })
-      .catch(() => {
-        toast.error('Failed to load user');
-        navigate('/users');
+    if (userToEdit) {
+      form.reset({
+        name: userToEdit.name,
+        username: userToEdit.username,
+        email: userToEdit.email,
+        role: (userToEdit.role as 'admin' | 'user') ?? 'user',
+        password: '', 
       });
-  }, [id, form, navigate]);
+    }
+  }, [userToEdit, form]);
 
   const onSubmit = async (data: FormData) => {
-    if (!user || !id) {
-      return;
+    if (!currentUser || !id) return;
+
+    const payload: Partial<FormData> = {
+      name: data.name,
+      username: data.username,
+      email: data.email,
+      role: data.role,
+    };
+
+    if (data.password && data.password.trim() !== '') {
+      payload.password = data.password;
     }
 
     try {
-      const payload: Partial<FormData> = {
-        name: data.name,
-        username: data.username,
-        email: data.email,
-        role: data.role,
-      };
-
-      if (data.password && data.password.trim().length > 0) {
-        payload.password = data.password;
-      }
-
-      await http.patch(`/users/${id}`, payload);
-
+      await updateUser({ id, data: payload });
       toast.success('User updated successfully');
       navigate('/users');
-    } catch {
-      toast.error('Failed to update user');
+    } catch (error) {
+      console.error(error);
     }
   };
 
+  if (isLoading) {
+    return <div className="py-20 text-center text-muted-foreground">Loading user data...</div>;
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-          Edit User
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Update user information.
-        </p>
+        <h1 className="text-2xl font-bold tracking-tight">Edit User</h1>
+        <p className="text-muted-foreground">Update user information.</p>
       </div>
-      <Card className="border-border shadow-sm">
+
+      <Card>
         <CardHeader>
           <CardTitle>User Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 sm:space-y-6"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
-                  {...form.register('name')}
-                  placeholder="Full name"
-                />
-                {form.formState.errors.name && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.name.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="username">Username *</Label>
-                <Input
-                  id="username"
-                  {...form.register('username')}
-                  placeholder="username"
-                />
-                {form.formState.errors.username && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.username.message}
-                  </p>
-                )}
-              </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input id="name" {...form.register('name')} />
+              {form.formState.errors.name && (
+                <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+              )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...form.register('email')}
-                  placeholder="user@example.com"
-                />
-                {form.formState.errors.email && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Role *</Label>
-                <Select
-                  value={form.watch('role')}
-                  onValueChange={(value) =>
-                    form.setValue('role', value as FormData['role'])
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.role && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.role.message}
-                  </p>
-                )}
-              </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" {...form.register('username')} />
+              {form.formState.errors.username && (
+                <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+              )}
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">New password (optional)</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                {...form.register('password')}
-                placeholder="Leave blank to keep current password"
-              />
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" {...form.register('email')} />
+              {form.formState.errors.email && (
+                <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+              )}
             </div>
-            <div className="flex gap-3">
-              <Button
-                type="submit"
-                disabled={form.formState.isSubmitting}
-              >
-                Update User
+
+            <div className="space-y-2">
+              <Label htmlFor="password">New Password (Optional)</Label>
+              <Input id="password" type="password" placeholder="Leave blank to keep current password" {...form.register('password')} />
+              {form.formState.errors.password && (
+                <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="pt-4 flex gap-4">
+              <Button type="submit" disabled={isUpdating || form.formState.isSubmitting}>
+                {isUpdating ? 'Updating...' : 'Update User'}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate('/users')}
-              >
+              <Button type="button" variant="outline" onClick={() => navigate('/users')}>
                 Cancel
               </Button>
             </div>
@@ -213,4 +134,3 @@ export default function EditUserPage() {
     </div>
   );
 }
-
