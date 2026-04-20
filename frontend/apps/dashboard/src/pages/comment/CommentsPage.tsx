@@ -10,8 +10,7 @@ import {
 import { Button } from '@repo/ui/button';
 import { CircleX, MessageSquare, Trash } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
-import { useDeleteComment } from '@/hooks/mutations/delete-comment'; 
-import { useComments } from '@/hooks/queries/all-comments'; 
+import { useComments, useDeleteComment } from '@/hooks/use-comments'; 
 
 export default function CommentsPage() {
   const { user } = useAuth();

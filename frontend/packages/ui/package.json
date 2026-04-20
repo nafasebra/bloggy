@@ -19,6 +19,7 @@
     "./radio-group": "./src/radio-group.tsx",
     "./sheet": "./src/sheet.tsx",
     "./sonner": "./src/sonner.tsx",
+    "./skeleton": "./src/skeleton.tsx",
     "./markdown-preview": "./src/markdown-preview.tsx",
     "./markdown-editor": "./src/markdown-editor.tsx",
     "./theme-toggle": "./src/theme-toggle.tsx"
