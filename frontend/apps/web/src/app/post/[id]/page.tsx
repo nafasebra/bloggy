@@ -13,9 +13,9 @@ import { Eye, Heart } from 'lucide-react';
 import LikeButton from '@/components/pages/blog/like-button';
 
 interface PostPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function getPostById(id: string) {
@@ -39,7 +39,8 @@ async function getPostViewCountByIP(postId: string) {
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const post = await getPostById(params.id);
+  const { id } = await params;
+  const post = await getPostById(id);
 
   if (!post) {
     return {
@@ -69,9 +70,10 @@ export async function generateMetadata({
 }
 
 export default async function PostPage({ params }: PostPageProps) {
+  const { id } = await params;
   const [post, postViewCount] = await Promise.all([
-    getPostById(params.id),
-    getPostViewCountByIP(params.id),
+    getPostById(id),
+    getPostViewCountByIP(id),
   ]);
 
   if (!post) {

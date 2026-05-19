@@ -7,6 +7,7 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react';
+import { hasSessionHint } from '@/lib/auth/client-session';
 import { UserService } from '@/services/user.services';
 import { User } from '@/types';
 import axios from 'axios';
@@ -43,6 +44,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const fetchUser = async () => {
+    if (!hasSessionHint()) {
+      setUser(null);
+      return;
+    }
+
     try {
       const userData = await UserService.getCurrentUser();
       setUser(userData);
