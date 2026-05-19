@@ -11,6 +11,9 @@ import { User } from 'src/users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ChangePasswordDto } from './dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
+
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 @Injectable()
 export class AuthService {
@@ -60,9 +63,12 @@ export class AuthService {
       sub: user._id,
       username: user.username,
       email: user.email,
+      role: user.role ?? 'user',
     };
 
-    const session_token = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const session_token = this.jwtService.sign(payload, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
 
     return {
       session_token,
@@ -77,8 +83,8 @@ export class AuthService {
     };
   }
 
-  async changePassword(changePasswordDto: ChangePasswordDto) {
-    const user = await this.userModel.findById(changePasswordDto.userId);
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    const user = await this.userModel.findById(userId);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -95,8 +101,30 @@ export class AuthService {
       changePasswordDto.new_password,
       10
     );
-    await this.userModel.findByIdAndUpdate(changePasswordDto.userId, {
+    await this.userModel.findByIdAndUpdate(userId, {
       password: hashedNewPassword,
     });
+  }
+
+  async forgetPassword(forgetPasswordDto: ForgetPasswordDto) {
+    const user = await this.userModel.findOne({
+      email: forgetPasswordDto.email,
+    });
+
+    if (!user) {
+      // Return silently to avoid email enumeration
+      return;
+    }
+
+    const resetToken = this.jwtService.sign(
+      { sub: user._id, purpose: 'password-reset' },
+      { expiresIn: '1h' }
+    );
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(
+        `[dev] Password reset token for ${forgetPasswordDto.email}: ${resetToken}`
+      );
+    }
   }
 }

@@ -1,0 +1,9 @@
+# Backend API URL (used by server-side routes and Next.js rewrites)
+API_URL=http://localhost:3030
+
+# Must match backend JWT_SECRET (used by middleware for session verification)
+JWT_SECRET=your-secret-key-here
+
+# Public URLs
+NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:3000

@@ -1,6 +1,12 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import http from '@/lib/http';
-import { meta } from 'zod/v4/core';
 
 interface User {
   _id: string;
@@ -14,7 +20,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   setUser: (user: User | null) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     http
       .get('/users/me')
       .then((res) => {
-        setUserState(res.data)
+        setUserState(res.data);
       })
       .catch(() => {
         setUserState(null);
@@ -45,8 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const logout = useCallback(() => {
-    setUserState(null);
+  const logout = useCallback(async () => {
+    const webLoginUrl =
+      import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
+    try {
+      await http.post('/auth/logout');
+    } catch {
+      // Clear local state even if backend call fails
+    } finally {
+      setUserState(null);
+      window.location.href = `${webLoginUrl}/auth/login`;
+    }
   }, []);
 
   const value: AuthContextType = {

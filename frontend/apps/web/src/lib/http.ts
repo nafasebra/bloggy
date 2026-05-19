@@ -1,9 +1,14 @@
 import axios from 'axios';
 
+const baseURL =
+  typeof window !== 'undefined'
+    ? '/api/backend'
+    : process.env.API_URL || 'http://localhost:3030';
+
 const http = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL,
   withCredentials: true,
-  timeout: 10000, // 10 seconds
+  timeout: 10000,
 });
 
 export default http;

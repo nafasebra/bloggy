@@ -9,6 +9,7 @@ import {
   Req,
   Ip,
   Delete,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   CreateCommentDto,
@@ -29,6 +30,13 @@ import {
 } from '@nestjs/swagger';
 import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    userId: string;
+    username?: string;
+  };
+}
 
 @ApiTags('comments')
 @Controller('comments')
@@ -65,9 +73,14 @@ export class CommentsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async createComment(
     @Param('postId') postId: string,
-    @Body() comment: CreateCommentDto
+    @Body() comment: CreateCommentDto,
+    @Req() req: AuthenticatedRequest
   ): Promise<Comment> {
-    return this.commentsService.create(postId, comment);
+    return this.commentsService.create(postId, {
+      ...comment,
+      authorId: req.user.userId,
+      authorName: req.user.username ?? comment.authorName,
+    });
   }
 
   @Put('reply/:postId')
@@ -83,9 +96,14 @@ export class CommentsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async replyComment(
     @Param('postId') postId: string,
-    @Body() comment: ReplyCommentDto
+    @Body() comment: ReplyCommentDto,
+    @Req() req: AuthenticatedRequest
   ): Promise<Comment> {
-    return this.commentsService.reply(postId, comment);
+    return this.commentsService.reply(postId, {
+      ...comment,
+      authorId: req.user.userId,
+      authorName: req.user.username ?? comment.authorName,
+    });
   }
 
   @Put(':commentId/like')
@@ -147,7 +165,14 @@ export class CommentsController {
     status: 200,
     description: 'Comment deleted successfully',
   })
-  async deleteComment(@Param('commentId') commentId: string): Promise<{ message: string }> {
+  async deleteComment(
+    @Param('commentId') commentId: string,
+    @Req() req: AuthenticatedRequest
+  ): Promise<{ message: string }> {
+    const comment = await this.commentsService.findById(commentId);
+    if (String(comment.authorId) !== String(req.user.userId)) {
+      throw new ForbiddenException('You can only delete your own comments');
+    }
     await this.commentsService.delete(commentId);
     return { message: 'Comment deleted successfully' };
   }

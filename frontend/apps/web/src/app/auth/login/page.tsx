@@ -12,7 +12,6 @@ import { toast } from 'sonner';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
-import http from '@/lib/http';
 import axios from 'axios';
 
 const loginSchema = z.object({
@@ -38,10 +37,10 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/login',
+        '/api/login',
         {
           username: data.username,
-          password: data.password
+          password: data.password,
         },
         {
           withCredentials: true,
@@ -66,7 +65,13 @@ export default function LoginPage() {
         if (isNew) {
           router.push('/auth/setup');
         } else {
-          router.push('/');
+          const params = new URLSearchParams(window.location.search);
+          const redirect = params.get('redirect');
+          router.push(
+            redirect?.startsWith('/') && !redirect.startsWith('//')
+              ? redirect
+              : '/'
+          );
         }
       } else {
         toast.error(

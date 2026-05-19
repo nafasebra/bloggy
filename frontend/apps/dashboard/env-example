@@ -1,0 +1,5 @@
+# Backend API URL (production; dev uses Vite proxy at /api)
+VITE_API_URL=http://localhost:3030
+
+# Web app URL (login / logout redirects)
+VITE_WEB_URL=http://localhost:3000

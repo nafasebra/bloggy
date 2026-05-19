@@ -230,6 +230,14 @@ export class CommentsService {
     return !!like;
   }
 
+  async findById(commentId: string): Promise<Comment> {
+    const comment = await this.commentModel.findById(commentId).exec();
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+    return comment;
+  }
+
   async delete(commentId: string): Promise<void> {
     const existing = await this.commentModel.findById(commentId).exec();
     if (!existing) {

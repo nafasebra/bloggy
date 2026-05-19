@@ -38,7 +38,6 @@ export default function ChangePasswordPage() {
 
   const onSubmit = async (data: ChangePasswordFormData) => {
     const tempData = {
-      userId: user?._id,
       old_password: data.oldPassword,
       new_password: data.password,
     };
@@ -47,7 +46,7 @@ export default function ChangePasswordPage() {
       await http.post('/auth/change-password', tempData);
 
       toast.success('Password changed successfully!');
-      router.push('/user/' + user?._id);
+      router.push('/user/me');
     } catch (err) {
       toast.error('Change failed. Please try again.');
     }
@@ -143,7 +142,7 @@ export default function ChangePasswordPage() {
 
             <div className="text-center pt-4">
               <Link
-                href="/user/1"
+                href="/user/me"
                 className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
               >
                 Back to profile

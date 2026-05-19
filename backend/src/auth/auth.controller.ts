@@ -1,7 +1,19 @@
-import { Controller, Res } from '@nestjs/common';
-import { Post, Body, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Res,
+  Post,
+  Body,
+  HttpStatus,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { Response } from 'express';
-import { RegisterDto, LoginDto, AuthResponseDto } from './dto';
+import {
+  RegisterDto,
+  LoginDto,
+  AuthResponseDto,
+  ForgetPasswordDto,
+} from './dto';
 import { AuthService } from './auth.service';
 import {
   ApiBody,
@@ -12,9 +24,15 @@ import {
   ApiConflictResponse,
   ApiUnauthorizedResponse,
   ApiInternalServerErrorResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { ChangePasswordDto } from './dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import {
+  getSessionCookieOptions,
+  SESSION_COOKIE_NAME,
+} from './cookie.config';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -91,12 +109,7 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
 
-    // Set http-only cookie with session_token
-    res.cookie('session_token', result.session_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    res.cookie(SESSION_COOKIE_NAME, result.session_token, getSessionCookieOptions());
 
     return {
       status: 'success',
@@ -108,7 +121,7 @@ export class AuthController {
   @Post('logout')
   @ApiOperation({
     summary: 'Logout a user',
-    description: 'Logs out a user by clearing the refresh token cookie.',
+    description: 'Logs out a user by clearing the session cookie.',
     tags: ['Authentication'],
   })
   @ApiResponse({
@@ -123,12 +136,7 @@ export class AuthController {
     },
   })
   async logout(@Res({ passthrough: true }) res: Response) {
-    // Clear the http-only session_token cookie
-    res.clearCookie('session_token', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
 
     return {
       status: 'success',
@@ -137,9 +145,11 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Change user password',
-    description: 'Allows a user to change their password.',
+    description: 'Allows the authenticated user to change their password.',
     tags: ['Authentication'],
   })
   @ApiBody({
@@ -151,16 +161,38 @@ export class AuthController {
     description: 'Password changed successfully',
   })
   @ApiUnauthorizedResponse({
-    description: 'Invalid old password',
+    description: 'Invalid old password or not authenticated',
     type: ErrorResponseDto,
   })
-  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
-    await this.authService.changePassword(changePasswordDto);
+  async changePassword(
+    @Request() req: { user: { userId: string } },
+    @Body() changePasswordDto: ChangePasswordDto
+  ) {
+    await this.authService.changePassword(req.user.userId, changePasswordDto);
     return {
       status: 'success',
       message: 'Password changed successfully',
     };
   }
 
-  // TODO forget password
+  @Post('forget-password')
+  @ApiOperation({
+    summary: 'Request a password reset',
+    description:
+      'Sends a password reset link to the provided email if the account exists.',
+    tags: ['Authentication'],
+  })
+  @ApiBody({ type: ForgetPasswordDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'If the email exists, a reset link will be sent',
+  })
+  async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    await this.authService.forgetPassword(forgetPasswordDto);
+    return {
+      status: 'success',
+      message:
+        'If an account with that email exists, a password reset link has been sent.',
+    };
+  }
 }

@@ -36,7 +36,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (user === null) {
-      // Disconnect if no token
       if (socket) {
         socket.disconnect();
         setSocket(null);
@@ -45,8 +44,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       return;
     }
 
-    const apiUrl = process.env.API_URL;
-    const newSocket = io(`${apiUrl}/notifications`, {
+    const newSocket = io('/notifications', {
+      path: '/api/backend/socket.io',
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
@@ -55,17 +54,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     });
 
     newSocket.on('connect', () => {
-      console.log('Socket connected');
       setIsConnected(true);
     });
 
     newSocket.on('disconnect', () => {
-      console.log('Socket disconnected');
       setIsConnected(false);
     });
 
-    newSocket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+    newSocket.on('connect_error', () => {
       setIsConnected(false);
     });
 
@@ -82,4 +78,3 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     </SocketContext.Provider>
   );
 };
-

@@ -54,8 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Call logout API to clear the refresh_token cookie
-      axios.post('/api/logout');
+      await axios.post('/api/logout', {}, { withCredentials: true });
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {

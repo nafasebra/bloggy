@@ -38,7 +38,7 @@ type FormData = z.infer<typeof editProfileSchema>;
 
 export default function EditUserPage() {
   const router = useRouter();
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
 
@@ -53,17 +53,13 @@ export default function EditUserPage() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!user?._id || !accessToken) {
+      if (!user?._id) {
         router.push('/auth/login');
         return;
       }
 
       try {
-        const response = await http.get(`/users/${user._id}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await http.get(`/users/${user._id}`);
 
         if (response.data) {
           const userData = response.data;
@@ -85,17 +81,13 @@ export default function EditUserPage() {
     };
 
     fetchUserData();
-  }, [user?._id, accessToken, router, setValue]);
+  }, [user?._id, router, setValue]);
 
   const onSubmit = async (data: FormData) => {
     const { avatar, ...updateData } = data;
 
     try {
-      const response = await http.patch(`/users/${user?._id}`, updateData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await http.patch(`/users/${user?._id}`, updateData);
 
       if (response.data) {
         toast.success('Profile updated successfully!');

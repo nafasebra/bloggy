@@ -29,7 +29,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user || !user._id) {
+  if (!user?._id || user.role !== "admin") {
     window.location.href = `${WEB_LOGIN_URL}/auth/login`;
     return null;
   }

@@ -8,9 +8,35 @@ import {
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
+import { SESSION_COOKIE_NAME } from '../auth/cookie.config';
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
+}
+
+function extractTokenFromHandshake(client: Socket): string | null {
+  const authToken = client.handshake.auth?.token as string | undefined;
+  if (authToken && typeof authToken === 'string') {
+    return authToken;
+  }
+
+  const authHeader = client.handshake.headers?.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    return authHeader.split(' ')[1];
+  }
+
+  const cookieHeader = client.handshake.headers?.cookie;
+  if (typeof cookieHeader === 'string') {
+    const cookies = cookieHeader.split(';').map(c => c.trim());
+    for (const cookie of cookies) {
+      const [name, ...valueParts] = cookie.split('=');
+      if (name === SESSION_COOKIE_NAME) {
+        return valueParts.join('=');
+      }
+    }
+  }
+
+  return null;
 }
 
 @WebSocketGateway({
@@ -27,17 +53,15 @@ export class NotificationsGateway
   server: Server;
 
   private readonly logger = new Logger(NotificationsGateway.name);
-  private connectedUsers = new Map<string, string>(); // userId -> socketId
+  private connectedUsers = new Map<string, string>();
 
   constructor(private readonly jwtService: JwtService) {}
 
   async handleConnection(client: AuthenticatedSocket) {
     try {
-      const authToken =
-        (client.handshake.auth?.token as string | undefined) ||
-        client.handshake.headers?.authorization?.split(' ')[1];
+      const authToken = extractTokenFromHandshake(client);
 
-      if (!authToken || typeof authToken !== 'string') {
+      if (!authToken) {
         this.logger.warn(`Client ${client.id} connected without token`);
         client.disconnect();
         return;
@@ -63,17 +87,7 @@ export class NotificationsGateway
 
       this.logger.log(`User ${userId} connected with socket ${client.id}`);
 
-      // Join user-specific room
-      const joinResult = client.join(`user:${userId}`);
-      if (
-        joinResult &&
-        typeof joinResult === 'object' &&
-        'catch' in joinResult
-      ) {
-        void joinResult.catch((err: unknown) => {
-          this.logger.error(`Failed to join room for user ${userId}:`, err);
-        });
-      }
+      void client.join(`user:${userId}`);
     } catch (error: unknown) {
       this.logger.error(
         `Authentication failed for client ${client.id}:`,
@@ -90,21 +104,17 @@ export class NotificationsGateway
     }
   }
 
-  // Emit notification to specific user
   emitNotification(userId: string, notification: any) {
     this.server.to(`user:${userId}`).emit('new-notification', notification);
     this.logger.log(`Notification sent to user ${userId}`);
   }
 
-  // Emit unread count update to specific user
   emitUnreadCount(userId: string, count: number) {
     this.server.to(`user:${userId}`).emit('unread-count', count);
   }
 
-  // Handle mark as read event from client
   @SubscribeMessage('mark-as-read')
   handleMarkAsRead() {
-    // This will be handled by the controller, but we can acknowledge it here
     return { success: true };
   }
 }

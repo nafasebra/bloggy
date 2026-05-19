@@ -10,6 +10,7 @@ import {
   Query,
   Req,
   Ip,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PostsService } from './posts.service';
@@ -64,8 +65,16 @@ export class PostsController {
     description: 'Invalid input',
     type: ErrorResponseDto,
   })
-  async cratePost(@Body() createPostDto: CreatePostDto): Promise<PostEntity> {
-    return this.postsService.create(createPostDto);
+  async cratePost(
+    @Body() createPostDto: CreatePostDto,
+    @Req() req: AuthenticatedRequest
+  ): Promise<PostEntity> {
+    const userId = req.user!.userId;
+    return this.postsService.create({
+      ...createPostDto,
+      authorId: userId,
+      authorName: req.user!.username ?? createPostDto.authorName,
+    });
   }
 
   @Get('search')
@@ -126,8 +135,13 @@ export class PostsController {
   })
   async updatePost(
     @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto
+    @Body() updatePostDto: UpdatePostDto,
+    @Req() req: AuthenticatedRequest
   ): Promise<PostEntity> {
+    const post = await this.postsService.findById(id);
+    if (String(post.authorId) !== String(req.user!.userId)) {
+      throw new ForbiddenException('You can only update your own posts');
+    }
     return this.postsService.update(id, updatePostDto);
   }
 
@@ -143,7 +157,14 @@ export class PostsController {
     description: 'Post not found',
     type: ErrorResponseDto,
   })
-  async deletePost(@Param('id') id: string): Promise<void> {
+  async deletePost(
+    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest
+  ): Promise<void> {
+    const post = await this.postsService.findById(id);
+    if (String(post.authorId) !== String(req.user!.userId)) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
     return this.postsService.delete(id);
   }
 

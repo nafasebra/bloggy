@@ -22,6 +22,6 @@ export class AuthService {
   }
 
   static async forgotPassword(email: string): Promise<void> {
-    await http.post('/auth/forgot-password', { email });
+    await http.post('/auth/forget-password', { email });
   }
 }

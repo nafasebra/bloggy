@@ -7,6 +7,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -105,7 +106,14 @@ export class UsersController {
     description: 'User ID',
     example: '507f1f77bcf86cd799439011',
   })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() req: { user: { userId: string } }
+  ) {
+    if (req.user.userId !== id) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
     return this.usersService.update(id, updateUserDto);
   }
 
@@ -128,7 +136,13 @@ export class UsersController {
     description: 'User ID',
     example: '507f1f77bcf86cd799439011',
   })
-  remove(@Param('id') id: string) {
+  remove(
+    @Param('id') id: string,
+    @Request() req: { user: { userId: string } }
+  ) {
+    if (req.user.userId !== id) {
+      throw new ForbiddenException('You can only delete your own account');
+    }
     return this.usersService.remove(id);
   }
 }

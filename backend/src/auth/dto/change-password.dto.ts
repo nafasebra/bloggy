@@ -1,21 +1,11 @@
-import {
-  IsMongoId,
-  isString,
-  IsString,
-  minLength,
-  MinLength,
-} from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 
 export class ChangePasswordDto {
-  // get user id
-  @IsMongoId()
-  userId: string;
-
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   old_password: string;
 
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   new_password: string;
 }

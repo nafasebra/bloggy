@@ -1,34 +1,32 @@
-import axios from "axios";
-import { NextRequest, NextResponse } from "next/server";
+import http from '@/lib/http';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const { name, username, email, password } = await request.json();
 
   try {
-    const response = await axios.post(
-      `/auth/register`,
-      {
-        name,
-        username,
-        email,
-        password,
-      },
-    );
+    const response = await http.post('/auth/register', {
+      name,
+      username,
+      email,
+      password,
+    });
 
     return NextResponse.json(response.data);
-  } catch (error: any) {
-    const status = error.response?.status ?? 500;
+  } catch (error: unknown) {
+    const axiosError = error as {
+      response?: { status?: number; data?: { message?: string; error?: string } };
+      message?: string;
+    };
+    const status = axiosError.response?.status ?? 500;
     const message =
-      error.response?.data?.message ??
-      error.response?.data?.error ??
-      error.message;
+      axiosError.response?.data?.message ??
+      axiosError.response?.data?.error ??
+      axiosError.message;
 
     return NextResponse.json(
       {
-        error:
-          typeof message === "string"
-            ? message
-            : "Registration failed",
+        error: typeof message === 'string' ? message : 'Registration failed',
       },
       { status }
     );
