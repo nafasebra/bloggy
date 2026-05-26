@@ -1,3 +1,1 @@
-# Enforce lint before commit (uncomment when ready):
-# npm --prefix backend run lint
-# pnpm --dir frontend run lint
+npm run lint-staged

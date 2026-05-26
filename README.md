@@ -111,9 +111,11 @@ Hooks are plain shell scripts in `.husky/` (no `husky install` / `husky add` —
 
 Add or update hooks by editing files in `.husky/` directly, then commit them.
 
+**Pre-commit** runs `lint-staged` on staged files: Prettier + ESLint for `backend/`, Prettier + ESLint for each `frontend/` app/package. Requires root `npm install`, and `pnpm` for frontend ESLint.
+
 Run hooks manually
 ```bash
-sh .husky/pre-commit
+npm run lint-staged
 sh .husky/commit-msg .git/COMMIT_EDITMSG
 ```
 

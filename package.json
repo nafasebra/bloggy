@@ -5,11 +5,12 @@
   "scripts": {
     "prepare": "husky",
     "commitlint": "commitlint",
-    "hooks:check": "node -e \"const {execSync}=require('child_process');const p=execSync('git config core.hooksPath',{encoding:'utf8'}).trim();if(p!=='.husky/_'){console.error('Husky not installed. Run: npm install');process.exit(1)}console.log('hooks OK:',p)\""
+    "lint-staged": "lint-staged"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2"
   }
 }
