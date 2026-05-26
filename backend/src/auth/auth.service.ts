@@ -35,9 +35,7 @@ export class AuthService {
       return await newUser.save();
     } catch (err: any) {
       if (err.code === 11000) {
-        throw new ConflictException(
-          'Username or email is already taken'
-        );
+        throw new ConflictException('Username or email is already taken');
       }
       throw err;
     }

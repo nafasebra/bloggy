@@ -100,27 +100,21 @@ This repository uses Husky to manage Git hooks in the root. Husky is installed a
 - Location: `.husky/` at the repo root (hooks are versioned)
 - Commitlint config: `commitlint.config.cjs` (root)
 
-Installing / enabling Husky
+Installing / enabling Husky (Husky v9)
 ```bash
-# from repo root
-npm install          # installs devDependencies and runs 'prepare' which installs hooks
-# or manually
-npx husky install
+# from repo root — required so Git uses .husky/_ as hooksPath
+npm install
+npm run hooks:check   # should print: hooks OK: .husky/_
 ```
 
-Add or update hooks
-```bash
-# Add a pre-commit hook that lints frontend then backend
-npx husky add .husky/pre-commit "npm --prefix ./front run lint || npm --prefix ./back run lint"
+Hooks are plain shell scripts in `.husky/` (no `husky install` / `husky add` — those commands are removed in v9). After `npm install`, `prepare` runs `husky`, which sets `core.hooksPath` to `.husky/_` in your local clone.
 
-# Ensure commit-msg hook runs commitlint (the project already contains this hook)
-npx husky add .husky/commit-msg "npx --no-install commitlint --edit \"$1\""
-```
+Add or update hooks by editing files in `.husky/` directly, then commit them.
 
 Run hooks manually
 ```bash
-# Run the pre-commit hook manually
-npx husky run pre-commit
+sh .husky/pre-commit
+sh .husky/commit-msg .git/COMMIT_EDITMSG
 ```
 
 Tips

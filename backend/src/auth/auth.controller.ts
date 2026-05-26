@@ -29,10 +29,7 @@ import {
 import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { ChangePasswordDto } from './dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import {
-  getSessionCookieOptions,
-  SESSION_COOKIE_NAME,
-} from './cookie.config';
+import { getSessionCookieOptions, SESSION_COOKIE_NAME } from './cookie.config';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -109,7 +106,11 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
 
-    res.cookie(SESSION_COOKIE_NAME, result.session_token, getSessionCookieOptions());
+    res.cookie(
+      SESSION_COOKIE_NAME,
+      result.session_token,
+      getSessionCookieOptions()
+    );
 
     return {
       status: 'success',

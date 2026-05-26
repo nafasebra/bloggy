@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "commitlint": "commitlint",
+    "hooks:check": "node -e \"const {execSync}=require('child_process');const p=execSync('git config core.hooksPath',{encoding:'utf8'}).trim();if(p!=='.husky/_'){console.error('Husky not installed. Run: npm install');process.exit(1)}console.log('hooks OK:',p)\""
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",

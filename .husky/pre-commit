@@ -1,3 +1,3 @@
-#!/usr/bin/env sh
-# cd frontend
-# npm run lint
+# Enforce lint before commit (uncomment when ready):
+# npm --prefix backend run lint
+# pnpm --dir frontend run lint
