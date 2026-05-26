@@ -1,6 +1,4 @@
-- Husky + commitlint + linting enforced at root level (already applied)
 - Better documentation
 
-- add CSP prevent to backend
 - Input sanitation to avoid XSS in Markdown output (use a sanitizer like rehype-sanitize or DOMPurify)
 - rate limiting
