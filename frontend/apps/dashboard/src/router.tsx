@@ -1,26 +1,26 @@
-import { lazy } from "react";
-import { createBrowserRouter, Navigate } from "react-router";
-import DashboardLayout from "./components/layout/DashboardLayout";
-import { useAuth } from "@/contexts/auth-provider";
-import RouteError from "./components/RouteError";
+import { lazy } from 'react';
+import { createBrowserRouter, Navigate, useNavigate } from 'react-router';
+import DashboardLayout from './components/layout/DashboardLayout';
+import { useAuth } from '@/contexts/auth-provider';
+import RouteError from './components/RouteError';
 
-const LazyWrapper = lazy(() => import("./components/LazyWrapper"));
+const LazyWrapper = lazy(() => import('./components/LazyWrapper'));
 
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
-const PostsPage = lazy(() => import("./pages/post/PostsPage"));
-const CreatePostPage = lazy(() => import("./pages/post/CreatePostPage"));
-const EditPostPage = lazy(() => import("./pages/post/EditPostPage"));
-const UsersPage = lazy(() => import("./pages/user/UsersPage"));
-const CreateUserPage = lazy(() => import("./pages/user/CreateUserPage"));
-const EditUserPage = lazy(() => import("./pages/user/EditUserPage"));
-const CommentsPage = lazy(() => import("./pages/comment/CommentsPage"));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const PostsPage = lazy(() => import('./pages/post/PostsPage'));
+const CreatePostPage = lazy(() => import('./pages/post/CreatePostPage'));
+const EditPostPage = lazy(() => import('./pages/post/EditPostPage'));
+const UsersPage = lazy(() => import('./pages/user/UsersPage'));
+const CreateUserPage = lazy(() => import('./pages/user/CreateUserPage'));
+const EditUserPage = lazy(() => import('./pages/user/EditUserPage'));
+const CommentsPage = lazy(() => import('./pages/comment/CommentsPage'));
+const RateLimitedPage = lazy(() => import('./pages/RateLimitedPage'));
 
-const WEB_LOGIN_URL =
-  import.meta.env.VITE_WEB_URL || "http://localhost:3000";
+const WEB_LOGIN_URL = import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-
+  const navigate = useNavigate();
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -29,8 +29,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user?._id || user.role !== "admin") {
-    window.location.href = `${WEB_LOGIN_URL}/auth/login`;
+  if ((!user?._id || user.role !== 'admin') && typeof window !== 'undefined') {
+    navigate(`${WEB_LOGIN_URL}/auth/login`, { replace: true });
     return null;
   }
 
@@ -39,7 +39,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/rate-limited',
+    element: (
+      <LazyWrapper>
+        <RateLimitedPage />
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: '/',
     errorElement: <RouteError />,
     element: (
       <ProtectedRoute>
@@ -56,7 +64,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "posts",
+        path: 'posts',
         element: (
           <LazyWrapper>
             <PostsPage />
@@ -64,7 +72,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "posts/create",
+        path: 'posts/create',
         element: (
           <LazyWrapper>
             <CreatePostPage />
@@ -72,7 +80,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "posts/edit/:id",
+        path: 'posts/edit/:id',
         element: (
           <LazyWrapper>
             <EditPostPage />
@@ -80,7 +88,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "users",
+        path: 'users',
         element: (
           <LazyWrapper>
             <UsersPage />
@@ -88,7 +96,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "users/create",
+        path: 'users/create',
         element: (
           <LazyWrapper>
             <CreateUserPage />
@@ -96,7 +104,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "users/edit/:id",
+        path: 'users/edit/:id',
         element: (
           <LazyWrapper>
             <EditUserPage />
@@ -104,7 +112,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "comments",
+        path: 'comments',
         element: (
           <LazyWrapper>
             <CommentsPage />
@@ -114,7 +122,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "*",
+    path: '*',
     element: <Navigate to="/" replace />,
   },
 ]);

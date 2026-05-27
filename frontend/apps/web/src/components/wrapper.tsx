@@ -6,10 +6,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import Footer from './layout/footer';
 import Navigation from './layout/navigation';
+import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { Toaster } from '@repo/ui/sonner';
 
 const queryClient = new QueryClient();
+const RATE_LIMIT_PATH = '/rate-limited';
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -17,18 +19,20 @@ interface WrapperProps {
 
 function Wrapper({ children }: WrapperProps) {
   const { resolvedTheme } = useTheme();
+  const pathname = usePathname();
+  const isRateLimitedPage = pathname === RATE_LIMIT_PATH;
 
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <SocketProvider>
-            <Navigation />
+            {!isRateLimitedPage && <Navigation />}
             <main>{children}</main>
           </SocketProvider>
         </AuthProvider>
       </QueryClientProvider>
-      <Footer />
+      {!isRateLimitedPage && <Footer />}
       <Toaster theme={resolvedTheme as 'light' | 'dark' | 'system'} />
     </>
   );

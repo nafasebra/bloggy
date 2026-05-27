@@ -1,3 +1,4 @@
+import { attachRateLimitInterceptor } from '@repo/http-client';
 import axios from 'axios';
 
 const baseURL = import.meta.env.DEV
@@ -9,5 +10,7 @@ const http = axios.create({
   withCredentials: true,
   timeout: 10000,
 });
+
+attachRateLimitInterceptor(http);
 
 export default http;

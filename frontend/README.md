@@ -1,3 +1,18 @@
+# Bloggy frontend
+
+Turborepo monorepo for the Bloggy web app, admin dashboard, and shared UI packages.
+
+## Rate limiting (frontend)
+
+When the API returns **429**, axios interceptors in `@repo/http-client` redirect the user to `/rate-limited`:
+
+- **Web** (`apps/web`): `/rate-limited` → “Back to Bloggy” (`/`)
+- **Dashboard** (`apps/dashboard`): `/rate-limited` → “Back to website” (`VITE_WEB_URL`)
+
+See the root [`task`](../task) document for full backend + frontend behavior and acceptance criteria.
+
+---
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.

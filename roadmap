@@ -1,4 +1,2 @@
 - Better documentation
-
 - Input sanitation to avoid XSS in Markdown output (use a sanitizer like rehype-sanitize or DOMPurify)
-- rate limiting

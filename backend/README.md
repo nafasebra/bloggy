@@ -65,6 +65,22 @@ Open the URL in your browser:
 http://localhost:3030/api
 ```
 
+## Rate limiting
+
+The API uses [`@nestjs/throttler`](https://github.com/nestjs/throttler) to limit abusive request bursts.
+
+| Setting | Value |
+|---------|--------|
+| Window (`ttl`) | 60 seconds |
+| Max requests (`limit`) | 10 per window |
+| Config file | `src/app.module.ts` |
+
+When the limit is exceeded, the API responds with **HTTP 429** and a throttler error message.
+
+Register `ThrottlerGuard` (globally via `APP_GUARD` or on specific controllers) so limits are enforced on routes. See the [Rate limiting](https://docs.nestjs.com/security/rate-limiting) section in the NestJS docs.
+
+The frontend apps (`apps/web`, `apps/dashboard`) detect `429` responses and redirect users to `/rate-limited`. Details are documented in the repo root [`task`](../task) file under **Rate limiting**.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
