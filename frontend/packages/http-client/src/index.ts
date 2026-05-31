@@ -1,1 +1,1 @@
-export { attachRateLimitInterceptor, RATE_LIMIT_PATH } from './rate-limit.js';
+export { attachRateLimitInterceptor, RATE_LIMIT_PATH } from './rate-limit';

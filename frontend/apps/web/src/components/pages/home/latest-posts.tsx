@@ -1,7 +1,7 @@
 'use server';
 
 import Link from 'next/link';
-import BlogCard from '@/components/shared/blog-card';
+import { PostCard } from '@/components/shared/post-card';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 import type { BlogPost } from '@/types/post';
@@ -57,7 +57,7 @@ export default async function LatestPosts() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {mockLatestPosts.map((post) => (
-            <BlogCard key={post.id} post={post} />
+            <PostCard key={post.id} variant="home" post={post} />
           ))}
         </div>
 

@@ -4,7 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import { configureSecurityHeaders } from './common/security/helmet.config';
 
 async function bootstrap() {
@@ -15,7 +15,7 @@ async function bootstrap() {
   // Enable Socket.IO adapter
   app.useWebSocketAdapter(new IoAdapter(app));
 
-  app.use(cookieParser);
+  app.use(cookieParser());
 
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:3001'],

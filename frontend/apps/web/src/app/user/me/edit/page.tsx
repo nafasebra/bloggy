@@ -14,6 +14,7 @@ import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Textarea } from '@repo/ui/textarea';
 import { Label } from '@repo/ui/label';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const editProfileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
@@ -112,14 +113,7 @@ export default function EditUserPage() {
   };
 
   if (loading) {
-    return (
-      <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

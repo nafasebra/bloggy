@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SearchBar from '@/components/pages/home/search-bar';
-import BlogCard from '@/components/pages/blog/blog-card';
+import SearchBar from '@/components/shared/search-bar';
+import { PostCard } from '@/components/shared/post-card';
+import { EmptyState } from '@/components/ui/empty-state';
 import CategoryButtons from '@/components/pages/blog/category-buttons';
-import http from '@/lib/http';
+import { serverGet } from '@/lib/http';
 import type { Post } from '@/types/post';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@repo/ui/button';
@@ -27,19 +28,10 @@ export const metadata: Metadata = {
 
 async function getAllPosts(query: string) {
   try {
-    let response;
     if (query && query.trim()) {
-      // Use search endpoint when there's a query
-      response = await http.get(`/posts/search`, {
-        params: {
-          query: query.trim(),
-        },
-      });
-    } else {
-      // Use regular posts endpoint when no query
-      response = await http.get(`/posts`);
+      return await serverGet<Post[]>('/posts/search', { query: query.trim() });
     }
-    return response.data;
+    return await serverGet<Post[]>('/posts');
   } catch (error) {
     console.error('Failed to fetch posts:', error);
     return [];
@@ -49,10 +41,9 @@ async function getAllPosts(query: string) {
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: { q: string; category: string };
+  searchParams: Promise<{ q?: string; category?: string }>;
 }) {
-  const query = searchParams.q;
-  const selectedCategory = searchParams.category;
+  const { q: query = '', category: selectedCategory = '' } = await searchParams;
   let postData = await getAllPosts(query);
 
   if (selectedCategory) {
@@ -119,38 +110,39 @@ export default async function BlogPage({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {postData.map((post: Post) => (
-                <BlogCard key={post._id} post={post} />
+                <PostCard key={post._id} post={post} />
               ))}
             </div>
           </>
         ) : (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-12 h-12 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              {query || selectedCategory
+          <EmptyState
+            icon={<Search className="w-12 h-12 text-gray-400" />}
+            title={
+              query || selectedCategory
                 ? 'No articles found'
-                : 'No articles available'}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {query && selectedCategory
+                : 'No articles available'
+            }
+            description={
+              query && selectedCategory
                 ? `No articles found for "${query}" in ${selectedCategory} category.`
                 : query
                   ? `No articles found for "${query}". Try different search terms.`
                   : selectedCategory
                     ? `No articles found in ${selectedCategory} category.`
-                    : 'There are no articles to display yet. Be the first to create one!'}
-            </p>
-            {(query || selectedCategory) && (
-              <Link
-                href="/blog"
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-              >
-                Clear filters
-              </Link>
-            )}
-          </div>
+                    : 'There are no articles to display yet. Be the first to create one!'
+            }
+            iconWrapperClassName="w-24 h-24"
+            action={
+              (query || selectedCategory) && (
+                <Link
+                  href="/blog"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                >
+                  Clear filters
+                </Link>
+              )
+            }
+          />
         )}
       </div>
     </div>

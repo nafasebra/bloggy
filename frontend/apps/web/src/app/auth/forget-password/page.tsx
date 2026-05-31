@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { AuthFormLayout } from '@/components/shared/auth-form-layout';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
@@ -45,52 +46,41 @@ export default function ForgetPasswordPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="w-full max-w-sm mx-auto">
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 py-10">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
-              Forgot your password?
-            </h2>
-            <p className="text-center text-gray-600 dark:text-gray-300 mt-2 text-sm">
-              Enter your email address and we&apos;ll send you a link to reset
-              your password.
-            </p>
+    <AuthFormLayout
+      title="Forgot your password?"
+      subtitle="Enter your email address and we'll send you a link to reset your password."
+    >
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email address"
+              {...register('email')}
+            />
+            {errors.email && (
+              <p className="mt-2 text-sm text-red-600">
+                {errors.email.message}
+              </p>
+            )}
           </div>
-
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? 'Sending...' : 'Send reset link'}
-            </Button>
-
-            <div className="text-center pt-4">
-              <Link
-                href="/auth/login"
-                className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
-              >
-                Back to login
-              </Link>
-            </div>
-          </form>
         </div>
-      </div>
-    </div>
+
+        <Button type="submit" disabled={isSubmitting} className="w-full">
+          {isSubmitting ? 'Sending...' : 'Send reset link'}
+        </Button>
+
+        <div className="text-center pt-4">
+          <Link
+            href="/auth/login"
+            className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200"
+          >
+            Back to login
+          </Link>
+        </div>
+      </form>
+    </AuthFormLayout>
   );
 }

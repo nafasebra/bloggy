@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CommentSection from '@/components/pages/blog/comment-section';
 import { ChevronLeft } from 'lucide-react';
-import http from '@/lib/http';
+import { serverGet, serverPost } from '@/lib/http';
 import { Post } from '@/types/post';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { Badge } from '@repo/ui/badge';
 import { Card, CardContent } from '@repo/ui/card';
 import { getReadTime } from '@/lib/utils';
+import { UserAvatar } from '@/components/ui/user-avatar';
 import { Eye } from 'lucide-react';
 import LikeButton from '@/components/pages/blog/like-button';
 
@@ -20,8 +21,7 @@ interface PostPageProps {
 
 async function getPostById(id: string) {
   try {
-    const response = await http.get<Post>(`/posts/${id}`);
-    return response.data;
+    return await serverGet<Post>(`/posts/${id}`);
   } catch {
     console.log('Failed to fetch post');
   }
@@ -29,8 +29,7 @@ async function getPostById(id: string) {
 
 async function getPostViewCountByIP(postId: string) {
   try {
-    const response = await http.post(`/posts/${postId}/view`);
-    return response.data;
+    return await serverPost(`/posts/${postId}/view`);
   } catch (error) {
     console.log('Failed to fetch post view count by IP:', error);
   }
@@ -109,13 +108,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </p>
 
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-linear-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-lg font-medium">
-                {post.authorName
-                  ? post.authorName.charAt(0)
-                  : post.authorId.charAt(0)}
-              </span>
-            </div>
+            <UserAvatar name={post.authorName || post.authorId} size="lg" />
             <div>
               <Link
                 href={`/user/${post.authorId}`}

@@ -1,7 +1,8 @@
 'use client';
 
 import { useAuth } from '@/contexts/auth-provider';
-import Link from 'next/link';
+import { LoginPrompt } from '@/components/shared/login-prompt';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -86,12 +87,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             </Button>
           </form>
         ) : (
-          <div className="bg-gray-50 dark:bg-gray-700 flex flex-col gap-3 border border-gray-300 dark:border-gray-600 py-5 px-3 rounded-lg text-center items-center justify-center ">
-            <p>Please login to write your thoughts</p>
-            <Link href="/auth/login">
-              <Button>Login</Button>
-            </Link>
-          </div>
+          <LoginPrompt message="Please login to write your thoughts" />
         )}
 
         <div className="space-y-6 mt-9">
@@ -110,14 +106,11 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         </div>
 
         {!isLoading && comments.length === 0 && (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageCircle />
-            </div>
-            <p className="text-gray-500 dark:text-gray-400">
-              No comments yet. Be the first to share your thoughts!
-            </p>
-          </div>
+          <EmptyState
+            icon={<MessageCircle className="w-8 h-8 text-gray-400" />}
+            title="No comments yet. Be the first to share your thoughts!"
+            className="py-8"
+          />
         )}
       </CardContent>
     </Card>

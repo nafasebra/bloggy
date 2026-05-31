@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { UserAvatar } from '@/components/ui/user-avatar';
+import { LoginPrompt } from '@/components/shared/login-prompt';
 import { CommentWithAuthor } from '@/types/comment';
 import { Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
@@ -54,11 +55,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
 
   return (
     <div key={comment._id} className="flex space-x-4">
-      <div className="w-10 h-10 bg-linear-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-sm font-medium">
-          {comment.author?.name?.charAt(0).toUpperCase() || 'U'}
-        </span>
-      </div>
+      <UserAvatar name={comment.author?.name || 'User'} size="md" />
 
       <div className="flex-1">
         <div className="flex items-center space-x-2 mb-2">
@@ -139,16 +136,11 @@ const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
                 </Button>
               </div>
             ) : (
-              <div className="text-center mt-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg py-3">
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                  You should be logged in to reply.
-                </p>
-                <Link href="/auth/login">
-                  <Button type="button" size="sm" className="mt-2">
-                    Login
-                  </Button>
-                </Link>
-              </div>
+              <LoginPrompt
+                message="You should be logged in to reply."
+                variant="dashed"
+                buttonSize="sm"
+              />
             )}
           </>
         )}
