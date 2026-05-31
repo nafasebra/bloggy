@@ -7,7 +7,7 @@ import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
 import { useAuth } from '@/contexts/auth-provider';
-import { useCreateUser } from '@/hooks/use-users';
+import { useCreateUser } from '@/hooks/mutation';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -24,12 +24,18 @@ type FormData = z.infer<typeof schema>;
 export default function CreateUserPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const { mutateAsync: createUser, isPending } = useCreateUser();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', username: '', email: '', role: 'user', password: '' },
+    defaultValues: {
+      name: '',
+      username: '',
+      email: '',
+      role: 'user',
+      password: '',
+    },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -57,41 +63,73 @@ export default function CreateUserPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" {...form.register('name')} placeholder="John Doe" />
+              <Input
+                id="name"
+                {...form.register('name')}
+                placeholder="John Doe"
+              />
               {form.formState.errors.name && (
-                <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.name.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" {...form.register('username')} placeholder="johndoe" />
+              <Input
+                id="username"
+                {...form.register('username')}
+                placeholder="johndoe"
+              />
               {form.formState.errors.username && (
-                <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.username.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...form.register('email')} placeholder="john@example.com" />
+              <Input
+                id="email"
+                type="email"
+                {...form.register('email')}
+                placeholder="john@example.com"
+              />
               {form.formState.errors.email && (
-                <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.email.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...form.register('password')} />
+              <Input
+                id="password"
+                type="password"
+                {...form.register('password')}
+              />
               {form.formState.errors.password && (
-                <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.password.message}
+                </p>
               )}
             </div>
 
             <div className="pt-4 flex gap-4">
-              <Button type="submit" disabled={isPending || form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isPending || form.formState.isSubmitting}
+              >
                 {isPending ? 'Creating...' : 'Create User'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => navigate('/users')}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/users')}
+              >
                 Cancel
               </Button>
             </div>

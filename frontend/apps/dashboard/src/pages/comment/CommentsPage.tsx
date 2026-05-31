@@ -10,13 +10,18 @@ import {
 import { Button } from '@repo/ui/button';
 import { CircleX, MessageSquare, Trash } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
-import { useComments, useDeleteComment } from '@/hooks/use-comments'; 
+import { useComments } from '@/hooks/query';
+import { useDeleteComment } from '@/hooks/mutation';
 
 export default function CommentsPage() {
   const { user } = useAuth();
-  
+
   const { data: comments = [], isLoading } = useComments(!!user?._id);
-  const { mutate: deleteComment, isPending: isDeleting, variables: deletingId } = useDeleteComment();
+  const {
+    mutate: deleteComment,
+    isPending: isDeleting,
+    variables: deletingId,
+  } = useDeleteComment();
 
   const handleDelete = (id: string) => {
     if (!user?._id) return;
@@ -57,8 +62,12 @@ export default function CommentsPage() {
                   <TableRow>
                     <TableHead className="min-w-55">Comment</TableHead>
                     <TableHead className="hidden sm:table-cell">Post</TableHead>
-                    <TableHead className="hidden md:table-cell">Author</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Author
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Created
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -89,8 +98,12 @@ export default function CommentsPage() {
                   <TableRow>
                     <TableHead className="min-w-55">Comment</TableHead>
                     <TableHead className="hidden sm:table-cell">Post</TableHead>
-                    <TableHead className="hidden md:table-cell">Author</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Author
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Created
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -122,7 +135,9 @@ export default function CommentsPage() {
                           onClick={() => handleDelete(comment._id)}
                         >
                           <Trash className="w-4 h-4 mr-1" />
-                          {isDeleting && deletingId === comment._id ? 'Deleting...' : 'Delete'}
+                          {isDeleting && deletingId === comment._id
+                            ? 'Deleting...'
+                            : 'Delete'}
                         </Button>
                       </TableCell>
                     </TableRow>

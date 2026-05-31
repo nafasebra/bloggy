@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '@repo/ui/styles/globals.css';
-@import '@repo/ui/styles/markdown-editor.css';
+@import '@repo/ui/style/globals.css';
+@import '@repo/ui/style/markdown-editor.css';
 
 @source "../../../packages/ui/src";

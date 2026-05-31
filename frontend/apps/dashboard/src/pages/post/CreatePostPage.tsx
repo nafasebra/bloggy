@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@repo/ui/button';
@@ -8,14 +8,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
 import { Input } from '@repo/ui/input';
 import { Textarea } from '@repo/ui/textarea';
 import { Label } from '@repo/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import { useAuth } from '@/contexts/auth-provider';
 import { categories } from '@/data';
 import { MarkdownEditor } from '@repo/ui/markdown-editor';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { toast } from 'sonner';
-import { useCreatePost } from '@/hooks/use-posts';
+import { useCreatePost } from '@/hooks/mutation';
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -31,12 +37,23 @@ export default function CreatePostPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
-  
+
   const { mutateAsync: createPost } = useCreatePost();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { title: '', excerpt: '', content: '', category: '', tags: '' },
+    defaultValues: {
+      title: '',
+      excerpt: '',
+      content: '',
+      category: '',
+      tags: '',
+    },
+  });
+
+  const [title, excerpt, content, category] = useWatch({
+    control: form.control,
+    name: ['title', 'excerpt', 'content', 'category'],
   });
 
   const onSubmit = async (data: FormData) => {
@@ -44,7 +61,7 @@ export default function CreatePostPage() {
       toast.error('You must be logged in to create a post');
       return;
     }
-    
+
     const postData = {
       ...data,
       tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
@@ -65,7 +82,9 @@ export default function CreatePostPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Create New Post</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+          Create New Post
+        </h1>
         <p className="text-muted-foreground mt-1">Write a new blog post</p>
       </div>
       <Card className="border-border shadow-sm">
@@ -79,16 +98,36 @@ export default function CreatePostPage() {
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
             <TabsContent value="write">
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 sm:space-y-6"
+              >
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="title">Title *</Label>
-                  <Input id="title" {...form.register('title')} placeholder="Enter post title" />
-                  {form.formState.errors.title && <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>}
+                  <Input
+                    id="title"
+                    {...form.register('title')}
+                    placeholder="Enter post title"
+                  />
+                  {form.formState.errors.title && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.title.message}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="excerpt">Excerpt *</Label>
-                  <Textarea id="excerpt" {...form.register('excerpt')} placeholder="Brief summary..." rows={3} />
-                  {form.formState.errors.excerpt && <p className="text-sm text-destructive">{form.formState.errors.excerpt.message}</p>}
+                  <Textarea
+                    id="excerpt"
+                    {...form.register('excerpt')}
+                    placeholder="Brief summary..."
+                    rows={3}
+                  />
+                  {form.formState.errors.excerpt && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.excerpt.message}
+                    </p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
@@ -97,23 +136,36 @@ export default function CreatePostPage() {
                       name="category"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
                             {categories.map((c) => (
-                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                              <SelectItem key={c} value={c}>
+                                {c}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {form.formState.errors.category && <p className="text-sm text-destructive">{form.formState.errors.category.message}</p>}
+                    {form.formState.errors.category && (
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.category.message}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="tags">Tags</Label>
-                    <Input id="tags" {...form.register('tags')} placeholder="Comma-separated tags..." />
+                    <Input
+                      id="tags"
+                      {...form.register('tags')}
+                      placeholder="Comma-separated tags..."
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -121,25 +173,63 @@ export default function CreatePostPage() {
                   <Controller
                     name="content"
                     control={form.control}
-                    render={({ field }) => <MarkdownEditor value={field.value} onChange={field.onChange} placeholder="Write content..." />}
+                    render={({ field }) => (
+                      <MarkdownEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Write content..."
+                      />
+                    )}
                   />
-                  {form.formState.errors.content && <p className="text-sm text-destructive">{form.formState.errors.content.message}</p>}
+                  {form.formState.errors.content && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.content.message}
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-3">
-                  <Button type="submit" disabled={form.formState.isSubmitting}>Create Post</Button>
-                  <Button type="button" variant="outline" onClick={() => navigate('/posts')}>Cancel</Button>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    Create Post
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/posts')}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </form>
             </TabsContent>
             <TabsContent value="preview">
               <div className="space-y-6">
-                <h1 className="text-3xl font-bold text-foreground">{form.watch('title') || 'Your Post Title'}</h1>
-                <p className="text-sm text-muted-foreground">{form.watch('category')} · {form.watch('content') ? Math.ceil(form.watch('content')!.trim().split(/\s+/).length / 200) : 0} min read</p>
-                {form.watch('excerpt') && <div className="rounded-lg border border-border bg-muted/50 p-4"><p className="italic text-muted-foreground">{form.watch('excerpt')}</p></div>}
-                <MarkdownPreview content={form.watch('content') || ''} />
+                <h1 className="text-3xl font-bold text-foreground">
+                  {title || 'Your Post Title'}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {category} ·{' '}
+                  {content
+                    ? Math.ceil(content.trim().split(/\s+/).length / 200)
+                    : 0}{' '}
+                  min read
+                </p>
+                {excerpt && (
+                  <div className="rounded-lg border border-border bg-muted/50 p-4">
+                    <p className="italic text-muted-foreground">{excerpt}</p>
+                  </div>
+                )}
+                <MarkdownPreview content={content || ''} />
                 <div className="flex gap-3 pt-6 border-t border-border">
-                  <Button type="button" variant="outline" onClick={() => setActiveTab('write')}>Back to Edit</Button>
-                  <Button type="button" onClick={form.handleSubmit(onSubmit)}>Create Post</Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setActiveTab('write')}
+                  >
+                    Back to Edit
+                  </Button>
+                  <Button type="button" onClick={form.handleSubmit(onSubmit)}>
+                    Create Post
+                  </Button>
                 </div>
               </div>
             </TabsContent>

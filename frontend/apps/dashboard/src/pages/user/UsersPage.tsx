@@ -1,17 +1,25 @@
 import { Link } from 'react-router';
 import { ShieldPlus, Trash2, Edit } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@repo/ui/table';
 import { Button } from '@repo/ui/button';
 import { Badge } from '@repo/ui/badge';
 import { Skeleton } from '@repo/ui/skeleton';
 import { useAuth } from '@/contexts/auth-provider';
-import { useUsers, useDeleteUser, useUpdateUser } from '@/hooks/use-users';
+import { useUsers } from '@/hooks/query';
+import { useDeleteUser, useUpdateUser } from '@/hooks/mutation';
 import { toast } from 'sonner';
 
 export default function UsersPage() {
   const { user: currentUser } = useAuth();
-  
+
   const { data: users = [], isLoading } = useUsers(!!currentUser?._id);
   const { mutate: deleteUser } = useDeleteUser();
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
@@ -33,8 +41,12 @@ export default function UsersPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Users</h1>
-          <p className="text-muted-foreground mt-1">Manage your dashboard users</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+            Users
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your dashboard users
+          </p>
         </div>
         <Button asChild className="w-full sm:w-auto">
           <Link to="/users/create">Create User</Link>
@@ -53,16 +65,22 @@ export default function UsersPage() {
               ))}
             </div>
           ) : users.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground">No users found.</div>
+            <div className="py-12 text-center text-muted-foreground">
+              No users found.
+            </div>
           ) : (
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden sm:table-cell">Email</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Email
+                    </TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead className="hidden lg:table-cell">Joined Date</TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Joined Date
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -71,16 +89,26 @@ export default function UsersPage() {
                     <TableRow key={u._id}>
                       <TableCell className="font-medium">
                         <div className="text-foreground">{u.name}</div>
-                        <div className="sm:hidden text-xs text-muted-foreground">{u.email}</div>
+                        <div className="sm:hidden text-xs text-muted-foreground">
+                          {u.email}
+                        </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell">{u.email}</TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {u.email}
+                      </TableCell>
                       <TableCell>
-                        <Badge variant={u.role === 'admin' ? 'destructive' : 'secondary'}>
+                        <Badge
+                          variant={
+                            u.role === 'admin' ? 'destructive' : 'secondary'
+                          }
+                        >
                           {u.role ?? 'User'}
                         </Badge>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
-                        {u.createdAt ? new Date(u.createdAt).toLocaleDateString('fa-IR') : '—'}
+                        {u.createdAt
+                          ? new Date(u.createdAt).toLocaleDateString('fa-IR')
+                          : '—'}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

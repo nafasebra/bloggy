@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@repo/ui/button';
@@ -8,14 +8,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
 import { Input } from '@repo/ui/input';
 import { Textarea } from '@repo/ui/textarea';
 import { Label } from '@repo/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import { useAuth } from '@/contexts/auth-provider';
 import { categories } from '@/data';
 import { MarkdownEditor } from '@repo/ui/markdown-editor';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { toast } from 'sonner';
-import { usePost, useUpdatePost } from '@/hooks/use-posts';
+import { usePost } from '@/hooks/query';
+import { useUpdatePost } from '@/hooks/mutation';
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -38,8 +45,16 @@ export default function EditPostPage() {
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { title: '', excerpt: '', content: '', category: '', tags: '' },
+    defaultValues: {
+      title: '',
+      excerpt: '',
+      content: '',
+      category: '',
+      tags: '',
+    },
   });
+
+  const content = useWatch({ control: form.control, name: 'content' });
 
   // پر کردن فرم بعد از لود شدن دیتا
   useEffect(() => {
@@ -56,7 +71,7 @@ export default function EditPostPage() {
 
   const onSubmit = async (data: FormData) => {
     if (!user || !id) return;
-    
+
     const postData = {
       ...data,
       tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
@@ -85,7 +100,9 @@ export default function EditPostPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Edit Post</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+          Edit Post
+        </h1>
         <p className="text-muted-foreground mt-1">Update your blog post</p>
       </div>
       <Card className="border-border shadow-sm">
@@ -99,16 +116,36 @@ export default function EditPostPage() {
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
             <TabsContent value="write">
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 sm:space-y-6"
+              >
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="title">Title *</Label>
-                  <Input id="title" {...form.register('title')} placeholder="Enter post title" />
-                  {form.formState.errors.title && <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>}
+                  <Input
+                    id="title"
+                    {...form.register('title')}
+                    placeholder="Enter post title"
+                  />
+                  {form.formState.errors.title && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.title.message}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="excerpt">Excerpt *</Label>
-                  <Textarea id="excerpt" {...form.register('excerpt')} rows={3} placeholder="Brief summary..." />
-                  {form.formState.errors.excerpt && <p className="text-sm text-destructive">{form.formState.errors.excerpt.message}</p>}
+                  <Textarea
+                    id="excerpt"
+                    {...form.register('excerpt')}
+                    rows={3}
+                    placeholder="Brief summary..."
+                  />
+                  {form.formState.errors.excerpt && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.excerpt.message}
+                    </p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
@@ -117,13 +154,18 @@ export default function EditPostPage() {
                       name="category"
                       control={form.control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
                             {categories.map((c) => (
-                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                              <SelectItem key={c} value={c}>
+                                {c}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -132,7 +174,11 @@ export default function EditPostPage() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="tags">Tags</Label>
-                    <Input id="tags" {...form.register('tags')} placeholder="Comma-separated..." />
+                    <Input
+                      id="tags"
+                      {...form.register('tags')}
+                      placeholder="Comma-separated..."
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -140,21 +186,46 @@ export default function EditPostPage() {
                   <Controller
                     name="content"
                     control={form.control}
-                    render={({ field }) => <MarkdownEditor value={field.value} onChange={field.onChange} />}
+                    render={({ field }) => (
+                      <MarkdownEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
                   />
-                  {form.formState.errors.content && <p className="text-sm text-destructive">{form.formState.errors.content.message}</p>}
+                  {form.formState.errors.content && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.content.message}
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-3">
-                  <Button type="submit" disabled={form.formState.isSubmitting}>Update Post</Button>
-                  <Button type="button" variant="outline" onClick={() => navigate('/posts')}>Cancel</Button>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    Update Post
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/posts')}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </form>
             </TabsContent>
             <TabsContent value="preview">
-              <MarkdownPreview content={form.watch('content') || ''} />
+              <MarkdownPreview content={content || ''} />
               <div className="flex gap-3 pt-6 border-t border-border">
-                <Button type="button" variant="outline" onClick={() => setActiveTab('write')}>Back to Edit</Button>
-                <Button type="button" onClick={form.handleSubmit(onSubmit)}>Update Post</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setActiveTab('write')}
+                >
+                  Back to Edit
+                </Button>
+                <Button type="button" onClick={form.handleSubmit(onSubmit)}>
+                  Update Post
+                </Button>
               </div>
             </TabsContent>
           </Tabs>

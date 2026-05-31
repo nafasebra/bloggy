@@ -1,7 +1,5 @@
 import http from '@/lib/http';
-import type { Post, Comment } from '@/types';
-
-export type CommentRow = Comment & { postTitle: string };
+import type { Comment, CommentRow, Post } from '@/types';
 
 class CommentService {
   async getAllCommentsWithPostTitles(): Promise<CommentRow[]> {
@@ -22,7 +20,7 @@ class CommentService {
       const postComments = Array.isArray(commentResponses[index].data)
         ? commentResponses[index].data
         : [];
-      
+
       postComments.forEach((comment) => {
         rows.push({
           ...comment,
@@ -33,7 +31,8 @@ class CommentService {
 
     // مرتب‌سازی بر اساس تاریخ (جدیدترین‌ها اول)
     return rows.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }
 

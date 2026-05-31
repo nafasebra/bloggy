@@ -8,7 +8,8 @@ import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
 import { useAuth } from '@/contexts/auth-provider';
-import { useUser, useUpdateUser } from '@/hooks/use-users';
+import { useUser } from '@/hooks/query';
+import { useUpdateUser } from '@/hooks/mutation';
 import { toast } from 'sonner';
 
 const schema = z.object({
@@ -33,7 +34,13 @@ export default function EditUserPage() {
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', username: '', email: '', role: 'user', password: '' },
+    defaultValues: {
+      name: '',
+      username: '',
+      email: '',
+      role: 'user',
+      password: '',
+    },
   });
 
   useEffect(() => {
@@ -43,7 +50,7 @@ export default function EditUserPage() {
         username: userToEdit.username,
         email: userToEdit.email,
         role: (userToEdit.role as 'admin' | 'user') ?? 'user',
-        password: '', 
+        password: '',
       });
     }
   }, [userToEdit, form]);
@@ -72,7 +79,11 @@ export default function EditUserPage() {
   };
 
   if (isLoading) {
-    return <div className="py-20 text-center text-muted-foreground">Loading user data...</div>;
+    return (
+      <div className="py-20 text-center text-muted-foreground">
+        Loading user data...
+      </div>
+    );
   }
 
   return (
@@ -92,7 +103,9 @@ export default function EditUserPage() {
               <Label htmlFor="name">Full Name</Label>
               <Input id="name" {...form.register('name')} />
               {form.formState.errors.name && (
-                <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.name.message}
+                </p>
               )}
             </div>
 
@@ -100,7 +113,9 @@ export default function EditUserPage() {
               <Label htmlFor="username">Username</Label>
               <Input id="username" {...form.register('username')} />
               {form.formState.errors.username && (
-                <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.username.message}
+                </p>
               )}
             </div>
 
@@ -108,23 +123,39 @@ export default function EditUserPage() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" {...form.register('email')} />
               {form.formState.errors.email && (
-                <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.email.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">New Password (Optional)</Label>
-              <Input id="password" type="password" placeholder="Leave blank to keep current password" {...form.register('password')} />
+              <Input
+                id="password"
+                type="password"
+                placeholder="Leave blank to keep current password"
+                {...form.register('password')}
+              />
               {form.formState.errors.password && (
-                <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.password.message}
+                </p>
               )}
             </div>
 
             <div className="pt-4 flex gap-4">
-              <Button type="submit" disabled={isUpdating || form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isUpdating || form.formState.isSubmitting}
+              >
                 {isUpdating ? 'Updating...' : 'Update User'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => navigate('/users')}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/users')}
+              >
                 Cancel
               </Button>
             </div>

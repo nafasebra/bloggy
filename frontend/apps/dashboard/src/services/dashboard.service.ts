@@ -1,12 +1,5 @@
-// src/services/dashboard.service.ts
 import http from '@/lib/http';
-import type { Post, User } from '@/types';
-
-export interface DashboardStats {
-  posts: number;
-  users: number;
-  comments: number;
-}
+import type { DashboardStats, Post, User } from '@/types';
 
 class DashboardService {
   async getStats(): Promise<DashboardStats> {
@@ -24,7 +17,7 @@ class DashboardService {
     const users = Array.isArray(usersRes.data) ? usersRes.data : [];
 
     let totalComments = 0;
-    
+
     // هشدار پرفورمنس: این بخش در آینده باید در بکند با Aggregation جایگزین شود
     if (posts.length > 0) {
       const commentResponses = await Promise.all(
