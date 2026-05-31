@@ -39,7 +39,7 @@ export default function SignupPage() {
       const response = await axios.post(
         '/api/register',
         {
-          ...data
+          ...data,
         },
         {
           withCredentials: true,
@@ -55,7 +55,7 @@ export default function SignupPage() {
             'The username or email is already taken'
         );
       }
-    } catch (err) {
+    } catch {
       toast.error('Signup failed. Please try again.');
     }
   };

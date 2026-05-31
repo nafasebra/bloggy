@@ -1,17 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { Badge } from '@repo/ui/badge';
-
-export interface BlogPost {
-  id: string | number;
-  category: string;
-  readTime: string;
-  title: string;
-  excerpt: string;
-  author: string;
-  authorId: string | number;
-  date: string | Date;
-}
+import type { BlogPost } from '@/types/post';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -32,9 +22,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
     >
       <div className="p-6">
         <div className="flex items-center justify-between mb-3">
-          <Badge variant="info">
-            {post.category}
-          </Badge>
+          <Badge variant="info">{post.category}</Badge>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {post.readTime}
           </span>

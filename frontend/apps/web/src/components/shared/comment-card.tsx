@@ -1,64 +1,35 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { CommentWithAuthor } from '@/types';
+import { CommentWithAuthor } from '@/types/comment';
 import { Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CommentService } from '@/services/comment.services';
-import { UserService } from '@/services/user.services';
 import { toast } from 'sonner';
+import { useCommentLikeQuery } from '@/hooks/query';
+import {
+  useToggleCommentLikeMutation,
+  useReplyToCommentMutation,
+} from '@/hooks/mutation';
 
 interface CommentCardProps {
   comment: CommentWithAuthor;
 }
 
-const CommentCard: React.FC<CommentCardProps> = ({
-  comment,
-}) => {
+const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
   const [isReply, setIsReply] = useState(false);
   const [replyText, setReplyText] = useState('');
-  const {user} = useAuth()
-  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  const { data: likeStatus } = useQuery({
-    queryKey: ['comment-like', comment._id],
-    queryFn: () => CommentService.checkIfCommentLiked(comment._id),
-    enabled: !!comment._id,
-  });
-
-  const likeMutation = useMutation({
-    mutationFn: () => CommentService.toggleLikeComment(comment._id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comment-like', comment._id] });
-      queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
-    },
-    onError: (error) => {
-      toast.error('Failed to like comment');
-    },
-  });
-
-  const replyMutation = useMutation({
-    mutationFn: async () => {
-      const user = await UserService.getCurrentUser();
-      const replyData = {
-        content: replyText,
-        authorId: user._id,
-        authorName: user.name,
-        postId: comment.postId,
-        parentId: comment._id,
-      };
-      return CommentService.replyToComment(replyData, comment.postId);
-    },
+  const { data: likeStatus } = useCommentLikeQuery(comment._id);
+  const likeMutation = useToggleCommentLikeMutation(
+    comment._id,
+    comment.postId
+  );
+  const replyMutation = useReplyToCommentMutation(comment.postId, {
     onSuccess: () => {
       setReplyText('');
       setIsReply(false);
-      queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
-      toast.success('Reply posted successfully!');
-    },
-    onError: (error) => {
-      toast.error('Failed to post reply');
     },
   });
 
@@ -72,7 +43,13 @@ const CommentCard: React.FC<CommentCardProps> = ({
       return;
     }
     if (!replyText.trim()) return;
-    replyMutation.mutate();
+    replyMutation.mutate({
+      content: replyText,
+      authorId: user._id,
+      authorName: user.name,
+      postId: comment.postId,
+      parentId: comment._id,
+    });
   };
 
   return (
@@ -135,11 +112,12 @@ const CommentCard: React.FC<CommentCardProps> = ({
               fill={likeStatus?.isLiked ? 'red' : 'none'}
               color={likeStatus?.isLiked ? 'red' : 'currentColor'}
             />
-            {likeMutation.isPending ? 'Liking...' : `Like (${comment.likes || 0})`}
+            {likeMutation.isPending
+              ? 'Liking...'
+              : `Like (${comment.likes || 0})`}
           </Button>
         </div>
 
-        {/* Reply Input */}
         {isReply && (
           <>
             {user?._id ? (

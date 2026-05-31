@@ -1,60 +1,30 @@
 'use client';
 
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import UserPostCard from '@/components/pages/user/user-post-card';
 import FollowButton from '@/components/pages/user/follow-button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
-import FollowerList from '@/components/pages/user/follower-list';
-import FollowingList from '@/components/pages/user/following-list';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@repo/ui/dropdown-menu';
-import { Button } from '@repo/ui/button';
-import { LocateIcon, MoreVertical, XSquare } from 'lucide-react';
-import { UserService } from '@/services/user.services';
-import { PostService } from '@/services/post.services';
-import { useQuery } from '@tanstack/react-query';
+import { LocateIcon, XSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-provider';
 import { useParams } from 'next/navigation';
-import http from '@/lib/http';
+import {
+  useUserQuery,
+  useUserPostsQuery,
+  useFollowerCountQuery,
+  useFollowingCountQuery,
+} from '@/hooks/query';
 
 export default function UserPage() {
   const { user } = useAuth();
   const params = useParams();
   const id = params.id as string;
 
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['user', id],
-    queryFn: () => UserService.getUserById(id as string),
-  });
-
-  const { data: postsData, isLoading: isLoadingPosts } = useQuery({
-    queryKey: ['user-posts', id],
-    queryFn: () => PostService.getPostsByUserId(id),
-    enabled: !!user?._id,
-  });
-
-  const { data: followerCountData } = useQuery({
-    queryKey: ['follower-count', id],
-    queryFn: async () => {
-      const response = await http.get(`/users/${id}/follower-count`);
-      return response.data;
-    },
-  });
-
-  const { data: followingCountData } = useQuery({
-    queryKey: ['following-count', id],
-    queryFn: async () => {
-      const response = await http.get(`/users/${id}/following-count`);
-      return response.data;
-    },
-  });
+  const { data: userData, isLoading: isLoadingUser } = useUserQuery(id);
+  const { data: postsData, isLoading: isLoadingPosts } = useUserPostsQuery(
+    id,
+    !!user?._id
+  );
+  const { data: followerCountData } = useFollowerCountQuery(id);
+  const { data: followingCountData } = useFollowingCountQuery(id);
 
   if (isLoadingUser) {
     return (
@@ -250,7 +220,7 @@ export default function UserPage() {
                 No posts yet
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {userData.name} hasn't published any articles yet.
+                {userData.name} hasn&apos;t published any articles yet.
               </p>
             </div>
           )}

@@ -1,10 +1,8 @@
 'use server';
 
 import Link from 'next/link';
-import http from '@/lib/http';
 import { Badge } from '@repo/ui/badge';
 
-// Mock data for latest users
 const mockLatestUsers = [
   {
     id: 1,
@@ -44,20 +42,7 @@ const mockLatestUsers = [
   },
 ];
 
-async function getLatestUsers() {
-  try {
-    const response = await http.get(`/users`);
-    return response.data;
-  } catch (error) {
-    throw new Error('Failed to fetch latest users');
-  }
-}
-
 export default async function LatestUsers() {
-  // const latestUsers = await getLatestUsers();
-
-  // console.log(latestUsers);
-
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

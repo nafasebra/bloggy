@@ -1,13 +1,12 @@
 'use server';
 
 import Link from 'next/link';
-import http from '@/lib/http';
 import BlogCard from '@/components/shared/blog-card';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@repo/ui/button';
+import type { BlogPost } from '@/types/post';
 
-// Mock data for latest posts
-const mockLatestPosts = [
+const mockLatestPosts: BlogPost[] = [
   {
     id: 1,
     title: 'The Future of Web Development in 2024',
@@ -43,20 +42,7 @@ const mockLatestPosts = [
   },
 ];
 
-async function getLatestPosts() {
-  try {
-    const response = await http.get(`/posts`);
-    return response.data;
-  } catch (error) {
-    throw new Error('Failed to fetch latest posts');
-  }
-}
-
 export default async function LatestPosts() {
-  // const latestPosts = await getLatestPosts();
-
-  // console.log(latestPosts);
-
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,7 +56,7 @@ export default async function LatestPosts() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockLatestPosts.map((post: any) => (
+          {mockLatestPosts.map((post) => (
             <BlogCard key={post.id} post={post} />
           ))}
         </div>

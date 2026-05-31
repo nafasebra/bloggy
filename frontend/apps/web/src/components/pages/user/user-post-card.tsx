@@ -1,17 +1,7 @@
 import Link from 'next/link';
 import { Eye, Heart } from 'lucide-react';
 import { Badge } from '@repo/ui/badge';
-
-interface UserPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  readTime: string;
-  category: string;
-  views: number;
-  likes: number;
-}
+import type { UserPost } from '@/types/post';
 
 interface UserPostCardProps {
   post: UserPost;
@@ -22,9 +12,7 @@ export default function UserPostCard({ post }: UserPostCardProps) {
     <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700">
       <div className="p-6">
         <div className="flex items-center justify-between mb-3">
-          <Badge variant="info">
-            {post.category}
-          </Badge>
+          <Badge variant="info">{post.category}</Badge>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {post.readTime}
           </span>

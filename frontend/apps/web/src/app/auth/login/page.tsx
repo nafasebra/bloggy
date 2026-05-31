@@ -79,7 +79,7 @@ export default function LoginPage() {
             'The Username or Password is incorrect'
         );
       }
-    } catch (err) {
+    } catch {
       toast.error('Login failed. Please try again.');
     }
   };

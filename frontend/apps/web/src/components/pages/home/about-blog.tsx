@@ -16,8 +16,8 @@ export default function AboutBlog() {
             Bloggy is a modern blogging platform designed to connect writers and
             readers from around the world. Share your thoughts, discover new
             perspectives, and build a community through the power of
-            storytelling. Whether you're a seasoned author or just starting your
-            writing journey, Bloggy provides the tools you need to express
+            storytelling. Whether you&apos;re a seasoned author or just starting
+            your writing journey, Bloggy provides the tools you need to express
             yourself and engage with like-minded individuals.
           </p>
           <div className="grid md:grid-cols-3 gap-8 mt-12">

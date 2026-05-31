@@ -39,7 +39,7 @@ export default function ForgetPasswordPage() {
       } else {
         toast.error('Failed to send reset email');
       }
-    } catch (err) {
+    } catch {
       toast.error('Request failed. Please try again.');
     }
   };
@@ -53,8 +53,8 @@ export default function ForgetPasswordPage() {
               Forgot your password?
             </h2>
             <p className="text-center text-gray-600 dark:text-gray-300 mt-2 text-sm">
-              Enter your email address and we&apos;ll send you a link to reset your
-              password.
+              Enter your email address and we&apos;ll send you a link to reset
+              your password.
             </p>
           </div>
 
@@ -76,11 +76,7 @@ export default function ForgetPasswordPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full"
-            >
+            <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Sending...' : 'Send reset link'}
             </Button>
 

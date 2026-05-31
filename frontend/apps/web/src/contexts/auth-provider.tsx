@@ -6,10 +6,11 @@ import React, {
   useState,
   ReactNode,
   useEffect,
+  useCallback,
 } from 'react';
 import { hasSessionHint } from '@/lib/auth/client-session';
 import { UserService } from '@/services/user.services';
-import { User } from '@/types';
+import { User } from '@/types/user';
 import axios from 'axios';
 
 interface AuthContextType {
@@ -39,11 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUserState(user);
   };
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     if (!hasSessionHint()) {
       setUser(null);
       return;
@@ -56,7 +53,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error fetching user:', error);
       setUser(null);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   const logout = async () => {
     try {

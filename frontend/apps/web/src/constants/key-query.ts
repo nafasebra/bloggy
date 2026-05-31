@@ -1,0 +1,16 @@
+export const queryKeys = {
+  followers: (userId: string) => ['followers', userId] as const,
+  following: (userId: string) => ['following', userId] as const,
+  postLiked: (postId: string) => ['postLiked', postId] as const,
+  post: (postId: string) => ['post', postId] as const,
+  comments: (postId: string) => ['comments', postId] as const,
+  commentLike: (commentId: string) => ['comment-like', commentId] as const,
+  userMe: () => ['user-me'] as const,
+  userMePosts: () => ['user-posts'] as const,
+  user: (id: string) => ['user', id] as const,
+  userPosts: (userId: string) => ['user-posts', userId] as const,
+  followerCount: (id: string) => ['follower-count', id] as const,
+  followingCount: (id: string) => ['following-count', id] as const,
+  notifications: () => ['notifications'] as const,
+  notificationsUnreadCount: () => ['notifications-unread-count'] as const,
+};

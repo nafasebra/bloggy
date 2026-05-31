@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-provider';
 import http from '@/lib/http';
+import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { Button } from '@repo/ui/button';
 
@@ -50,18 +51,18 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     setLoading(true);
 
     try {
-      const response = await http.post(
-        `/users/${userId}/follow`,
-      );
+      const response = await http.post(`/users/${userId}/follow`);
 
       setIsFollowing(response.data.isFollowing);
       const message = response.data.isFollowing
         ? 'User followed successfully'
         : 'User unfollowed successfully';
       toast.success(message);
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to update follow status';
+    } catch (error) {
+      const errorMessage = isAxiosError(error)
+        ? (error.response?.data as { message?: string })?.message ||
+          'Failed to update follow status'
+        : 'Failed to update follow status';
       toast.error(errorMessage);
       console.error('Follow error:', error);
     } finally {

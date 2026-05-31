@@ -2,29 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import http from '@/lib/http';
-
-type User = {
-  _id: string;
-  name: string;
-  bio: string;
-  avatar?: string;
-  category?: string;
-};
+import { useFollowingQuery } from '@/hooks/query';
 
 type FollowingListProps = {
   userId: string;
 };
 
 const FollowingList: React.FC<FollowingListProps> = ({ userId }) => {
-  const { data: followingData, isLoading, isError } = useQuery({
-    queryKey: ['following', userId],
-    queryFn: async () => {
-      const response = await http.get(`/users/${userId}/following`);
-      return response.data;
-    },
-  });
+  const { data: followingData, isLoading, isError } = useFollowingQuery(userId);
 
   if (isLoading) {
     return (
@@ -32,7 +17,9 @@ const FollowingList: React.FC<FollowingListProps> = ({ userId }) => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Following
         </h2>
-        <div className="text-center py-8 text-gray-500">Loading following...</div>
+        <div className="text-center py-8 text-gray-500">
+          Loading following...
+        </div>
       </div>
     );
   }
@@ -43,7 +30,9 @@ const FollowingList: React.FC<FollowingListProps> = ({ userId }) => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Following
         </h2>
-        <div className="text-center py-8 text-red-500">Failed to load following</div>
+        <div className="text-center py-8 text-red-500">
+          Failed to load following
+        </div>
       </div>
     );
   }
@@ -61,7 +50,7 @@ const FollowingList: React.FC<FollowingListProps> = ({ userId }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {following.map((user: User) => (
+          {following.map((user) => (
             <div
               key={user._id}
               className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300"
@@ -81,7 +70,9 @@ const FollowingList: React.FC<FollowingListProps> = ({ userId }) => {
                   </Link>
                 </h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{user.bio || 'No bio available'}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {user.bio || 'No bio available'}
+              </p>
             </div>
           ))}
         </div>

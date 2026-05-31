@@ -1,5 +1,5 @@
 import http from '@/lib/http';
-import type { User, UpdateUserData } from '@/types';
+import type { User, UpdateUserData } from '@/types/user';
 
 export class UserService {
   static async getCurrentUser(): Promise<User> {

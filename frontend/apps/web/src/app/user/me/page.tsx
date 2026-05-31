@@ -13,10 +13,8 @@ import {
 } from '@repo/ui/dropdown-menu';
 import { Button } from '@repo/ui/button';
 import { LocateIcon, MoreVertical, XSquare } from 'lucide-react';
-import { UserService } from '@/services/user.services';
-import { PostService } from '@/services/post.services';
-import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-provider';
+import { useCurrentUserQuery, useUserMePostsQuery } from '@/hooks/query';
 import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
@@ -38,18 +36,10 @@ export default function UserPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['user-me'],
-    queryFn: () => UserService.getCurrentUser(),
-  });
-
-  console.log("userData", userData);
-
-  const { data: postsData, isLoading: isLoadingPosts } = useQuery({
-    queryKey: ['user-posts'],
-    queryFn: () => PostService.getPostsByUserId(user?._id as string),
-    enabled: !!user?._id,
-  });
+  const { data: userData, isLoading: isLoadingUser } = useCurrentUserQuery();
+  const { data: postsData, isLoading: isLoadingPosts } = useUserMePostsQuery(
+    user?._id
+  );
 
   const handleLogout = () => {
     logout(); // Clears auth state

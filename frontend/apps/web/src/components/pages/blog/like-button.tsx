@@ -3,10 +3,8 @@
 import { Heart } from 'lucide-react';
 import React from 'react';
 import { Button } from '@repo/ui/button';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PostService } from '@/services/post.services';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/auth-provider';
+import { usePostLikedQuery } from '@/hooks/query';
+import { useTogglePostLikeMutation } from '@/hooks/mutation';
 
 interface LikeButtonProps {
   postId: string;
@@ -14,35 +12,9 @@ interface LikeButtonProps {
 }
 
 function LikeButton({ postId, initialLikes = 0 }: LikeButtonProps) {
-  const queryClient = useQueryClient();
-
-  // Query to check if the post is liked
-  const { data: likeStatus, isLoading: isCheckingLikeStatus } = useQuery({
-    queryKey: ['postLiked', postId],
-    queryFn: () => PostService.checkIfPostLiked(postId),
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
-
-  // Mutation to toggle like
-  const toggleLikeMutation = useMutation({
-    mutationFn: () => PostService.toggleLikePost(postId),
-    onSuccess: (response) => {
-      queryClient.setQueryData(['postLiked', postId], {
-        isLiked: response.isLiked,
-      });
-
-      if (response.message === 'liked') {
-        toast.success('Liked!');
-      } else {
-        toast.success('Unliked');
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['post', postId] });
-    },
-    onError: () => {
-      toast.error('Failed to toggle like');
-    },
-  });
+  const { data: likeStatus, isLoading: isCheckingLikeStatus } =
+    usePostLikedQuery(postId);
+  const toggleLikeMutation = useTogglePostLikeMutation(postId);
 
   const isLiked = likeStatus?.isLiked ?? false;
   const likes = toggleLikeMutation.data?.post.likes ?? initialLikes;

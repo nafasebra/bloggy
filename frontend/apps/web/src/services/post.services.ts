@@ -1,10 +1,8 @@
 import http from '@/lib/http';
-import type { Post, CreatePostData, UpdatePostData } from '@/types';
+import type { Post, CreatePostData, UpdatePostData } from '@/types/post';
 
 export class PostService {
-  static async createPost(
-    data: CreatePostData,
-  ): Promise<Post> {
+  static async createPost(data: CreatePostData): Promise<Post> {
     const response = await http.post<Post>('/posts', data);
     return response.data;
   }
@@ -40,14 +38,12 @@ export class PostService {
     return response.data;
   }
 
-  static async toggleLikePost(
-    id: string
-  ): Promise<{
+  static async toggleLikePost(id: string): Promise<{
     post: Post;
     isLiked: boolean;
     action: 'liked' | 'unliked';
     message: string;
-  }> {    
+  }> {
     const response = await http.post<{
       post: Post;
       isLiked: boolean;
@@ -57,9 +53,7 @@ export class PostService {
     return response.data;
   }
 
-  static async checkIfPostLiked(
-    id: string,
-  ): Promise<{ isLiked: boolean }> {    
+  static async checkIfPostLiked(id: string): Promise<{ isLiked: boolean }> {
     const response = await http.get<{ isLiked: boolean }>(`/posts/${id}/liked`);
     return response.data;
   }

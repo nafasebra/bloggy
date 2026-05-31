@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import http from '@/lib/http';
 import { useRouter } from 'next/navigation';
@@ -46,7 +47,8 @@ export default function CreateUserPage() {
   const { user } = useAuth();
 
   const onSubmit = async (data: FormData) => {
-    const { avatar, ...tempdata } = data;
+    const tempdata = { ...data };
+    delete tempdata.avatar;
 
     try {
       const response = await http.patch(`/users/${user?._id}`, tempdata);
@@ -58,7 +60,7 @@ export default function CreateUserPage() {
           `Failed with error: ${response.statusText} - ${response.status}`
         );
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to create profile. Please try again.');
     }
   };
@@ -73,10 +75,13 @@ export default function CreateUserPage() {
               <div className="mb-6">
                 <div className="relative mx-auto w-32 h-32 mb-4">
                   <div className="w-32 h-32 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden">
-                    <img
+                    <Image
                       src="/placeholder-avatar.jpg"
                       alt="Avatar preview"
+                      width={128}
+                      height={128}
                       className="w-full h-full object-cover"
+                      unoptimized
                       onError={(e) => {
                         const target = e.currentTarget as HTMLElement;
                         const sibling =
@@ -206,11 +211,7 @@ export default function CreateUserPage() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full"
-              >
+              <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
               </Button>
             </form>

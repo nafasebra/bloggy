@@ -3,42 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
-import http from '@/lib/http';
+import { useFollowersQuery } from '@/hooks/query';
 import { Badge } from '@repo/ui/badge';
-
-type FollowerUser = {
-  _id: string;
-  name: string;
-  username: string;
-  bio?: string;
-  avatar?: string;
-};
-
-type FollowDocument = {
-  _id: string;
-  followerId: FollowerUser;
-  followingId: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type FollowersResponse = {
-  followers: FollowDocument[];
-};
 
 type FollowerListProps = {
   userId: string;
 };
 
 const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
-  const { data: followersData, isLoading, isError } = useQuery<FollowersResponse>({
-    queryKey: ['followers', userId],
-    queryFn: async () => {
-      const response = await http.get<FollowersResponse>(`/users/${userId}/followers`);
-      return response.data;
-    },
-  });
+  const { data: followersData, isLoading, isError } = useFollowersQuery(userId);
 
   if (isLoading) {
     return (
@@ -114,7 +87,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
           {followers.length} {followers.length === 1 ? 'follower' : 'followers'}
         </Badge>
       </div>
-      
+
       {followers.length === 0 ? (
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
@@ -132,19 +105,21 @@ const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
               />
             </svg>
           </div>
-          <p className="text-gray-500 dark:text-gray-400 text-lg">No followers yet</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            No followers yet
+          </p>
           <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
             Start sharing to get followers
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {followers.map((follow: FollowDocument) => {
+          {followers.map((follow) => {
             const user = follow.followerId;
             const displayName = user.name || user.username || 'Unknown';
             const username = user.username || '';
             const initials = displayName.charAt(0).toUpperCase();
-            
+
             return (
               <Link
                 key={follow._id}
@@ -170,7 +145,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors truncate">
@@ -192,7 +167,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ userId }) => {
                     </p>
                   )}
                 </div>
-                
+
                 <div className="flex-shrink-0">
                   <svg
                     className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors"

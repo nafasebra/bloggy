@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import { Input } from '@repo/ui/input';
 import { Button } from '@repo/ui/button';
 
-export default function SearchBar({}) {
+export default function SearchBar() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentQuery = searchParams.get('q') || '';

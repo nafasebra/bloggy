@@ -1,7 +1,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Bell, ExternalLink, UserPlus, Heart, MessageCircle } from 'lucide-react';
+import {
+  Bell,
+  ExternalLink,
+  UserPlus,
+  Heart,
+  MessageCircle,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +15,19 @@ import {
 } from '@repo/ui/dropdown-menu';
 import { Button } from '@repo/ui/button';
 import { Badge } from '@repo/ui/badge';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { NotificationService } from '@/services/notification.services';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-provider';
 import { useSocket } from '@/contexts/socket-provider';
-import type { Notification } from '@/types';
+import type { Notification } from '@/types/notification';
+import { queryKeys } from '@/constants/key-query';
+import {
+  useNotificationsQuery,
+  useNotificationsUnreadCountQuery,
+} from '@/hooks/query';
+import {
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
+} from '@/hooks/mutation';
 
 const typeColors = {
   info: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -86,58 +100,35 @@ function NotificationButton() {
   const { user } = useAuth();
   const { socket, isConnected } = useSocket();
   const queryClient = useQueryClient();
+  const isAuthenticated = !!user?._id;
 
-  // Fetch notifications (initial load)
-  const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: () => NotificationService.getNotifications(),
-    enabled: !!user?._id,
-  });
+  const { data: notifications = [], isLoading } =
+    useNotificationsQuery(isAuthenticated);
+  const { data: unreadCount = 0 } =
+    useNotificationsUnreadCountQuery(isAuthenticated);
+  const markAsReadMutation = useMarkNotificationAsReadMutation();
+  const markAllAsReadMutation = useMarkAllNotificationsAsReadMutation();
 
-  // Fetch unread count (initial load)
-  const { data: unreadCount = 0 } = useQuery({
-    queryKey: ['notifications-unread-count'],
-    queryFn: () => NotificationService.getUnreadCount(),
-    enabled: !!user?._id,
-  });
-
-  // Mark as read mutation
-  const markAsReadMutation = useMutation({
-    mutationFn: (notificationId: string) =>
-      NotificationService.markAsRead(notificationId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
-    },
-  });
-
-  // Mark all as read mutation
-  const markAllAsReadMutation = useMutation({
-    mutationFn: () => NotificationService.markAllAsRead(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
-    },
-  });
-
-  // WebSocket listeners for real-time updates
   useEffect(() => {
     if (!socket || !isConnected) return;
 
-    // Listen for new notifications
     const handleNewNotification = (notification: Notification) => {
-      queryClient.setQueryData<Notification[]>(['notifications'], (old = []) => {
-        // Add new notification at the beginning
-        return [notification, ...old];
-      });
-      
-      // Update unread count
-      queryClient.setQueryData<number>(['notifications-unread-count'], (old = 0) => old + 1);
+      queryClient.setQueryData<Notification[]>(
+        queryKeys.notifications(),
+        (old = []) => [notification, ...old]
+      );
+
+      queryClient.setQueryData<number>(
+        queryKeys.notificationsUnreadCount(),
+        (old = 0) => old + 1
+      );
     };
 
-    // Listen for unread count updates
     const handleUnreadCount = (count: number) => {
-      queryClient.setQueryData<number>(['notifications-unread-count'], count);
+      queryClient.setQueryData<number>(
+        queryKeys.notificationsUnreadCount(),
+        count
+      );
     };
 
     socket.on('new-notification', handleNewNotification);
@@ -184,7 +175,10 @@ function NotificationButton() {
             </Badge>
           )}
           {!isConnected && (
-            <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full" title="Disconnected" />
+            <div
+              className="absolute -bottom-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full"
+              title="Disconnected"
+            />
           )}
         </Button>
       </DropdownMenuTrigger>

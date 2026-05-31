@@ -70,6 +70,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     return () => {
       newSocket.close();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reconnect only when authenticated user changes
   }, [user?._id]);
 
   return (

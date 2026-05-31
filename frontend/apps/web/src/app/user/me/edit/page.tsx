@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import http from '@/lib/http';
 import { useRouter } from 'next/navigation';
@@ -16,11 +17,17 @@ import { Label } from '@repo/ui/label';
 
 const editProfileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .optional(),
   email: z.string().email('Please enter a valid email').optional(),
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   avatar: z.any().optional(),
-  location: z.string().max(100, 'Location must be less than 100 characters').optional(),
+  location: z
+    .string()
+    .max(100, 'Location must be less than 100 characters')
+    .optional(),
   website: z
     .string()
     .url('Please enter a valid URL')
@@ -31,7 +38,10 @@ const editProfileSchema = z.object({
     .regex(/^@?[A-Za-z0-9_]{1,15}$/, 'Please enter a valid Twitter username')
     .or(z.literal(''))
     .optional(),
-  category: z.string().max(50, 'Category must be less than 50 characters').optional(),
+  category: z
+    .string()
+    .max(50, 'Category must be less than 50 characters')
+    .optional(),
 });
 
 type FormData = z.infer<typeof editProfileSchema>;
@@ -73,7 +83,7 @@ export default function EditUserPage() {
           setValue('category', userData.category || '');
           setAvatarPreview(userData.avatar || '');
         }
-      } catch (err) {
+      } catch {
         toast.error('Failed to load user data');
       } finally {
         setLoading(false);
@@ -84,7 +94,8 @@ export default function EditUserPage() {
   }, [user?._id, router, setValue]);
 
   const onSubmit = async (data: FormData) => {
-    const { avatar, ...updateData } = data;
+    const updateData = { ...data };
+    delete updateData.avatar;
 
     try {
       const response = await http.patch(`/users/${user?._id}`, updateData);
@@ -95,7 +106,7 @@ export default function EditUserPage() {
       } else {
         toast.error(`Failed to update profile`);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to update profile. Please try again.');
     }
   };
@@ -122,14 +133,18 @@ export default function EditUserPage() {
                 <div className="relative mx-auto w-32 h-32 mb-4">
                   <div className="w-32 h-32 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden">
                     {avatarPreview ? (
-                      <img
+                      <Image
                         src={avatarPreview}
                         alt="Avatar preview"
+                        width={128}
+                        height={128}
                         className="w-full h-full object-cover"
+                        unoptimized
                         onError={(e) => {
                           const target = e.currentTarget;
                           target.style.display = 'none';
-                          const sibling = target.nextElementSibling as HTMLElement;
+                          const sibling =
+                            target.nextElementSibling as HTMLElement;
                           if (sibling) {
                             sibling.style.display = 'flex';
                           }

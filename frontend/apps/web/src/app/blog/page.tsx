@@ -4,6 +4,7 @@ import SearchBar from '@/components/pages/home/search-bar';
 import BlogCard from '@/components/pages/blog/blog-card';
 import CategoryButtons from '@/components/pages/blog/category-buttons';
 import http from '@/lib/http';
+import type { Post } from '@/types/post';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 
@@ -56,7 +57,7 @@ export default async function BlogPage({
 
   if (selectedCategory) {
     postData = postData.filter(
-      (post: any) => post.category === selectedCategory
+      (post: Post) => post.category === selectedCategory
     );
   }
 
@@ -117,7 +118,7 @@ export default async function BlogPage({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {postData.map((post: any) => (
+              {postData.map((post: Post) => (
                 <BlogCard key={post._id} post={post} />
               ))}
             </div>

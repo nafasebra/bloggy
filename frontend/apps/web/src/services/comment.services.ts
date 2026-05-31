@@ -1,10 +1,10 @@
 import http from '@/lib/http';
-import type { Comment, CreateCommentData, UpdateCommentData } from '@/types';
+import type { Comment, CreateCommentData } from '@/types/comment';
 
 export class CommentService {
   static async createComment(
     data: CreateCommentData,
-    postId: string,
+    postId: string
   ): Promise<Comment> {
     const response = await http.post<Comment>(`/comments/${postId}`, data);
     return response.data;
@@ -17,7 +17,7 @@ export class CommentService {
 
   static async replyToComment(
     data: CreateCommentData,
-    postId: string,
+    postId: string
   ): Promise<Comment> {
     const response = await http.put<Comment>(`/comments/reply/${postId}`, data);
     return response.data;
@@ -28,8 +28,12 @@ export class CommentService {
     return response.data;
   }
 
-  static async checkIfCommentLiked(commentId: string): Promise<{ isLiked: boolean }> {
-    const response = await http.get<{ isLiked: boolean }>(`/comments/${commentId}/like`);
+  static async checkIfCommentLiked(
+    commentId: string
+  ): Promise<{ isLiked: boolean }> {
+    const response = await http.get<{ isLiked: boolean }>(
+      `/comments/${commentId}/like`
+    );
     return response.data;
   }
 }

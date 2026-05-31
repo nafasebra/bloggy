@@ -4,12 +4,12 @@ import { notFound } from 'next/navigation';
 import CommentSection from '@/components/pages/blog/comment-section';
 import { ChevronLeft } from 'lucide-react';
 import http from '@/lib/http';
-import { Post } from '@/types';
+import { Post } from '@/types/post';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { Badge } from '@repo/ui/badge';
 import { Card, CardContent } from '@repo/ui/card';
 import { getReadTime } from '@/lib/utils';
-import { Eye, Heart } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import LikeButton from '@/components/pages/blog/like-button';
 
 interface PostPageProps {
@@ -22,7 +22,7 @@ async function getPostById(id: string) {
   try {
     const response = await http.get<Post>(`/posts/${id}`);
     return response.data;
-  } catch (error) {
+  } catch {
     console.log('Failed to fetch post');
   }
 }
@@ -71,10 +71,8 @@ export async function generateMetadata({
 
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
-  const [post, postViewCount] = await Promise.all([
-    getPostById(id),
-    getPostViewCountByIP(id),
-  ]);
+  const post = await getPostById(id);
+  await getPostViewCountByIP(id);
 
   if (!post) {
     notFound();
@@ -96,9 +94,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
 
           <div className="flex items-center space-x-2 mb-4">
-            <Badge variant="info">
-              {post.category}
-            </Badge>
+            <Badge variant="info">{post.category}</Badge>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {getReadTime(post.content)}
             </span>
@@ -159,16 +155,16 @@ export default async function PostPage({ params }: PostPageProps) {
               </div>
             </div>
 
-          {/* View and Like Counts */}
-          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <div className="w-full flex items-center justify-between gap-5">
-              <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                <Eye />
-                <span>{post.views || 0}</span>
-              </span>
-              <LikeButton postId={post._id} />
+            {/* View and Like Counts */}
+            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <div className="w-full flex items-center justify-between gap-5">
+                <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                  <Eye />
+                  <span>{post.views || 0}</span>
+                </span>
+                <LikeButton postId={post._id} />
+              </div>
             </div>
-          </div>
           </CardContent>
         </Card>
 

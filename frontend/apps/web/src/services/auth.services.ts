@@ -4,7 +4,7 @@ import type {
   LoginCredentials,
   RegisterData,
   ChangePasswordData,
-} from '@/types';
+} from '@/types/auth';
 
 export class AuthService {
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {

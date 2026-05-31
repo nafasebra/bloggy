@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/auth-provider';
 import http from '@/lib/http';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
@@ -25,8 +24,6 @@ export default function ChangePasswordPage() {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-
-  const { user } = useAuth();
 
   const {
     register,
@@ -47,7 +44,7 @@ export default function ChangePasswordPage() {
 
       toast.success('Password changed successfully!');
       router.push('/user/me');
-    } catch (err) {
+    } catch {
       toast.error('Change failed. Please try again.');
     }
   };
@@ -83,7 +80,9 @@ export default function ChangePasswordPage() {
                     size="icon"
                     className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowOldPassword(!showOldPassword)}
-                    aria-label={showOldPassword ? 'Hide password' : 'Show password'}
+                    aria-label={
+                      showOldPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showOldPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -115,7 +114,9 @@ export default function ChangePasswordPage() {
                     size="icon"
                     className="absolute right-0 top-1/2 -translate-y-1/2 size-9"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -132,11 +133,7 @@ export default function ChangePasswordPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full"
-            >
+            <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Changing...' : 'Change Password'}
             </Button>
 

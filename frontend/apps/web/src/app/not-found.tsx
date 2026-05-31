@@ -40,9 +40,9 @@ export default function NotFound() {
             Oops! Page Not Found
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-            The page you're looking for seems to have wandered off into the
-            digital void. Don't worry, even the best explorers sometimes take a
-            wrong turn!
+            The page you&apos;re looking for seems to have wandered off into the
+            digital void. Don&apos;t worry, even the best explorers sometimes
+            take a wrong turn!
           </p>
         </div>
 
