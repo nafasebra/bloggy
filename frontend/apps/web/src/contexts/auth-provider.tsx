@@ -15,8 +15,10 @@ import axios from 'axios';
 
 interface AuthContextType {
   user: User | null;
+  isLoading: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const setUser = (user: User | null) => {
     setUserState(user);
@@ -43,6 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchUser = useCallback(async () => {
     if (!hasSessionHint()) {
       setUser(null);
+      setIsLoading(false);
       return;
     }
 
@@ -52,6 +56,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Error fetching user:', error);
       setUser(null);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -73,8 +79,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        isLoading,
         setUser,
         logout,
+        refreshUser: fetchUser,
       }}
     >
       {children}

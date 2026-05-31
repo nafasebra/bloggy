@@ -116,6 +116,7 @@ export class AuthController {
       status: 'success',
       message: 'User logged in successfully',
       user: result.user,
+      session_token: result.session_token,
     };
   }
 
@@ -136,7 +137,7 @@ export class AuthController {
       },
     },
   })
-  async logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
 
     return {

@@ -13,6 +13,7 @@ export interface User {
   followers?: number;
   following?: number;
   category: string;
+  role?: 'admin' | 'user';
   postIds?: string[];
   createdAt: string;
   updatedAt: string;

@@ -1,11 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+
 import { useCallback, useState } from 'react';
+
 import { Button } from '@repo/ui/button';
+
 import ThemeButton from '../shared/theme-button';
+
 import NotificationButton from '../shared/notification-button';
+
 import { Menu, User, LayoutDashboard } from 'lucide-react';
+
 import {
   Sheet,
   SheetContent,
@@ -13,11 +19,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@repo/ui/sheet';
+
 import { useAuth } from '@/contexts/auth-provider';
+
+const DASHBOARD_URL =
+  process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useAuth();
+
+  const { user, isLoading } = useAuth();
+
+  const isLoggedIn = Boolean(user?._id);
+
+  const isAdmin = user?.role === 'admin';
 
   const changeMenuState = useCallback((state: boolean) => {
     setIsMenuOpen(state);
@@ -31,6 +46,7 @@ export default function Navigation() {
             <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">B</span>
             </div>
+
             <span className="text-xl font-bold text-gray-900 dark:text-white">
               Bloggy
             </span>
@@ -38,34 +54,49 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-3">
-          {user?._id && <NotificationButton />}
+          {isLoggedIn && <NotificationButton />}
+
           <ThemeButton />
+
           <div className="flex items-center gap-4">
-            {user?._id ? (
-              <a
-                href={
-                  process.env.NEXT_PUBLIC_DASHBOARD_URL ||
-                  'http://localhost:3001'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-              </a>
+            {isLoading ? (
+              <div className="hidden sm:block w-20 h-9" />
+            ) : isLoggedIn ? (
+              <>
+                {isAdmin && (
+                  <a
+                    href={DASHBOARD_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </a>
+                )}
+
+                <Link href="/user/me">
+                  <Button className="hidden sm:flex">
+                    <User />
+
+                    <span>My Account</span>
+                  </Button>
+                </Link>
+              </>
             ) : (
               <>
                 <Link href="/auth/login">
                   <Button>Login</Button>
                 </Link>
+
                 <Link href="/auth/signup">
                   <Button variant={'outline'}>Sign Up</Button>
                 </Link>
               </>
             )}
           </div>
-          {!user?._id ? (
+
+          {!isLoading && !isLoggedIn ? (
             <div className="md:hidden flex">
               <Sheet open={isMenuOpen} onOpenChange={changeMenuState}>
                 <SheetTrigger asChild>
@@ -73,6 +104,7 @@ export default function Navigation() {
                     <Menu />
                   </Button>
                 </SheetTrigger>
+
                 <SheetContent
                   side="left"
                   className="w-75 sm:w-100 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700"
@@ -82,6 +114,7 @@ export default function Navigation() {
                       Bloggy
                     </SheetTitle>
                   </SheetHeader>
+
                   <nav className="px-4 flex flex-col gap-3 mt-4 space-y-3 pt-4">
                     <Link href="/auth/login">
                       <Button
@@ -91,6 +124,7 @@ export default function Navigation() {
                         Login
                       </Button>
                     </Link>
+
                     <Link
                       href="/auth/signup"
                       onClick={() => setIsMenuOpen(false)}
@@ -103,28 +137,27 @@ export default function Navigation() {
                 </SheetContent>
               </Sheet>
             </div>
-          ) : (
-            <>
-              <a
-                href={
-                  process.env.NEXT_PUBLIC_DASHBOARD_URL ||
-                  'http://localhost:3001'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="md:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-              </a>
-              <Link href={`/user/me`}>
+          ) : !isLoading && isLoggedIn ? (
+            <div className="md:hidden flex items-center gap-2">
+              {isAdmin && (
+                <a
+                  href={DASHBOARD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </a>
+              )}
+
+              <Link href="/user/me">
                 <Button>
                   <User />
-                  <span className="hidden md:flex">My Account</span>
                 </Button>
               </Link>
-            </>
-          )}
+            </div>
+          ) : null}
         </div>
       </div>
     </nav>

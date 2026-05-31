@@ -51,7 +51,7 @@ export default function LoginPage() {
       if (result.user) {
         const dashboardUrl =
           process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
-        const { isNew, role, ...userWithoutIsNew } = result.user;
+        const { isNew, role, ...userProfile } = result.user;
         const isAdmin = role === 'admin';
 
         if (isAdmin) {
@@ -59,7 +59,7 @@ export default function LoginPage() {
           return;
         }
 
-        setUser(userWithoutIsNew);
+        setUser({ ...userProfile, role: role ?? 'user' });
 
         if (isNew) {
           router.push('/auth/setup');

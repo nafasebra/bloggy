@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import http from '@/lib/http';
-import { SESSION_HINT_COOKIE } from '@/lib/auth/constants';
-
-const isProduction = process.env.NODE_ENV === 'production';
+import {
+  applySessionCookies,
+  extractSessionTokenFromSetCookie,
+} from '@/lib/auth/server-cookies';
 
 export async function POST(request: Request) {
   try {
@@ -10,26 +11,15 @@ export async function POST(request: Request) {
 
     const response = await http.post('/auth/login', { username, password });
 
-    const res = NextResponse.json(response.data, { status: response.status });
+    const { session_token: sessionTokenFromBody, ...clientData } =
+      response.data;
+    const sessionToken =
+      sessionTokenFromBody ??
+      extractSessionTokenFromSetCookie(response.headers['set-cookie']);
 
-    const setCookieHeader = response.headers['set-cookie'];
-    if (setCookieHeader) {
-      if (Array.isArray(setCookieHeader)) {
-        setCookieHeader.forEach((cookie) =>
-          res.headers.append('set-cookie', cookie)
-        );
-      } else {
-        res.headers.append('set-cookie', setCookieHeader);
-      }
-    }
+    const res = NextResponse.json(clientData, { status: response.status });
 
-    res.cookies.set(SESSION_HINT_COOKIE, '1', {
-      httpOnly: false,
-      secure: isProduction,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    applySessionCookies(res, sessionToken);
 
     return res;
   } catch (error: unknown) {
