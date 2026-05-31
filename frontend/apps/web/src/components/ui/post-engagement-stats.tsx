@@ -1,5 +1,5 @@
 import { Eye, Heart } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@repo/ui/utils';
 
 interface PostEngagementStatsProps {
   views?: number;

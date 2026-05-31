@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn } from '@repo/ui/utils';
 
 const sizeClasses = {
   sm: { container: 'w-8 h-8', text: 'text-sm', image: 32 },

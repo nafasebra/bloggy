@@ -21,6 +21,7 @@ import { categories } from '@/data';
 import { MarkdownEditor } from '@repo/ui/markdown-editor';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { toast } from 'sonner';
+import { getReadTime } from '@repo/shared';
 import { useCreatePost } from '@/hooks/mutation';
 
 const schema = z.object({
@@ -207,11 +208,7 @@ export default function CreatePostPage() {
                   {title || 'Your Post Title'}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  {category} ·{' '}
-                  {content
-                    ? Math.ceil(content.trim().split(/\s+/).length / 200)
-                    : 0}{' '}
-                  min read
+                  {category} · {content ? getReadTime(content) : 0} min read
                 </p>
                 {excerpt && (
                   <div className="rounded-lg border border-border bg-muted/50 p-4">

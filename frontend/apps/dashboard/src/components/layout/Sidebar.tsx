@@ -1,6 +1,12 @@
 import { Link, useLocation } from 'react-router';
-import { cn } from '@/lib/utils';
-import { X, LayoutDashboard, FileText, Users, MessageSquare } from 'lucide-react';
+import { cn } from '@repo/ui/utils';
+import {
+  X,
+  LayoutDashboard,
+  FileText,
+  Users,
+  MessageSquare,
+} from 'lucide-react';
 import { Button } from '@repo/ui/button';
 
 const items = [
@@ -34,7 +40,11 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           'fixed lg:static inset-y-0 left-0 z-40 flex h-full w-64 flex-col border-r border-border bg-card transition-transform duration-300 shadow-lg lg:shadow-none',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
-        aria-hidden={!mobileOpen && typeof window !== 'undefined' && window.innerWidth < 1024}
+        aria-hidden={
+          !mobileOpen &&
+          typeof window !== 'undefined' &&
+          window.innerWidth < 1024
+        }
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-6">
           <h2 className="text-lg font-semibold text-foreground">Admin</h2>

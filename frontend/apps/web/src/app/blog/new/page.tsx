@@ -19,7 +19,7 @@ const MarkdownEditor = dynamic(
     })),
   { ssr: false }
 );
-import { getReadTime } from '@/lib/utils';
+import { getReadTime } from '@repo/shared';
 import { categories } from '@/data';
 import { toast } from 'sonner';
 import { Button } from '@repo/ui/button';

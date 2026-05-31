@@ -47,6 +47,9 @@ importers:
       '@repo/http-client':
         specifier: workspace:*
         version: link:../../packages/http-client
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -265,6 +268,9 @@ importers:
       '@repo/http-client':
         specifier: workspace:*
         version: link:../../packages/http-client
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -410,6 +416,15 @@ importers:
       axios:
         specifier: ^1.11.0
         version: 1.13.5
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+
+  packages/shared:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
