@@ -8,7 +8,9 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@repo/shared": ["../../packages/shared/src/index.ts"],
+      "@repo/ui/utils": ["../../packages/ui/src/lib/utils.ts"]
     },
     "declaration": false,
     "declarationMap": false
@@ -17,12 +19,25 @@
     "**/*.ts",
     "**/*.tsx",
     "next-env.d.ts",
+    "src/vitest-env.d.ts",
+    "vitest.config.ts",
     "next.config.js",
-    ".next/types/**/*.ts"
-, "../../packages/ui/src/alert-dialog.stories.tsx", "../../packages/ui/src/badge.stories.tsx", "../../packages/ui/src/button.stories.tsx", "../../packages/ui/src/card.stories.tsx", "../../packages/ui/src/checkbox.stories.tsx", "../../packages/ui/src/dropdown-menu.stories.tsx", "../../packages/ui/src/input.stories.tsx", "../../packages/ui/src/label.stories.tsx", "../../packages/ui/src/radio-group.stories.tsx", "../../packages/ui/src/select.stories.tsx", "../../packages/ui/src/sheet.stories.tsx", "../../packages/ui/src/sonner.stories.tsx", "../../packages/ui/src/table.stories.tsx", "../../packages/ui/src/tabs.stories.tsx", "../../packages/ui/src/textarea.stories.tsx"  ],
-  "exclude": [
-    "node_modules",
-    "**/*.stories.tsx",
-    "**/*.stories.ts"
-  ]
+    ".next/types/**/*.ts",
+    "../../packages/ui/src/alert-dialog.stories.tsx",
+    "../../packages/ui/src/badge.stories.tsx",
+    "../../packages/ui/src/button.stories.tsx",
+    "../../packages/ui/src/card.stories.tsx",
+    "../../packages/ui/src/checkbox.stories.tsx",
+    "../../packages/ui/src/dropdown-menu.stories.tsx",
+    "../../packages/ui/src/input.stories.tsx",
+    "../../packages/ui/src/label.stories.tsx",
+    "../../packages/ui/src/radio-group.stories.tsx",
+    "../../packages/ui/src/select.stories.tsx",
+    "../../packages/ui/src/sheet.stories.tsx",
+    "../../packages/ui/src/sonner.stories.tsx",
+    "../../packages/ui/src/table.stories.tsx",
+    "../../packages/ui/src/tabs.stories.tsx",
+    "../../packages/ui/src/textarea.stories.tsx"
+  ],
+  "exclude": ["node_modules", "**/*.stories.tsx", "**/*.stories.ts"]
 }

@@ -1,2 +1,5 @@
-- Better documentation
-- Input sanitation to avoid XSS in Markdown output (use a sanitizer like rehype-sanitize or DOMPurify)
+- handle photo uploading
+- Add unit test for frontend and backend
+- Add e2e and integration tests for both
+- Write better documentation for root, frontend and backend
+- Make dockerfile for both
