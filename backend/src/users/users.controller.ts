@@ -5,10 +5,15 @@ import {
   Patch,
   Param,
   Delete,
+  Post,
   UseGuards,
   Request,
   ForbiddenException,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import {
   ApiBody,
@@ -20,13 +25,13 @@ import {
 } from '@nestjs/swagger';
 import {
   UpdateUserDto,
-  UserResponseDto,
   SingleUserResponseDto,
   UsersResponseDto,
   ErrorResponseDto,
 } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiUnauthorizedResponse, ApiConsumes } from '@nestjs/swagger';
+import { avatarUploadOptions } from './avatar-upload.config';
 
 @ApiTags('Users')
 @Controller('users')
@@ -56,7 +61,7 @@ export class UsersController {
     type: SingleUserResponseDto,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  getCurrentUser(@Request() req: any) {
+  getCurrentUser(@Request() req: { user: { userId: string } }) {
     return this.usersService.findOne(req.user.userId);
   }
 
@@ -79,6 +84,38 @@ export class UsersController {
   })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/avatar')
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload user avatar' })
+  @ApiResponse({
+    status: 200,
+    description: 'Avatar uploaded successfully',
+    type: SingleUserResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @UseInterceptors(FileInterceptor('avatar', avatarUploadOptions))
+  uploadAvatar(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: { user: { userId: string } }
+  ) {
+    if (req.user.userId !== id) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
+    if (!file) {
+      throw new BadRequestException('Avatar file is required');
+    }
+    const avatar = `/uploads/avatars/${file.filename}`;
+    return this.usersService.update(id, { avatar });
   }
 
   @UseGuards(JwtAuthGuard)

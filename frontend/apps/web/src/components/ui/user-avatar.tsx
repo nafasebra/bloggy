@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@repo/ui/utils';
+import { resolveAvatarUrl } from '@/lib/avatar';
 
 const sizeClasses = {
   sm: { container: 'w-8 h-8', text: 'text-sm', image: 32 },
@@ -28,12 +29,13 @@ export function UserAvatar({
 }: UserAvatarProps) {
   const { container, text, image } = sizeClasses[size];
   const initial = name.charAt(0).toUpperCase();
+  const avatarUrl = resolveAvatarUrl(src);
   const gradientClass =
     variant === 'green'
       ? 'bg-linear-to-r from-green-500 to-blue-600'
       : 'bg-linear-to-r from-blue-500 to-purple-600';
 
-  if (src && src.startsWith('http')) {
+  if (avatarUrl) {
     return (
       <div
         className={cn(
@@ -43,7 +45,7 @@ export function UserAvatar({
         )}
       >
         <Image
-          src={src}
+          src={avatarUrl}
           alt={name}
           width={image}
           height={image}

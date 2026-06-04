@@ -54,11 +54,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   bio?: string;
 
   @ApiPropertyOptional({
-    description: "URL to the user's avatar image",
-    example: 'https://example.com/avatar.jpg',
+    description: "URL or path to the user's avatar image",
+    example: '/uploads/avatars/user-id.jpg',
   })
   @IsOptional()
-  @IsUrl()
+  @IsString()
   avatar?: string;
 
   @ApiPropertyOptional({

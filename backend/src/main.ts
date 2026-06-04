@@ -4,11 +4,19 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
 import { configureSecurityHeaders } from './common/security/helmet.config';
+import { ensureAvatarUploadDir } from './users/avatar-upload.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  ensureAvatarUploadDir();
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads',
+  });
 
   configureSecurityHeaders(app);
 

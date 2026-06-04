@@ -8,7 +8,6 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -18,14 +17,6 @@ import {
 } from '@nestjs/swagger';
 import { FollowService } from './follow.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-
-interface AuthenticatedRequest extends ExpressRequest {
-  user: {
-    userId: string;
-    email?: string;
-    username?: string;
-  };
-}
 
 @ApiTags('Follow')
 @Controller('users')
@@ -61,7 +52,7 @@ export class FollowController {
   @HttpCode(HttpStatus.OK)
   async toggleFollow(
     @Param('id') followingId: string,
-    @Request() req: AuthenticatedRequest
+    @Request() req: { user: { userId: string } }
   ) {
     return this.followService.toggleFollow(req.user.userId, followingId);
   }
