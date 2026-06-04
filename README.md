@@ -1,542 +1,481 @@
-# 🚀 Bloggy - Modern Blogging Platform
+# Bloggy
 
-A full-stack blogging platform built with Next.js, NestJS, and MongoDB. Create, share, and discover amazing content with a beautiful, modern interface.
+Full-stack blogging platform: a public blog, an admin CMS, and a shared NestJS API backed by MongoDB.
 
-![Bloggy Platform](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
-![NestJS](https://img.shields.io/badge/NestJS-11-red?style=for-the-badge&logo=nestjs)
-![MongoDB](https://img.shields.io/badge/MongoDB-8-green?style=for-the-badge&logo=mongodb)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwind-css)
+| Part | Stack | Dev URL |
+|------|-------|---------|
+| **Web** — public blog for readers and authors | Next.js 16, React 19 | http://localhost:3000 |
+| **Dashboard** — admin CMS | Vite 7, React Router 7 | http://localhost:3001 |
+| **Backend** — REST + WebSocket API | NestJS 11, Mongoose 8 | http://localhost:3030 |
+| **Storybook** — UI component catalog | Storybook 10 | http://localhost:6006 |
 
-## ✨ Features
+**New here?** Follow [Quick start](#quick-start) below, then read the focused guides:
 
-### 📝 Content Management
-- **Rich Markdown Editor**: Write with a powerful markdown editor featuring a toolbar
-- **Markdown Support**: Full GitHub Flavored Markdown (GFM) support
-- **Live Preview**: Real-time preview of your markdown content
-- **Side-by-Side Editing**: Edit and preview simultaneously
-- **Category & Tags**: Organize content with categories and tags
-- **Auto-calculated Read Time**: Smart reading time estimation
-- **Draft System**: Save and edit drafts before publishing
-
-### 👥 User Experience
-- **User Profiles**: Beautiful user profiles with social links
-- **Comment System**: Engage with readers through comments
-- **Search & Discovery**: Find content and users easily
-- **Responsive Design**: Works perfectly on all devices
-- **Dark Mode**: Elegant dark/light theme support
-
-### 🔧 Admin Dashboard
-- **Dashboard Overview**: View key statistics and metrics
-- **Post Management**: Create, edit, and delete blog posts
-- **User Management**: Manage user accounts and roles
-
-### 🔍 Discovery & Search
-- **Advanced Search**: Search posts by title, content, and tags
-- **Category Filtering**: Browse posts by category
-- **User Discovery**: Find and follow interesting authors
-- **Latest Content**: Stay updated with recent posts
-
-### 🎨 Modern UI/UX
-- **Clean Design**: Modern, minimalist interface
-- **Smooth Animations**: Delightful user interactions
-- **Accessibility**: Built with accessibility in mind
-- **Performance**: Optimized for speed and efficiency
-
-## 🏗️ Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │    Database     │
-│   (Next.js)     │◄──►│   (NestJS)      │◄──►│   (MongoDB)     │
-│                 │    │                 │    │                 │
-│ - User Interface│    │ - REST API      │    │ - Collections   │
-│ - Components    │    │ - Controllers   │    │ - Documents     │
-│ - Pages         │    │ - Services      │    │ - Indexes       │
-│ - State Mgmt    │    │ - Schemas       │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **Next.js 15** - React framework with App Router and Turbopack
-- **React 19** - Latest React with enhanced features
-- **TypeScript 5** - Type-safe development
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **shadcn/ui** - High-quality UI components built on Radix UI
-- **React SimpleMDE Editor** - Rich markdown editor (EasyMDE)
-- **React Markdown** - Markdown rendering with GFM support
-- **TanStack Query** - Data fetching and state management
-- **React Hook Form** - Form validation with Zod
-- **Axios** - HTTP client for API requests
-- **Lucide React** - Beautiful icon library
-
-### Backend
-- **NestJS 11** - Progressive Node.js framework
-- **MongoDB 8** - NoSQL database with Mongoose ODM
-- **Mongoose** - Elegant MongoDB object modeling
-- **Passport.js** - Authentication middleware (JWT & Local strategies)
-- **JWT** - JSON Web Token authentication
-- **Bcrypt** - Password hashing
-- **Express Session** - Session management with MongoDB store
-- **Swagger** - API documentation
-- **Class Validator** - DTO validation
-- **Class Transformer** - Object transformation
-
-### Development Tools
-- **ESLint 9** - Code linting for both frontend and backend
-- **Prettier** - Code formatting
-- **Jest** - Backend testing framework
-- **Vitest** - Frontend testing framework with browser mode
-- **Storybook 9** - UI component development and documentation
-- **Playwright** - E2E testing browser automation
-- **TypeScript** - Static type checking across the stack
-
-### 🪝 Git Hooks (Husky)
-
-This repository uses Husky to manage Git hooks in the root. Husky is installed and configured in the root `package.json` and the `.husky/` folder. Commit message linting is provided by `commitlint` and configured in `commitlint.config.cjs`.
-
-- Location: `.husky/` at the repo root (hooks are versioned)
-- Commitlint config: `commitlint.config.cjs` (root)
-
-Installing / enabling Husky (Husky v9)
-```bash
-# from repo root — required so Git uses .husky/_ as hooksPath
-npm install
-npm run hooks:check   # should print: hooks OK: .husky/_
-```
-
-Hooks are plain shell scripts in `.husky/` (no `husky install` / `husky add` — those commands are removed in v9). After `npm install`, `prepare` runs `husky`, which sets `core.hooksPath` to `.husky/_` in your local clone.
-
-Add or update hooks by editing files in `.husky/` directly, then commit them.
-
-**Pre-commit** runs `lint-staged` on staged files: Prettier + ESLint for `backend/`, Prettier + ESLint for each `frontend/` app/package. Requires root `npm install`, and `pnpm` for frontend ESLint.
-
-Run hooks manually
-```bash
-npm run lint-staged
-sh .husky/commit-msg .git/COMMIT_EDITMSG
-```
-
-Tips
-- If you need to remove or change a hook, edit or delete files in the `.husky/` directory and commit the changes
-- If you prefer hooks only in a specific package, update the package script and hook commands accordingly
-
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 20+ 
-- npm or yarn or pnpm
-- MongoDB (local or Atlas)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/nafasebra/bloggy.git
-   cd bloggy
-   ```
-
-2. **Install dependencies**
-   ```bash
-   # Install backend dependencies
-   cd back && npm install
-   
-   # Install frontend dependencies
-   cd ../front && npm install
-   ```
-
-3. **Environment Setup**
-
-   **Backend (.env in `back/` directory):**
-   ```env
-   MONGODB_URI=mongodb://localhost:27017/bloggy
-   PORT=3000
-   NODE_ENV=development
-   JWT_SECRET=your-secret-key-here
-   JWT_EXPIRES_IN=7d
-   ```
-
-   **Frontend (.env.local in `front/` directory):**
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:3000
-   ```
-
-4. **Start MongoDB**
-   ```bash
-   # Using Docker
-   docker run -d -p 27017:27017 --name mongodb mongo:latest
-   
-   # Or install MongoDB locally
-   # https://docs.mongodb.com/manual/installation/
-   ```
-
-5. **Run the application**
-
-   **Backend (in `back/` directory):**
-   ```bash
-   cd back
-   npm run start:dev
-   ```
-   Backend will run at: http://localhost:3000
-
-   **Frontend (in `front/` directory):**
-   ```bash
-   cd front
-   npm run dev
-   ```
-   Frontend will run at: http://localhost:3000 (Next.js default port)
-
-## 📁 Project Structure
-
-```
-bloggy/
-├── back/                           # Backend (NestJS)
-│   ├── src/
-│   │   ├── auth/                  # Authentication module
-│   │   │   ├── dto/               # Auth DTOs (login, register, etc.)
-│   │   │   ├── jwt-auth.guard.ts  # JWT authentication guard
-│   │   │   ├── jwt.strategy.ts    # JWT strategy
-│   │   │   └── auth.service.ts    # Auth business logic
-│   │   ├── users/                 # User management module
-│   │   │   ├── dto/               # User DTOs
-│   │   │   ├── schemas/           # User Mongoose schemas
-│   │   │   └── users.service.ts   # User business logic
-│   │   ├── posts/                 # Blog posts module
-│   │   │   ├── dto/               # Post DTOs
-│   │   │   ├── schemas/           # Post Mongoose schemas
-│   │   │   └── posts.service.ts   # Post business logic
-│   │   ├── comments/              # Comments module
-│   │   │   ├── dto/               # Comment DTOs
-│   │   │   ├── schemas/           # Comment Mongoose schemas
-│   │   │   └── comments.service.ts # Comment business logic
-│   │   ├── database/              # Database configuration
-│   │   │   └── database.module.ts # MongoDB setup
-│   │   ├── app.module.ts          # Root application module
-│   │   └── main.ts                # Application entry point
-│   ├── test/                      # E2E tests
-│   ├── eslint.config.mjs          # ESLint configuration
-│   ├── nest-cli.json              # NestJS CLI configuration
-│   └── package.json
-├── front/                          # Frontend (Next.js)
-│   ├── src/
-│   │   ├── app/                   # Next.js App Router
-│   │   │   ├── auth/              # Authentication pages (login, register)
-│   │   │   ├── blog/              # Blog listing pages
-│   │   │   ├── post/              # Individual post pages
-│   │   │   ├── dashboard/         # Admin dashboard
-│   │   │   ├── user/              # User profile pages
-│   │   │   ├── api/               # API routes
-│   │   │   └── layout.tsx         # Root layout
-│   │   ├── components/            # React components
-│   │   │   ├── dashboard/         # Dashboard components
-│   │   │   ├── layout/            # Layout components (header, footer)
-│   │   │   ├── pages/             # Page-specific components
-│   │   │   ├── shared/            # Shared/reusable components
-│   │   │   └── ui/                # UI components (shadcn/ui)
-│   │   ├── contexts/              # React contexts
-│   │   │   └── auth-provider.tsx  # Authentication context
-│   │   ├── hooks/                 # Custom React hooks
-│   │   │   └── useTheme.ts        # Theme management hook
-│   │   ├── lib/                   # Utility libraries
-│   │   │   ├── http.ts            # HTTP client (axios)
-│   │   │   └── utils.ts           # Helper functions
-│   │   ├── services/              # API service layer
-│   │   │   ├── auth.services.ts   # Auth API calls
-│   │   │   ├── post.services.ts   # Post API calls
-│   │   │   ├── user.services.ts   # User API calls
-│   │   │   └── comment.services.ts # Comment API calls
-│   │   ├── stories/               # Storybook stories
-│   │   │   ├── Button.stories.ts  # Button component stories
-│   │   │   ├── Header.stories.ts  # Header component stories
-│   │   │   └── Page.stories.ts    # Page component stories
-│   │   ├── styles/                # Global styles
-│   │   │   └── markdown-editor.css # Markdown editor styles
-│   │   └── types/                 # TypeScript type definitions
-│   ├── public/                    # Static assets
-│   ├── components.json            # shadcn/ui configuration
-│   ├── vitest.config.ts           # Vitest configuration
-│   └── package.json
-└── README.md                      # Project documentation
-```
-
-## 🎯 Available Scripts
-
-### Backend (in `back/` directory)
-```bash
-npm run start:dev      # Start in development mode with watch
-npm run start:debug    # Start in debug mode
-npm run build          # Build the application
-npm run start          # Start in production mode (with env file)
-npm run start:prod     # Start in production mode (dist)
-npm run format         # Format code with Prettier
-npm run lint           # Lint and fix code with ESLint
-npm run test           # Run unit tests with Jest
-npm run test:watch     # Run tests in watch mode
-npm run test:cov       # Run tests with coverage
-npm run test:debug     # Run tests in debug mode
-npm run test:e2e       # Run end-to-end tests
-```
-
-### Frontend (in `front/` directory)
-```bash
-npm run dev              # Start development server with Turbopack
-npm run build            # Build the application for production
-npm run start            # Start production server
-npm run lint             # Run ESLint
-npm run format           # Format code with Prettier
-npm run test             # Run tests with Vitest
-npm run storybook        # Start Storybook development server (port 6006)
-npm run build-storybook  # Build Storybook for production
-```
-
-## 📚 API Documentation
-
-The backend includes Swagger documentation available at `http://localhost:3000/api` when running in development mode.
-
-### Authentication
-```
-POST   /auth/register         # Register new user
-POST   /auth/login            # Login user
-POST   /auth/refresh          # Refresh JWT token
-POST   /auth/forget-password  # Request password reset
-POST   /auth/change-password  # Change user password
-```
-
-### Users
-```
-GET    /users                 # Get all users
-GET    /users/:id             # Get user by ID
-POST   /users                 # Create new user (admin)
-PATCH  /users/:id             # Update user profile
-DELETE /users/:id             # Delete user (admin)
-```
-
-### Posts
-```
-GET    /posts                 # Get all posts (with pagination, filters)
-GET    /posts/:id             # Get post by ID
-POST   /posts                 # Create new post (authenticated)
-PATCH  /posts/:id             # Update post (author only)
-DELETE /posts/:id             # Delete post (author/admin)
-GET    /posts/search          # Search posts by title, content, tags
-GET    /posts/category/:cat   # Get posts by category
-POST   /posts/:id/like        # Like/unlike a post
-```
-
-### Comments
-```
-GET    /comments/:postId      # Get comments for a post
-POST   /comments              # Create new comment (authenticated)
-PATCH  /comments/:id          # Update comment (author only)
-DELETE /comments/:id          # Delete comment (author/admin)
-POST   /comments/:id/reply    # Reply to a comment
-POST   /comments/:id/like     # Like/unlike a comment
-```
-
-## 🎨 Features in Detail
-
-### Blog Post Creation
-- **Rich Markdown Editor** with intuitive toolbar
-  - Bold, Italic, Headings formatting
-  - Lists (ordered & unordered)
-  - Code blocks and inline code
-  - Tables, quotes, and links
-  - Image embedding support
-  - Fullscreen and side-by-side modes
-- **Live Preview**: Real-time markdown rendering
-- **GitHub Flavored Markdown** (GFM) support
-- Category and tag selection
-- Auto-calculated read time
-- Draft saving and editing
-- SEO-friendly URLs
-
-### User Profiles
-- Customizable user profiles
-- Social media links
-- Post statistics
-- Follower/following system
-- User activity feed
-
-### Search & Discovery
-- Full-text search across posts
-- Category-based filtering
-- Tag-based content discovery
-- User search functionality
-- Advanced filtering options
-
-### Comment System
-- Nested comment threads
-- Like/unlike comments
-- Real-time comment updates
-- Comment moderation tools
-
-### Admin Dashboard
-- Statistics dashboard with real-time metrics
-- Comprehensive post management interface
-- User administration and role management
-- Content moderation and oversight tools
-
-## 🔧 Configuration
-
-### Database Setup
-The application uses MongoDB with Mongoose ODM. You can either:
-
-1. **Use MongoDB Atlas** (Recommended for production)
-   ```env
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/bloggy
-   ```
-
-2. **Use Local MongoDB**
-   ```env
-   MONGODB_URI=mongodb://localhost:27017/bloggy
-   ```
-
-### Environment Variables
-
-**Backend (.env in `back/` directory)**
-```env
-# Database
-MONGODB_URI=mongodb://localhost:27017/bloggy
-
-# Server
-PORT=3000
-NODE_ENV=development
-
-# JWT Authentication
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=7d
-
-# Session (if using express-session)
-SESSION_SECRET=your-session-secret-key
-```
-
-**Frontend (.env.local in `front/` directory)**
-```env
-# API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000
-
-# Site Configuration (optional)
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-## 🚀 Deployment
-
-### Frontend (Vercel)
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
-
-### Backend (Railway/Render)
-1. Connect your GitHub repository
-2. Set environment variables
-3. Configure build commands
-4. Deploy automatically
-
-### Database (MongoDB Atlas)
-1. Create MongoDB Atlas cluster
-2. Configure network access
-3. Create database user
-4. Update connection string
-
-## 🧪 Testing
-
-### Backend Testing (Jest)
-```bash
-cd back
-
-# Run all tests
-npm run test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:cov
-
-# Run E2E tests
-npm run test:e2e
-
-# Debug tests
-npm run test:debug
-```
-
-### Frontend Testing (Vitest)
-```bash
-cd front
-
-# Run tests
-npm run test
-
-# Run tests with UI
-npm run test -- --ui
-
-# Run tests with coverage
-npm run test -- --coverage
-```
-
-### Storybook Testing
-```bash
-cd front
-
-# Start Storybook for visual testing
-npm run storybook
-
-# Build Storybook
-npm run build-storybook
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## � Key Features Implementation
-
-### Authentication System
-- JWT-based authentication with refresh tokens
-- Password hashing with bcrypt
-- Passport.js strategies (JWT and Local)
-- Protected routes with guards
-- Session management with MongoDB store
-
-### Database Schema
-- **Users**: Profile information, authentication credentials, social links
-- **Posts**: Blog content, metadata, categories, tags, read time
-- **Comments**: Nested comments with replies, likes
-- **Post Likes**: User engagement tracking
-- **Comment Likes**: Comment interaction tracking
-
-### Frontend Architecture
-- Server and Client Components (React Server Components)
-- API route handlers for backend communication
-- Context-based authentication state
-- Custom hooks for theme and data fetching
-- Service layer for API abstraction
-- Component-driven development with Storybook
-
-## �🙏 Acknowledgments
-
-- [Next.js](https://nextjs.org/) - React framework with App Router
-- [NestJS](https://nestjs.com/) - Progressive Node.js framework
-- [MongoDB](https://mongodb.com/) - NoSQL database
-- [Mongoose](https://mongoosejs.com/) - MongoDB ODM
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
-- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
-- [Radix UI](https://www.radix-ui.com/) - Unstyled, accessible components
-- [TypeScript](https://typescriptlang.org/) - Type safety
-- [TanStack Query](https://tanstack.com/query) - Data fetching
-- [Storybook](https://storybook.js.org/) - Component documentation
-- [Vitest](https://vitest.dev/) - Fast unit testing
+- [Frontend README](frontend/README.md) — Turborepo layout, web vs dashboard, proxies, Vitest
+- [Backend README](backend/README.md) — modules, entities, Swagger, Jest unit & e2e tests
 
 ---
 
-<div align="center">
-  <p>Made with ❤️ by <a href="https://github.com/nafasebra">Nafas Ebrahimi</a></p>
-  <p>If this project helps you, please give it a ⭐️</p>
-</div>
+## What you can build with this repo
+
+Bloggy is a learning-friendly monorepo that covers common full-stack patterns:
+
+- **Content** — markdown posts with categories, tags, search, and read-time
+- **Social** — user profiles, follow graph, likes, threaded comments
+- **Realtime** — Socket.IO notifications when someone follows, likes, or comments
+- **Auth** — JWT in an HTTP-only cookie, role-based admin access
+- **Admin** — separate SPA for `admin` users to manage posts, users, and comments
+
+---
+
+## Architecture
+
+Three clients share one API and one database. Frontends send cookies on every request (`withCredentials: true`).
+
+```
+                         ┌─────────────────────────────────────┐
+                         │           MongoDB (bloggy)          │
+                         │  users · posts · comments · follow  │
+                         │  notifications · likes · views      │
+                         └──────────────────▲──────────────────┘
+                                            │ Mongoose
+┌──────────────────┐  REST + cookies  ┌─────┴──────────────┐  WebSocket
+│  web (3000)      │ ───────────────► │  backend (3030)    │ ◄── notifications
+│  Next.js         │  /api/backend/*  │  NestJS            │
+└──────────────────┘                  └─────────▲──────────┘
+┌──────────────────┐  Vite proxy /api           │
+│  dashboard       │ ─────────────────────────┘
+│  (3001)          │
+└──────────────────┘
+```
+
+| Layer | Responsibility |
+|-------|----------------|
+| **web** | SSR/SSG pages, auth route handlers, SEO, public UX |
+| **dashboard** | Admin-only CRUD; guards on `user.role === 'admin'` |
+| **backend** | Controllers → services → Mongoose schemas; Swagger at `/api` |
+| **frontend/packages** | Shared UI (`@repo/ui`), HTTP client, utilities |
+
+**Request path (web):** browser → `/api/backend/...` → Next rewrite → `http://localhost:3030/...`
+
+**Request path (dashboard):** browser → Vite proxy `/api` → backend
+
+Details: [frontend — How data reaches the backend](frontend/README.md#how-data-reaches-the-backend) · [backend — How data is served](backend/README.md#how-data-is-served)
+
+---
+
+## Repository layout
+
+```
+bloggy/
+├── backend/                 # NestJS API (npm)
+│   ├── src/
+│   │   ├── auth/            # JWT, login, guards
+│   │   ├── users/           # Profiles, avatars
+│   │   ├── posts/           # Posts, views, likes
+│   │   ├── comments/        # Comments, replies
+│   │   ├── follow/          # Follow graph
+│   │   └── notifications/   # REST + Socket.IO gateway
+│   └── test/                # E2E specs (*.e2e-spec.ts)
+│
+├── frontend/                # Turborepo (pnpm)
+│   ├── apps/
+│   │   ├── web/             # Public Next.js app
+│   │   ├── dashboard/       # Admin Vite SPA
+│   │   └── storybook/       # Component docs
+│   └── packages/
+│       ├── ui/              # Design system
+│       ├── http-client/     # Axios + 429 handling
+│       └── shared/          # Pure utilities
+│
+├── .husky/                  # Git hooks (pre-commit, commit-msg)
+└── package.json             # Root: Husky, commitlint, lint-staged
+```
+
+---
+
+## Quick start
+
+### Prerequisites
+
+| Tool | Version | Used by |
+|------|---------|---------|
+| Node.js | 20+ recommended | everywhere |
+| npm | latest | `backend/`, root hooks |
+| pnpm | 9+ | `frontend/` |
+| MongoDB | local, Docker, or Atlas | backend |
+| Git for Windows | latest | clone, Husky hooks |
+
+> **On Windows?** Use [Git Bash](https://git-scm.com/download/win), **PowerShell**, or **WSL**. The bash commands below work in Git Bash and WSL. PowerShell/CMD equivalents are in [Windows development](#windows-development).
+
+### 1. Clone and install root hooks
+
+```bash
+git clone https://github.com/nafasebra/bloggy.git
+cd bloggy
+npm install          # enables Husky git hooks (prepare script)
+```
+
+### 2. Start MongoDB
+
+**Option A — Docker (macOS, Linux, Windows with Docker Desktop)**
+
+```bash
+docker run -d -p 27017:27017 --name mongodb mongo:latest
+```
+
+**Option B — Local install**
+
+Install [MongoDB Community Server](https://www.mongodb.com/try/download/community) or use [MongoDB Compass](https://www.mongodb.com/products/tools/compass) (includes a local server option). Default connection:
+
+```
+mongodb://localhost:27017/bloggy
+```
+
+**Option C — MongoDB Atlas**
+
+Create a free cluster and set `DATABASE_URI` in `backend/.env` to your Atlas connection string.
+
+The backend connects to `localhost:27017` by default when `DATABASE_URI` is unset.
+### 3. Backend
+
+```bash
+cd backend
+npm install
+cp .env.example .env   # then edit JWT_SECRET and DATABASE_URI
+npm run start:dev
+```
+
+Backend runs at **http://localhost:3030**. Swagger UI: **http://localhost:3030/api**
+
+> The app reads **`DATABASE_URI`**, not `MONGODB_URI`. Set `DATABASE_URI=mongodb://localhost:27017/bloggy` in `backend/.env`.
+
+**Backend `.env` (minimum):**
+
+```env
+DATABASE_URI=mongodb://localhost:27017/bloggy
+PORT=3030
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=7d
+```
+
+### 4. Frontend
+
+In a **second terminal**:
+
+```bash
+cd frontend
+pnpm install
+```
+
+Copy env files (see [frontend/.env.example](frontend/.env.example)):
+
+```bash
+cp .env.example apps/web/.env.local
+cp .env.example apps/dashboard/.env
+# Edit JWT_SECRET so it matches backend/.env
+```
+
+Start both apps:
+
+```bash
+pnpm dev                    # web + dashboard
+# or
+pnpm dev --filter=web       # http://localhost:3000 only
+pnpm dev --filter=dashboard # http://localhost:3001 only
+```
+
+### 5. Verify everything works
+
+1. Open http://localhost:3000 — home page loads
+2. Register a user via the web app or `POST /auth/register` in Swagger
+3. Open http://localhost:3030/api — explore endpoints
+4. To use the dashboard, set a user's `role` to `admin` in MongoDB, then open http://localhost:3001
+
+---
+
+## Windows development
+
+Tested on **Windows 10/11**. You can use **Git Bash** (recommended — matches the bash snippets below), **PowerShell 7+**, or **WSL 2**.
+
+### Install tools
+
+1. **[Node.js LTS](https://nodejs.org/)** — check `node -v` (20+).
+2. **pnpm** (after Node is installed):
+
+   ```powershell
+   corepack enable
+   corepack prepare pnpm@latest --activate
+   pnpm -v
+   ```
+
+   Or: `npm install -g pnpm`
+
+3. **[Git for Windows](https://git-scm.com/download/win)** — required for Husky hooks and Git Bash.
+4. **MongoDB** — pick one:
+   - **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** — then run the `docker run` command from [Quick start](#2-start-mongodb).
+   - **[MongoDB Community Server](https://www.mongodb.com/try/download/community)** — MSI installer; optionally install as a **Windows service** (starts on boot). Verify in PowerShell:
+
+     ```powershell
+     mongosh
+     # or legacy: mongo
+     ```
+
+   - **[MongoDB Compass](https://www.mongodb.com/products/tools/compass)** — GUI to browse data and run queries; useful for setting `role: admin` on a user.
+   - **MongoDB Atlas** — no local install; paste the Atlas URI into `backend/.env`.
+
+### Shell and terminals
+
+| Task | Git Bash / WSL | PowerShell |
+|------|----------------|------------|
+| Clone & npm | same as Quick start | same |
+| Copy env files | `cp` (below) | `Copy-Item` (below) |
+| Run backend + frontend | two tabs in [Windows Terminal](https://aka.ms/terminal) | same |
+
+Open **two terminals** at the repo root — one for `backend/` (`npm run start:dev`), one for `frontend/` (`pnpm dev`).
+
+### Copy environment files (PowerShell)
+
+From `backend/`:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+From `frontend/`:
+
+```powershell
+Copy-Item .env.example apps\web\.env.local
+Copy-Item .env.example apps\dashboard\.env
+```
+
+**CMD equivalent:**
+
+```cmd
+cd backend
+copy .env.example .env
+cd ..\frontend
+copy .env.example apps\web\.env.local
+copy .env.example apps\dashboard\.env
+```
+
+Edit `.env` files in VS Code or Cursor. Keep `JWT_SECRET` **identical** in `backend\.env` and `frontend\apps\web\.env.local`.
+
+### MongoDB on Windows (without Docker)
+
+After installing MongoDB Community Server:
+
+- The **MongoDB** Windows service usually listens on `127.0.0.1:27017`.
+- Default data directory is under `C:\Program Files\MongoDB\Server\<version>\data` (or a path chosen in the installer).
+- Manage the service: **Services** app (`services.msc`) → **MongoDB Server** → Start / Restart.
+
+Manual start (custom data path):
+
+```powershell
+mkdir C:\data\db -Force
+mongod --dbpath C:\data\db
+```
+
+Set in `backend\.env`:
+
+```env
+DATABASE_URI=mongodb://127.0.0.1:27017/bloggy
+```
+
+**E2E tests** prefer `mongodb://127.0.0.1:27017/bloggy-e2e`. If MongoDB is not running, tests fall back to **mongodb-memory-server** (first run may download binaries — allow firewall/antivirus access).
+
+### Git hooks (Husky)
+
+From the repo root:
+
+```powershell
+npm install
+```
+
+Husky v9 sets `core.hooksPath` automatically. Hooks run via Git Bash on Windows. If hooks fail:
+
+- Ensure Git for Windows is installed and `git` is on your `PATH`.
+- Run hooks from **Git Bash** or a terminal where `sh` is available.
+- Re-run `npm install` at the repo root after cloning.
+
+Pre-commit uses `lint-staged`, which is already configured for Windows paths (see `lint-staged.config.mjs`).
+
+### Run tests on Windows
+
+```powershell
+cd backend
+npm run test
+npm run test:e2e
+
+cd ..\frontend
+pnpm test
+```
+
+If e2e downloads hang behind a corporate proxy, `backend/test/global-setup.ts` temporarily clears proxy env vars while starting mongodb-memory-server.
+
+### Common Windows issues
+
+| Issue | Fix |
+|-------|-----|
+| `pnpm` not found | Run `corepack enable` or install pnpm globally |
+| Port already in use (3000, 3030, …) | `netstat -ano` + `findstr :3030`, then `taskkill /PID <pid> /F` |
+| Husky hook permission errors | Use Git Bash; run `npm install` at repo root |
+| `EPERM` / file locks on `node_modules` | Close dev servers and editors locking files; retry install |
+| Long path errors | Enable long paths: **Settings → System → For developers → Developer Mode**, or group policy `LongPathsEnabled` |
+| Avatar uploads | Backend writes to `backend\uploads\avatars\` — path is created on startup |
+| Cookie not sent in browser | Use `localhost` (not `127.0.0.1`) for web and API during local dev |
+
+### Recommended VS Code / Cursor extensions
+
+- ESLint
+- Prettier
+- MongoDB for VS Code (optional — inspect collections)
+
+---
+
+## Environment variables (cheat sheet)
+
+Keep **`JWT_SECRET` identical** in `backend/.env` and `frontend/apps/web/.env.local`.
+
+| Variable | Where | Purpose |
+|----------|-------|---------|
+| `DATABASE_URI` | backend | MongoDB connection |
+| `PORT` | backend | API port (default `3030`) |
+| `JWT_SECRET` | backend, web | Sign / verify session tokens |
+| `JWT_EXPIRES_IN` | backend | Token lifetime (default `7d`) |
+| `API_URL` | web | Backend URL for rewrites & server calls |
+| `NEXT_PUBLIC_APP_URL` | web | Canonical public site URL |
+| `NEXT_PUBLIC_DASHBOARD_URL` | web | Link to admin app |
+| `VITE_API_URL` | dashboard | Backend URL (production) |
+| `VITE_WEB_URL` | dashboard | Public site (login redirects) |
+
+Full tables: [backend README](backend/README.md#environment-variables) · [frontend README](frontend/README.md#getting-started)
+
+---
+
+## Common commands
+
+### Backend (`backend/`)
+
+```bash
+npm run start:dev    # watch mode
+npm run build        # compile
+npm run lint         # ESLint
+npm run test         # unit tests (Jest)
+npm run test:e2e     # end-to-end tests
+```
+
+### Frontend (`frontend/`)
+
+```bash
+pnpm dev             # all dev apps (Turbo)
+pnpm build           # production build
+pnpm lint            # ESLint workspace-wide
+pnpm check-types     # TypeScript
+pnpm test            # Vitest (web + dashboard)
+```
+
+### Storybook
+
+```bash
+cd frontend/apps/storybook
+pnpm storybook       # http://localhost:6006
+```
+
+---
+
+## Testing
+
+| Layer | Runner | Location | Docs |
+|-------|--------|----------|------|
+| Backend unit | Jest | `backend/src/**/*.spec.ts` | [backend README](backend/README.md#unit-tests) |
+| Backend e2e | Jest + supertest | `backend/test/*.e2e-spec.ts` | [backend README](backend/README.md#end-to-end-e2e-tests) |
+| Frontend unit | Vitest | `frontend/apps/*/src/**/*.test.ts` | [frontend README](frontend/README.md#testing-vitest) |
+
+**Backend e2e** uses a real MongoDB instance when available (`E2E_DATABASE_URI`), otherwise falls back to `mongodb-memory-server`.
+
+**Run everything before a PR:**
+
+```bash
+cd backend && npm run test && npm run test:e2e
+cd ../frontend && pnpm test
+```
+
+---
+
+## API overview
+
+Interactive docs: **http://localhost:3030/api** (Swagger)
+
+| Prefix | Examples |
+|--------|----------|
+| `/auth` | register, login, logout, change-password |
+| `/users` | profiles, avatar upload, follow/unfollow |
+| `/posts` | CRUD, search, views, likes |
+| `/comments` | list, create, reply, like, delete |
+| `/notifications` | inbox, mark read, unread count |
+
+Route details and entity schemas: [backend README](backend/README.md)
+
+---
+
+## Rate limiting
+
+The API allows **10 requests per 60 seconds** per client (`@nestjs/throttler` in `backend/src/app.module.ts`). Over-limit responses return **HTTP 429**.
+
+Frontends detect 429 via `@repo/http-client` and redirect to `/rate-limited`.
+
+---
+
+## Git hooks
+
+Husky runs at the repo root on every clone after `npm install`:
+
+| Hook | Action |
+|------|--------|
+| **pre-commit** | `lint-staged` — Prettier + ESLint on staged files |
+| **commit-msg** | Conventional Commits via `commitlint` |
+
+Run manually:
+
+```bash
+npm run lint-staged
+```
+
+Hooks live in `.husky/`. Config: `commitlint.config.cjs`, root `package.json`.
+
+---
+
+## Tech stack (summary)
+
+| Area | Technologies |
+|------|--------------|
+| **Frontend** | Next.js 16, Vite 7, React 19, Tailwind CSS 4, TanStack Query, React Hook Form, Zod, Socket.IO client, Turborepo, pnpm |
+| **Backend** | NestJS 11, Mongoose 8, Passport JWT, bcrypt, class-validator, Swagger, Socket.IO, Helmet, Multer |
+| **Database** | MongoDB |
+| **Testing** | Jest (backend), Vitest (frontend), supertest (e2e) |
+| **Tooling** | TypeScript 5, ESLint 9, Prettier, Husky, Storybook 10 |
+
+---
+
+## Contributing
+
+1. Fork and create a branch (`feature/my-change`)
+2. Install dependencies and run tests (see above)
+3. Use [Conventional Commits](https://www.conventionalcommits.org/) — enforced by commitlint
+4. Open a pull request with a short summary and test plan
+
+---
+
+## Where to read next
+
+| Topic | Document |
+|-------|----------|
+| Web vs dashboard, proxies, shared packages | [frontend/README.md](frontend/README.md) |
+| NestJS modules, MongoDB collections, e2e setup | [backend/README.md](backend/README.md) |
+| Windows setup (MongoDB, pnpm, hooks, troubleshooting) | [Windows development](#windows-development) |
+| Swagger API reference | http://localhost:3030/api (with backend running) |
+
+---
+
+Made by [Nafas Ebrahimi](https://github.com/nafasebra)
