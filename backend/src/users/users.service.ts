@@ -19,12 +19,15 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).lean().exec();
+    const user = await this.userModel
+      .findById(id)
+      .select({ password: 0, __v: 0 })
+      .lean()
+      .exec();
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const { password, ...rest } = user as any;
-    return rest;
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {

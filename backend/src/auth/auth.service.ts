@@ -33,8 +33,13 @@ export class AuthService {
     const newUser = new this.userModel(user);
     try {
       return await newUser.save();
-    } catch (err: any) {
-      if (err.code === 11000) {
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'code' in err &&
+        (err as { code: number }).code === 11000
+      ) {
         throw new ConflictException('Username or email is already taken');
       }
       throw err;

@@ -35,6 +35,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LikePostResponseDto } from './dto/like-post.dto';
+import { getClientIp } from '../common/http/get-client-ip';
+import { toObjectIdString } from '../common/mongo/to-object-id-string';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -139,7 +141,7 @@ export class PostsController {
     @Req() req: AuthenticatedRequest
   ): Promise<PostEntity> {
     const post = await this.postsService.findById(id);
-    if (String(post.authorId) !== String(req.user!.userId)) {
+    if (toObjectIdString(post.authorId) !== req.user!.userId) {
       throw new ForbiddenException('You can only update your own posts');
     }
     return this.postsService.update(id, updatePostDto);
@@ -162,7 +164,7 @@ export class PostsController {
     @Req() req: AuthenticatedRequest
   ): Promise<void> {
     const post = await this.postsService.findById(id);
-    if (String(post.authorId) !== String(req.user!.userId)) {
+    if (toObjectIdString(post.authorId) !== req.user!.userId) {
       throw new ForbiddenException('You can only delete your own posts');
     }
     return this.postsService.delete(id);
@@ -186,16 +188,7 @@ export class PostsController {
     @Ip() ip: string,
     @Req() req: Request
   ): Promise<{ post: PostEntity; isNewView: boolean; message: string }> {
-    // Get real IP address (handle proxy/load balancer scenarios)
-    const clientIP =
-      (req.headers['x-forwarded-for'] as string) ||
-      (req.headers['x-real-ip'] as string) ||
-      req.connection.remoteAddress ||
-      ip;
-
-    const realIP = Array.isArray(clientIP)
-      ? clientIP[0]
-      : clientIP.split(',')[0];
+    const realIP = getClientIp(req, ip);
     const result = await this.postsService.viewPost(id, realIP);
 
     return {
@@ -228,15 +221,7 @@ export class PostsController {
     @Ip() ip: string,
     @Req() req: AuthenticatedRequest
   ): Promise<{ post: PostEntity; isLiked: boolean; message: string }> {
-    const clientIP =
-      (req.headers['x-forwarded-for'] as string) ||
-      (req.headers['x-real-ip'] as string) ||
-      req.connection.remoteAddress ||
-      ip;
-
-    const realIP = Array.isArray(clientIP)
-      ? clientIP[0]
-      : clientIP.split(',')[0];
+    const realIP = getClientIp(req, ip);
 
     // Extract userId if user is authenticated (optional)
     const userId = req.user?.userId;
@@ -266,15 +251,7 @@ export class PostsController {
     @Ip() ip: string,
     @Req() req: AuthenticatedRequest
   ): Promise<{ isLiked: boolean }> {
-    const clientIP =
-      (req.headers['x-forwarded-for'] as string) ||
-      (req.headers['x-real-ip'] as string) ||
-      req.connection.remoteAddress ||
-      ip;
-
-    const realIP = Array.isArray(clientIP)
-      ? clientIP[0]
-      : clientIP.split(',')[0];
+    const realIP = getClientIp(req, ip);
 
     // Extract userId if user is authenticated (optional)
     const userId = req.user?.userId;

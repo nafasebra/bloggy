@@ -1,6 +1,4 @@
 import { IsArray, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
-import { Post } from '../schemas/post.schema';
-import { OmitType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdatePostDto {

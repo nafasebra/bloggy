@@ -30,6 +30,8 @@ import {
 } from '@nestjs/swagger';
 import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getClientIp } from '../common/http/get-client-ip';
+import { toObjectIdString } from '../common/mongo/to-object-id-string';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -119,13 +121,7 @@ export class CommentsController {
     @Ip() ip: string,
     @Req() req: Request
   ): Promise<Comment> {
-    const clientIP =
-      (req.headers['x-forwarded-for'] as string) ||
-      (req.headers['x-real-ip'] as string) ||
-      req.connection.remoteAddress ||
-      ip;
-
-    return this.commentsService.like(commentId, clientIP);
+    return this.commentsService.like(commentId, getClientIp(req, ip));
   }
 
   // get state of like
@@ -142,15 +138,9 @@ export class CommentsController {
     @Ip() ip: string,
     @Req() req: Request
   ): Promise<{ isLiked: boolean }> {
-    const clientIP =
-      (req.headers['x-forwarded-for'] as string) ||
-      (req.headers['x-real-ip'] as string) ||
-      req.connection.remoteAddress ||
-      ip;
-
     const isLiked = await this.commentsService.checkIfLiked(
       commentId,
-      clientIP
+      getClientIp(req, ip)
     );
 
     return { isLiked };
@@ -170,7 +160,7 @@ export class CommentsController {
     @Req() req: AuthenticatedRequest
   ): Promise<{ message: string }> {
     const comment = await this.commentsService.findById(commentId);
-    if (String(comment.authorId) !== String(req.user.userId)) {
+    if (toObjectIdString(comment.authorId) !== req.user.userId) {
       throw new ForbiddenException('You can only delete your own comments');
     }
     await this.commentsService.delete(commentId);

@@ -1,14 +1,12 @@
 // jwt.strategy.ts
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
 
 function cookieExtractor(req: Request): string | null {
-  if (req && req.cookies && req.cookies.session_token) {
-    return req.cookies.session_token;
-  }
-  return null;
+  const token = req.cookies?.session_token;
+  return typeof token === 'string' ? token : null;
 }
 
 @Injectable()
@@ -20,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: {
+  validate(payload: {
     sub: string;
     email: string;
     username: string;
