@@ -1,150 +1,214 @@
 # Bloggy frontend
 
-Turborepo monorepo for the Bloggy web app, admin dashboard, and shared UI packages.
+Turborepo monorepo for the Bloggy platform: the public blog (**web**), the admin panel (**dashboard**), shared UI packages, and Storybook for component docs.
 
-## Rate limiting (frontend)
+## Overview
 
-When the API returns **429**, axios interceptors in `@repo/http-client` redirect the user to `/rate-limited`:
+| App / package                                         | Role                                       | Default dev URL       |
+| ----------------------------------------------------- | ------------------------------------------ | --------------------- |
+| **web**                                               | Public-facing blog for readers and authors | http://localhost:3000 |
+| **dashboard**                                         | Admin-only CMS (posts, users, comments)    | http://localhost:3001 |
+| **storybook**                                         | Isolated docs for `@repo/ui` components    | http://localhost:6006 |
+| **@repo/ui**                                          | Shared React components (Radix + Tailwind) | —                     |
+| **@repo/http-client**                                 | Shared Axios helpers (rate-limit handling) | —                     |
+| **@repo/shared**                                      | Cross-app utilities (`getReadTime`, etc.)  | —                     |
+| **@repo/eslint-config** / **@repo/typescript-config** | Shared lint & TS configs                   | —                     |
 
-- **Web** (`apps/web`): `/rate-limited` → “Back to Bloggy” (`/`)
-- **Dashboard** (`apps/dashboard`): `/rate-limited` → “Back to website” (`VITE_WEB_URL`)
-
-See the root [`task`](../task) document for full backend + frontend behavior and acceptance criteria.
+Both apps talk to the same [NestJS backend](../backend) (default `http://localhost:3030`). They are separate frontends on purpose: different users, different UX, and different deployment targets.
 
 ---
 
-# Turborepo starter
+## Web vs dashboard
 
-This Turborepo starter is maintained by the Turborepo core team.
+### Web (`apps/web`)
 
-## Using this example
+The **public blog**. Built with **Next.js 16** (App Router).
 
-Run the following command:
+**Audience:** readers and logged-in authors.
 
-```sh
-npx create-turbo@latest
-```
+**Features:**
 
-## What's inside?
+- Home, blog listing, and post detail pages
+- Create and edit posts (markdown editor)
+- Auth: signup, login, password reset, profile setup
+- User profiles, followers / following
+- Post likes, comments, read-time estimates
+- Real-time notifications (Socket.IO)
+- Theme toggle (light / dark)
+- SEO-friendly routes and metadata
 
-This Turborepo includes the following packages/apps:
+**Why Next.js here:** server rendering and route handlers for auth cookies, rewrites to the API, and a content-focused public site.
 
-### Apps and Packages
+### Dashboard (`apps/dashboard`)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+The **admin CMS**. Built with **Vite 7 + React Router 7** (SPA).
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+**Audience:** users with `role: admin` only. Non-admins are redirected to web login.
 
-### Utilities
+**Features:**
 
-This Turborepo has some additional tools already setup for you:
+- Overview stats (posts, users, comments)
+- CRUD for posts, users, and comments
+- Markdown editor for post content
+- React Query–backed lists and forms
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+**Why a separate SPA:** admin workflows do not need SSR; a fast client app with simple routing and a dev proxy is enough. Keeping admin out of the public Next app reduces bundle size, attack surface, and coupling.
 
-### Build
+---
 
-To build all apps and packages, run the following command:
+## How data reaches the backend
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Both apps use **Axios** with **`withCredentials: true`** so session cookies from the Nest API are sent on each request.
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+┌─────────────┐     rewrite / proxy      ┌──────────────────┐
+│  web (3000) │ ──► /api/backend/* ─────►│ NestJS (3030)    │
+│  Next.js    │     (next.config.js)     │ REST + WebSocket │
+└─────────────┘                          └──────────────────┘
+┌─────────────┐     Vite proxy
+│ dashboard   │ ──► /api/* ─────────────►│ same backend     │
+│ (3001)      │     (vite.config.ts)     │                  │
+└─────────────┘                          └──────────────────┘
 ```
 
-### Develop
+### Web
 
-To develop all apps and packages, run the following command:
+- **Browser:** requests go to `/api/backend/...`; Next rewrites to `API_URL` (see `apps/web/next.config.js`).
+- **Server components / route handlers:** call `API_URL` directly via `fetch` or Axios (`apps/web/src/lib/http.ts`).
+- **Auth:** Next route handlers (e.g. `/api/login`) proxy login to the backend and set HTTP-only session cookies.
 
-```
-cd my-turborepo
+### Dashboard
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- **Dev:** Vite proxies `/api` → `VITE_API_URL` (strip `/api` prefix).
+- **Prod:** Axios uses `VITE_API_URL` as `baseURL`.
+- **Auth:** reads the same session cookie; `ProtectedRoute` requires `user.role === 'admin'`.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+### Shared API layer
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+- Service modules per domain (`post.service.ts`, `user.services.ts`, etc.) wrap REST endpoints.
+- **TanStack React Query** handles caching, loading state, and mutations (`hooks/query`, `hooks/mutation` in dashboard; similar patterns in web).
+- **`@repo/http-client`** attaches a **429** interceptor and redirects to `/rate-limited` (see below).
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## Tech stack
 
-### Remote Caching
+| Layer          | Web                                 | Dashboard                        | Shared                                   |
+| -------------- | ----------------------------------- | -------------------------------- | ---------------------------------------- |
+| Framework      | Next.js 16, React 19                | Vite 7, React Router 7, React 19 | —                                        |
+| Styling        | Tailwind CSS 4, `@repo/ui`          | Tailwind CSS 4, `@repo/ui`       | `globals.css`, Radix UI                  |
+| Data           | TanStack Query, Axios               | TanStack Query, Axios            | `@repo/http-client`                      |
+| Forms          | React Hook Form, Zod                | React Hook Form, Zod             | —                                        |
+| Realtime       | Socket.IO client                    | —                                | —                                        |
+| Auth           | JWT session cookies via Next routes | Cookie + admin guard             | —                                        |
+| Markdown       | react-markdown, SimpleMDE           | Same                             | `@repo/ui/markdown-*`                    |
+| Monorepo       | pnpm workspaces + Turborepo         | same                             | same                                     |
+| Lint / types   | ESLint 9, TypeScript 5.9            | same                             | shared configs                           |
+| Component docs | —                                   | —                                | Storybook 10 + `@storybook/addon-themes` |
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Testing (Vitest)
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Unit tests run with **[Vitest](https://vitest.dev/)** (v4). From the frontend root:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+pnpm test              # all apps via Turbo
+pnpm test --filter=web
+pnpm test --filter=dashboard
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Per app:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+```bash
+cd apps/web && pnpm test          # single run
+cd apps/web && pnpm test:watch    # watch mode
 ```
 
-## Useful Links
+**What we test today:** shared helpers used in both apps — e.g. `getReadTime` from `@repo/shared` and `cn` from `@repo/ui/utils` (`apps/web/src/lib/utils.test.ts`, `apps/dashboard/src/lib/utils.test.ts`).
 
-Learn more about the power of Turborepo:
+**Config:**
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- **Web:** `apps/web/vitest.config.ts` — Node environment, path alias `@/`, globals enabled.
+- **Dashboard:** Vitest block inside `apps/dashboard/vite.config.ts` — same include pattern `src/**/*.{test,spec}.{ts,tsx}`.
+
+Turbo defines a `test` task so CI can run frontend tests in parallel with backend Jest.
+
+---
+
+## Rate limiting (frontend)
+
+When the API returns **429**, Axios interceptors in `@repo/http-client` redirect the user to `/rate-limited`:
+
+- **Web:** `/rate-limited` → “Back to Bloggy” (`/`)
+- **Dashboard:** `/rate-limited` → “Back to website” (`VITE_WEB_URL`)
+
+See the root [`task`](../task) document for full backend + frontend behavior.
+
+---
+
+## Getting started
+
+**Prerequisites:** Node ≥ 18, pnpm 9, backend running on port 3030.
+
+```bash
+cd frontend
+pnpm install
+pnpm dev                    # web + dashboard (and other dev tasks)
+pnpm dev --filter=web       # public site only
+pnpm dev --filter=dashboard # admin only
+```
+
+**Storybook** (UI components):
+
+```bash
+cd apps/storybook
+pnpm storybook
+```
+
+**Environment variables** (see `turbo.json` `globalEnv`):
+
+| Variable                    | Used by                 | Purpose                          |
+| --------------------------- | ----------------------- | -------------------------------- |
+| `API_URL`                   | web (server / rewrites) | Backend base URL                 |
+| `NEXT_PUBLIC_APP_URL`       | web                     | Canonical site URL               |
+| `NEXT_PUBLIC_DASHBOARD_URL` | web                     | Link to admin                    |
+| `VITE_API_URL`              | dashboard               | Backend base URL (prod)          |
+| `VITE_WEB_URL`              | dashboard               | Public site URL (login redirect) |
+| `JWT_SECRET`                | web (session)           | Must match backend               |
+
+---
+
+## Common commands
+
+```bash
+pnpm build              # production build (Turbo)
+pnpm lint               # ESLint across workspace
+pnpm check-types        # TypeScript
+pnpm format             # Prettier
+```
+
+Build or dev a single app:
+
+```bash
+pnpm build --filter=web
+pnpm dev --filter=dashboard
+```
+
+---
+
+## Repository layout
+
+```
+frontend/
+├── apps/
+│   ├── web/           # Next.js public blog
+│   ├── dashboard/     # Vite admin SPA
+│   └── storybook/     # UI component catalog
+└── packages/
+    ├── ui/            # Design system + *.stories.tsx
+    ├── http-client/   # Axios rate-limit helper
+    ├── shared/        # Shared pure utilities
+    ├── eslint-config/
+    └── typescript-config/
+```
