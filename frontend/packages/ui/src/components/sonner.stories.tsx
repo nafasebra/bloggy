@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/react';
 import { Toaster } from '@repo/ui/sonner';
 import { Button } from '@repo/ui/button';
 import { toast } from 'sonner';

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/react';
 import { RadioGroup, RadioGroupItem } from '@repo/ui/radio-group';
 import { Label } from '@repo/ui/label';
 

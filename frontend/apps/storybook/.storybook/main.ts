@@ -1,21 +1,36 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 
-import { dirname } from "path"
+const configDir = dirname(fileURLToPath(import.meta.url));
+const frontendDir = join(configDir, '../../..');
 
-import { fileURLToPath } from "url"
-
-/**
-* This function is used to resolve the absolute path of a package.
-* It is needed in projects that use Yarn PnP or are set up within a monorepo.
-*/
-function getAbsolutePath(value: string): string {
-  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)))
-}
 const config: StorybookConfig = {
-  "stories": [
-    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+  stories: [
+    '../../../packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../apps/web/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../apps/dashboard/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
-  "addons": [],
-  "framework": getAbsolutePath('@storybook/react-vite')
+  addons: ['@storybook/addon-themes'],
+  framework: {
+    name: '@storybook/react-vite',
+    options: {},
+  },
+  async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
+    return mergeConfig(config, {
+      plugins: [tailwindcss()],
+      resolve: {
+        dedupe: ['react', 'react-dom'],
+      },
+      server: {
+        fs: {
+          allow: [frontendDir],
+        },
+      },
+    });
+  },
 };
+
 export default config;

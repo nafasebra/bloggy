@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/react';
 import { Label } from '@repo/ui/label';
 import { Input } from '@repo/ui/input';
 import { Checkbox } from '@repo/ui/checkbox';
