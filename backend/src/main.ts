@@ -7,6 +7,7 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { join } from 'path';
+import { getCorsOrigins } from './common/config/cors.config';
 import { configureSecurityHeaders } from './common/security/helmet.config';
 import { ensureAvatarUploadDir } from './users/avatar-upload.config';
 
@@ -26,7 +27,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: getCorsOrigins(),
     credentials: true,
   });
   app.useGlobalPipes(

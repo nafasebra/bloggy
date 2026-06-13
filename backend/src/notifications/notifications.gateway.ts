@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
+import { getCorsOrigins } from '../common/config/cors.config';
 import { SESSION_COOKIE_NAME } from '../auth/cookie.config';
 
 interface AuthenticatedSocket extends Socket {
@@ -41,7 +42,7 @@ function extractTokenFromHandshake(client: Socket): string | null {
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: getCorsOrigins(),
     credentials: true,
   },
   namespace: '/notifications',

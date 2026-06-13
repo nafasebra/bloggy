@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+out
+.git
+.gitignore
+**/*.md
+.env
+.env.*
+!.env.example
+**/*.log
+apps/storybook

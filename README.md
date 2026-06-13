@@ -88,9 +88,13 @@ bloggy/
 │       ├── http-client/     # Axios + 429 handling
 │       └── shared/          # Pure utilities
 │
+├── docker-compose.yml       # Optional: full stack in containers
+├── .env.docker.example      # Optional: Compose environment template
 ├── .husky/                  # Git hooks (pre-commit, commit-msg)
 └── package.json             # Root: Husky, commitlint, lint-staged
 ```
+
+Production **`Dockerfile`**s are also included (`backend/Dockerfile`, `frontend/Dockerfile`) — see [Docker (optional)](#docker-optional) if you prefer containers over a local install.
 
 ---
 
@@ -104,6 +108,7 @@ bloggy/
 | npm | latest | `backend/`, root hooks |
 | pnpm | 9+ | `frontend/` |
 | MongoDB | local, Docker, or Atlas | backend |
+| Docker Desktop / Engine | latest | optional — [full stack in containers](#docker-optional) |
 | Git for Windows | latest | clone, Husky hooks |
 
 > **On Windows?** Use [Git Bash](https://git-scm.com/download/win), **PowerShell**, or **WSL**. The bash commands below work in Git Bash and WSL. PowerShell/CMD equivalents are in [Windows development](#windows-development).
@@ -191,6 +196,108 @@ pnpm dev --filter=dashboard # http://localhost:3001 only
 2. Register a user via the web app or `POST /auth/register` in Swagger
 3. Open http://localhost:3030/api — explore endpoints
 4. To use the dashboard, set a user's `role` to `admin` in MongoDB, then open http://localhost:3001
+
+---
+
+## Docker (optional)
+
+Prefer not to install Node.js, pnpm, or MongoDB locally? You can run the entire stack with **Docker Compose** instead of the [Quick start](#quick-start) steps above.
+
+### Install Docker
+
+| Platform | Install |
+|----------|---------|
+| **Windows / macOS** | [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
+| **Linux** | [Docker Engine](https://docs.docker.com/engine/install/) + [Compose plugin](https://docs.docker.com/compose/install/linux/) |
+
+Verify:
+
+```bash
+docker --version
+docker compose version
+```
+
+On Windows, start **Docker Desktop** and wait until the engine is running before building.
+
+### Run the full stack
+
+From the repo root:
+
+```bash
+cp .env.docker.example .env
+# Edit JWT_SECRET in .env (required — do not use the default in production)
+
+docker compose up --build
+```
+
+First build can take several minutes (frontend monorepo + Next.js standalone). Later runs use cached layers.
+
+| Service | URL |
+|---------|-----|
+| Web (public blog) | http://localhost:3000 |
+| Dashboard (admin) | http://localhost:3001 |
+| Backend API + Swagger | http://localhost:3030/api |
+
+Stop containers: `docker compose down`. Add `-v` to remove MongoDB and upload volumes.
+
+### Compose environment
+
+Root **`.env`** (from [`.env.docker.example`](.env.docker.example)) drives build args and runtime config:
+
+```env
+JWT_SECRET=change-me-in-production
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3030
+VITE_WEB_URL=http://localhost:3000
+```
+
+| Variable | Notes |
+|----------|-------|
+| `JWT_SECRET` | Must match between backend and web build |
+| `CORS_ORIGINS` | Comma-separated browser origins allowed by the API |
+| `VITE_API_URL` | URL the **browser** uses to reach the API (not the internal `http://backend:3030` hostname) |
+| `NEXT_PUBLIC_*`, `VITE_WEB_URL` | Public URLs for links and redirects |
+
+The web container talks to the API over the Docker network (`API_URL=http://backend:3030` is set in `docker-compose.yml`). Dashboard and CORS settings must use host URLs your browser can open.
+
+### Data persistence
+
+Compose creates named volumes:
+
+- **`mongodb-data`** — database files
+- **`backend-uploads`** — avatar uploads under `uploads/avatars/`
+
+### Build individual images
+
+```bash
+# Backend only
+docker build -t bloggy-backend ./backend
+
+# Next.js web
+docker build -t bloggy-web --target web \
+  --build-arg APP=web \
+  --build-arg JWT_SECRET=your-secret \
+  ./frontend
+
+# Admin dashboard (static nginx)
+docker build -t bloggy-dashboard --target dashboard \
+  --build-arg APP=dashboard \
+  --build-arg VITE_API_URL=http://localhost:3030 \
+  ./frontend
+```
+
+### Useful commands
+
+```bash
+docker compose up -d --build   # detached
+docker compose logs -f backend
+docker compose ps
+docker compose down
+```
+
+After the stack is up, register a user at http://localhost:3000, then set `role: admin` on that user in MongoDB to use the dashboard (same as [step 5](#5-verify-everything-works) above).
 
 ---
 
@@ -348,6 +455,7 @@ Keep **`JWT_SECRET` identical** in `backend/.env` and `frontend/apps/web/.env.lo
 | `NEXT_PUBLIC_DASHBOARD_URL` | web | Link to admin app |
 | `VITE_API_URL` | dashboard | Backend URL (production) |
 | `VITE_WEB_URL` | dashboard | Public site (login redirects) |
+| `CORS_ORIGINS` | backend, root `.env` (optional Docker) | Allowed browser origins (comma-separated) |
 
 Full tables: [backend README](backend/README.md#environment-variables) · [frontend README](frontend/README.md#getting-started)
 
@@ -380,6 +488,14 @@ pnpm test            # Vitest (web + dashboard)
 ```bash
 cd frontend/apps/storybook
 pnpm storybook       # http://localhost:6006
+```
+
+### Docker (optional)
+
+```bash
+docker compose up --build    # full stack — see Docker (optional) section
+docker compose down          # stop containers
+docker compose logs -f web   # follow web logs
 ```
 
 ---
@@ -474,6 +590,7 @@ Hooks live in `.husky/`. Config: `commitlint.config.cjs`, root `package.json`.
 | Web vs dashboard, proxies, shared packages | [frontend/README.md](frontend/README.md) |
 | NestJS modules, MongoDB collections, e2e setup | [backend/README.md](backend/README.md) |
 | Windows setup (MongoDB, pnpm, hooks, troubleshooting) | [Windows development](#windows-development) |
+| Optional Docker full-stack setup | [Docker (optional)](#docker-optional) |
 | Swagger API reference | http://localhost:3030/api (with backend running) |
 
 ---
