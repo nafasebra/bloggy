@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { ThemeProvider } from '@wrksz/themes/next';
 import './globals.css';
 import Wrapper from '@/components/wrapper';
 
@@ -51,11 +52,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900`}
       >
-        <Wrapper>{children}</Wrapper>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          storage="cookie"
+          disableTransitionOnChange
+        >
+          <Wrapper>{children}</Wrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

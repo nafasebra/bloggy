@@ -7,7 +7,7 @@ import React from 'react';
 import Footer from './layout/footer';
 import Navigation from './layout/navigation';
 import { usePathname } from 'next/navigation';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@wrksz/themes/client';
 import { Toaster } from '@repo/ui/sonner';
 
 const queryClient = new QueryClient();
