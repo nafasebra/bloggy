@@ -8,7 +8,7 @@ import {
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
 export interface ToasterPropsWithTheme extends Omit<ToasterProps, 'theme'> {
-  /** Optional theme. When not provided, uses system. Web app can pass next-themes theme. */
+  /** Optional theme. When not provided, uses system. Web app can pass @wrksz/themes theme. */
   theme?: ToasterProps['theme'];
 }
 
