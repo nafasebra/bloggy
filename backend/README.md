@@ -236,6 +236,25 @@ npm run start:prod
 
 ---
 
+## Run the backend with Docker Compose
+
+From the `backend` directory, copy `.env.example` to `.env` if needed and set `JWT_SECRET`, then run:
+
+```powershell
+docker compose up -d --build
+docker compose logs -f backend
+```
+
+This starts PostgreSQL and builds the NestJS application using `Dockerfile`. The API is available at **http://localhost:3030**, with Swagger at **http://localhost:3030/api**. The application waits for PostgreSQL to be healthy and applies pending migrations on startup. Database files and uploaded avatars persist in named volumes.
+
+The Compose file sets the application database hostname to `postgres`. `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, and `POSTGRES_PORT` configure the database; `PORT` sets the API's host port. Set frontend API URLs to `http://localhost:3030` when running the frontends locally.
+
+```powershell
+docker compose down
+```
+
+Stopping the stack keeps its data volumes. This backend stack has separate volumes from the repository-root stack; use one stack at a time with the default ports.
+
 ## Database migrations
 
 Start PostgreSQL from the repository root with `docker compose up -d postgres`. The backend uses `TypeOrmModule.forRootAsync` with `ConfigService`, feature modules register entities with `TypeOrmModule.forFeature`, and services inject `Repository<Entity>` with `@InjectRepository`.
