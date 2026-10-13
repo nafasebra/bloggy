@@ -5,7 +5,7 @@ import {
   IsDate,
   IsOptional,
   IsArray,
-  IsMongoId,
+  IsUUID,
   IsEmail,
   IsBoolean,
 } from 'class-validator';
@@ -13,7 +13,7 @@ import {
 export class UserResponseDto {
   @ApiProperty({
     description: 'The unique identifier of the user',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsString()
   _id: string;
@@ -121,11 +121,14 @@ export class UserResponseDto {
 
   @ApiPropertyOptional({
     description: 'Array of post IDs created by the user',
-    example: ['507f1f77bcf86cd799439012', '507f1f77bcf86cd799439013'],
+    example: [
+      '550e8400-e29b-41d4-a716-446655440000',
+      '550e8400-e29b-41d4-a716-446655440000',
+    ],
   })
   @IsOptional()
   @IsArray()
-  @IsMongoId({ each: true })
+  @IsUUID('4', { each: true })
   postIds?: string[];
 
   @ApiProperty({

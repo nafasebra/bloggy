@@ -1,12 +1,12 @@
 # Bloggy
 
-Full-stack blogging platform: a public blog, an admin CMS, and a shared NestJS API backed by MongoDB.
+Full-stack blogging platform: a public blog, an admin CMS, and a shared NestJS API backed by PostgreSQL.
 
 | Part | Stack | Dev URL |
 |------|-------|---------|
 | **Web** — public blog for readers and authors | Next.js 16, React 19 | http://localhost:3000 |
 | **Dashboard** — admin CMS | Vite 7, React Router 7 | http://localhost:3001 |
-| **Backend** — REST + WebSocket API | NestJS 11, Mongoose 8 | http://localhost:3030 |
+| **Backend** — REST + WebSocket API | NestJS 11, TypeORM 0.3 | http://localhost:3030 |
 | **Storybook** — UI component catalog | Storybook 10 | http://localhost:6006 |
 
 **New here?** Follow [Quick start](#quick-start) below, then read the focused guides:
@@ -34,11 +34,11 @@ Three clients share one API and one database. Frontends send cookies on every re
 
 ```
                          ┌─────────────────────────────────────┐
-                         │           MongoDB (bloggy)          │
+                         │           PostgreSQL (bloggy)          │
                          │  users · posts · comments · follow  │
                          │  notifications · likes · views      │
                          └──────────────────▲──────────────────┘
-                                            │ Mongoose
+                                            │ TypeORM
 ┌──────────────────┐  REST + cookies  ┌─────┴──────────────┐  WebSocket
 │  web (3000)      │ ───────────────► │  backend (3030)    │ ◄── notifications
 │  Next.js         │  /api/backend/*  │  NestJS            │
@@ -53,7 +53,7 @@ Three clients share one API and one database. Frontends send cookies on every re
 |-------|----------------|
 | **web** | SSR/SSG pages, auth route handlers, SEO, public UX |
 | **dashboard** | Admin-only CRUD; guards on `user.role === 'admin'` |
-| **backend** | Controllers → services → Mongoose schemas; Swagger at `/api` |
+| **backend** | Controllers → services → TypeORM entities; Swagger at `/api` |
 | **frontend/packages** | Shared UI (`@repo/ui`), HTTP client, utilities |
 
 **Request path (web):** browser → `/api/backend/...` → Next rewrite → `http://localhost:3030/...`
@@ -107,7 +107,7 @@ Production **`Dockerfile`**s are also included (`backend/Dockerfile`, `frontend/
 | Node.js | 20+ recommended | everywhere |
 | npm | latest | `backend/`, root hooks |
 | pnpm | 9+ | `frontend/` |
-| MongoDB | local, Docker, or Atlas | backend |
+| PostgreSQL | local, Docker, or hosted PostgreSQL | backend |
 | Docker Desktop / Engine | latest | optional — [full stack in containers](#docker-optional) |
 | Git for Windows | latest | clone, Husky hooks |
 
@@ -121,44 +121,39 @@ cd bloggy
 npm install          # enables Husky git hooks (prepare script)
 ```
 
-### 2. Start MongoDB
+### 2. Start PostgreSQL
 
-**Option A — Docker (macOS, Linux, Windows with Docker Desktop)**
+Start the database from the repository root:
 
 ```bash
-docker run -d -p 27017:27017 --name mongodb mongo:latest
+docker compose up -d postgres
 ```
 
-**Option B — Local install**
+Alternatively, install PostgreSQL locally and create a database and user. Set the connection in `backend/.env`:
 
-Install [MongoDB Community Server](https://www.mongodb.com/try/download/community) or use [MongoDB Compass](https://www.mongodb.com/products/tools/compass) (includes a local server option). Default connection:
-
-```
-mongodb://localhost:27017/bloggy
+```env
+DATABASE_URL=postgresql://bloggy:bloggy@localhost:5432/bloggy
 ```
 
-**Option C — MongoDB Atlas**
+The backend requires `DATABASE_URL` and applies TypeORM migrations on startup. Existing PostgreSQL data is not imported; this creates a new PostgreSQL schema with UUID IDs.
 
-Create a free cluster and set `DATABASE_URI` in `backend/.env` to your Atlas connection string.
-
-The backend connects to `localhost:27017` by default when `DATABASE_URI` is unset.
 ### 3. Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env   # then edit JWT_SECRET and DATABASE_URI
+cp .env.example .env   # then edit JWT_SECRET and DATABASE_URL
 npm run start:dev
 ```
 
 Backend runs at **http://localhost:3030**. Swagger UI: **http://localhost:3030/api**
 
-> The app reads **`DATABASE_URI`**, not `MONGODB_URI`. Set `DATABASE_URI=mongodb://localhost:27017/bloggy` in `backend/.env`.
+> Set `DATABASE_URL` in `backend/.env` before starting the backend.
 
 **Backend `.env` (minimum):**
 
 ```env
-DATABASE_URI=mongodb://localhost:27017/bloggy
+DATABASE_URL=postgresql://bloggy:bloggy@localhost:5432/bloggy
 PORT=3030
 JWT_SECRET=your-secret-key-here
 JWT_EXPIRES_IN=7d
@@ -195,13 +190,13 @@ pnpm dev --filter=dashboard # http://localhost:3001 only
 1. Open http://localhost:3000 — home page loads
 2. Register a user via the web app or `POST /auth/register` in Swagger
 3. Open http://localhost:3030/api — explore endpoints
-4. To use the dashboard, set a user's `role` to `admin` in MongoDB, then open http://localhost:3001
+4. To use the dashboard, set a user's `role` to `admin` in PostgreSQL, then open http://localhost:3001
 
 ---
 
 ## Docker (optional)
 
-Prefer not to install Node.js, pnpm, or MongoDB locally? You can run the entire stack with **Docker Compose** instead of the [Quick start](#quick-start) steps above.
+Prefer not to install Node.js, pnpm, or PostgreSQL locally? You can run the entire stack with **Docker Compose** instead of the [Quick start](#quick-start) steps above.
 
 ### Install Docker
 
@@ -238,7 +233,7 @@ First build can take several minutes (frontend monorepo + Next.js standalone). L
 | Dashboard (admin) | http://localhost:3001 |
 | Backend API + Swagger | http://localhost:3030/api |
 
-Stop containers: `docker compose down`. Add `-v` to remove MongoDB and upload volumes.
+Stop containers: `docker compose down`. Add `-v` to remove PostgreSQL and upload volumes.
 
 ### Compose environment
 
@@ -266,7 +261,7 @@ The web container talks to the API over the Docker network (`API_URL=http://back
 
 Compose creates named volumes:
 
-- **`mongodb-data`** — database files
+- **`postgres-data`** — database files
 - **`backend-uploads`** — avatar uploads under `uploads/avatars/`
 
 ### Build individual images
@@ -297,7 +292,7 @@ docker compose ps
 docker compose down
 ```
 
-After the stack is up, register a user at http://localhost:3000, then set `role: admin` on that user in MongoDB to use the dashboard (same as [step 5](#5-verify-everything-works) above).
+After the stack is up, register a user at http://localhost:3000, then set `role: admin` on that user in PostgreSQL to use the dashboard (same as [step 5](#5-verify-everything-works) above).
 
 ---
 
@@ -319,17 +314,7 @@ Tested on **Windows 10/11**. You can use **Git Bash** (recommended — matches t
    Or: `npm install -g pnpm`
 
 3. **[Git for Windows](https://git-scm.com/download/win)** — required for Husky hooks and Git Bash.
-4. **MongoDB** — pick one:
-   - **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** — then run the `docker run` command from [Quick start](#2-start-mongodb).
-   - **[MongoDB Community Server](https://www.mongodb.com/try/download/community)** — MSI installer; optionally install as a **Windows service** (starts on boot). Verify in PowerShell:
-
-     ```powershell
-     mongosh
-     # or legacy: mongo
-     ```
-
-   - **[MongoDB Compass](https://www.mongodb.com/products/tools/compass)** — GUI to browse data and run queries; useful for setting `role: admin` on a user.
-   - **MongoDB Atlas** — no local install; paste the Atlas URI into `backend/.env`.
+4. **PostgreSQL** — use Docker Desktop with `docker compose up -d postgres`, or install [PostgreSQL for Windows](https://www.postgresql.org/download/windows/) and create the database and user. pgAdmin can inspect tables and edit a user's role.
 
 ### Shell and terminals
 
@@ -368,28 +353,11 @@ copy .env.example apps\dashboard\.env
 
 Edit `.env` files in VS Code or Cursor. Keep `JWT_SECRET` **identical** in `backend\.env` and `frontend\apps\web\.env.local`.
 
-### MongoDB on Windows (without Docker)
+### PostgreSQL on Windows (without Docker)
 
-After installing MongoDB Community Server:
+Install PostgreSQL, create the `bloggy` user and database, then set `DATABASE_URL` in `backend/.env`. The default port is 5432. Manage PostgreSQL through Windows Services and inspect tables with pgAdmin or psql.
 
-- The **MongoDB** Windows service usually listens on `127.0.0.1:27017`.
-- Default data directory is under `C:\Program Files\MongoDB\Server\<version>\data` (or a path chosen in the installer).
-- Manage the service: **Services** app (`services.msc`) → **MongoDB Server** → Start / Restart.
-
-Manual start (custom data path):
-
-```powershell
-mkdir C:\data\db -Force
-mongod --dbpath C:\data\db
-```
-
-Set in `backend\.env`:
-
-```env
-DATABASE_URI=mongodb://127.0.0.1:27017/bloggy
-```
-
-**E2E tests** prefer `mongodb://127.0.0.1:27017/bloggy-e2e`. If MongoDB is not running, tests fall back to **mongodb-memory-server** (first run may download binaries — allow firewall/antivirus access).
+E2E tests require `E2E_DATABASE_URL`. They create and remove an isolated temporary schema; the database account must be able to create schemas.
 
 ### Git hooks (Husky)
 
@@ -418,7 +386,7 @@ cd ..\frontend
 pnpm test
 ```
 
-If e2e downloads hang behind a corporate proxy, `backend/test/global-setup.ts` temporarily clears proxy env vars while starting mongodb-memory-server.
+Set `$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5432/bloggy"` before running backend e2e tests in PowerShell.
 
 ### Common Windows issues
 
@@ -436,7 +404,7 @@ If e2e downloads hang behind a corporate proxy, `backend/test/global-setup.ts` t
 
 - ESLint
 - Prettier
-- MongoDB for VS Code (optional — inspect collections)
+- PostgreSQL for VS Code (optional — inspect tables)
 
 ---
 
@@ -446,7 +414,7 @@ Keep **`JWT_SECRET` identical** in `backend/.env` and `frontend/apps/web/.env.lo
 
 | Variable | Where | Purpose |
 |----------|-------|---------|
-| `DATABASE_URI` | backend | MongoDB connection |
+| `DATABASE_URL` | backend | PostgreSQL connection |
 | `PORT` | backend | API port (default `3030`) |
 | `JWT_SECRET` | backend, web | Sign / verify session tokens |
 | `JWT_EXPIRES_IN` | backend | Token lifetime (default `7d`) |
@@ -508,7 +476,7 @@ docker compose logs -f web   # follow web logs
 | Backend e2e | Jest + supertest | `backend/test/*.e2e-spec.ts` | [backend README](backend/README.md#end-to-end-e2e-tests) |
 | Frontend unit | Vitest | `frontend/apps/*/src/**/*.test.ts` | [frontend README](frontend/README.md#testing-vitest) |
 
-**Backend e2e** uses a real MongoDB instance when available (`E2E_DATABASE_URI`), otherwise falls back to `mongodb-memory-server`.
+**Backend e2e** uses PostgreSQL (`E2E_DATABASE_URL`) with a temporary schema created for each test run.
 
 **Run everything before a PR:**
 
@@ -567,8 +535,8 @@ Hooks live in `.husky/`. Config: `commitlint.config.cjs`, root `package.json`.
 | Area | Technologies |
 |------|--------------|
 | **Frontend** | Next.js 16, Vite 7, React 19, Tailwind CSS 4, TanStack Query, React Hook Form, Zod, Socket.IO client, Turborepo, pnpm |
-| **Backend** | NestJS 11, Mongoose 8, Passport JWT, bcrypt, class-validator, Swagger, Socket.IO, Helmet, Multer |
-| **Database** | MongoDB |
+| **Backend** | NestJS 11, TypeORM 0.3, Passport JWT, bcrypt, class-validator, Swagger, Socket.IO, Helmet, Multer |
+| **Database** | PostgreSQL |
 | **Testing** | Jest (backend), Vitest (frontend), supertest (e2e) |
 | **Tooling** | TypeScript 5, ESLint 9, Prettier, Husky, Storybook 10 |
 
@@ -588,8 +556,8 @@ Hooks live in `.husky/`. Config: `commitlint.config.cjs`, root `package.json`.
 | Topic | Document |
 |-------|----------|
 | Web vs dashboard, proxies, shared packages | [frontend/README.md](frontend/README.md) |
-| NestJS modules, MongoDB collections, e2e setup | [backend/README.md](backend/README.md) |
-| Windows setup (MongoDB, pnpm, hooks, troubleshooting) | [Windows development](#windows-development) |
+| NestJS modules, PostgreSQL tables, e2e setup | [backend/README.md](backend/README.md) |
+| Windows setup (PostgreSQL, pnpm, hooks, troubleshooting) | [Windows development](#windows-development) |
 | Optional Docker full-stack setup | [Docker (optional)](#docker-optional) |
 | Swagger API reference | http://localhost:3030/api (with backend running) |
 

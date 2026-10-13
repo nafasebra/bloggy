@@ -1,4 +1,4 @@
-import { IsArray, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsUUID, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostDto {
@@ -45,11 +45,11 @@ export class CreatePostDto {
   tags: string[];
 
   @ApiProperty({
-    description: 'MongoDB ObjectId of the author',
-    example: '5f8f8c44b54764421b7156c2',
+    description: 'UUID of the author',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsUUID()
   authorId: string;
 
   @ApiProperty({

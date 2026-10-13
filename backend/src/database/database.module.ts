@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { databaseOptions } from './database.config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      process.env.DATABASE_URI || 'mongodb://localhost:27017/bloggy'
-    ),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        databaseOptions(config.getOrThrow<string>('DATABASE_URL')),
+    }),
   ],
 })
 export class DatabaseModule {}

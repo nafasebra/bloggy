@@ -1,3 +1,4 @@
+import { ParseUUIDPipe } from '@nestjs/common';
 import {
   Controller,
   Post,
@@ -14,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PostsService } from './posts.service';
-import { Post as PostEntity } from './schemas/post.schema';
+import { Post as PostEntity } from './entities/post.entity';
 import {
   CreatePostDto,
   UpdatePostDto,
@@ -36,7 +37,6 @@ import {
 } from '@nestjs/swagger';
 import { LikePostResponseDto } from './dto/like-post.dto';
 import { getClientIp } from '../common/http/get-client-ip';
-import { toObjectIdString } from '../common/mongo/to-object-id-string';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -114,7 +114,9 @@ export class PostsController {
     description: 'Post not found',
     type: ErrorResponseDto,
   })
-  async findPostById(@Param('id') id: string): Promise<PostEntity> {
+  async findPostById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string
+  ): Promise<PostEntity> {
     return this.postsService.findById(id);
   }
 
@@ -136,12 +138,12 @@ export class PostsController {
     type: ErrorResponseDto,
   })
   async updatePost(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updatePostDto: UpdatePostDto,
     @Req() req: AuthenticatedRequest
   ): Promise<PostEntity> {
     const post = await this.postsService.findById(id);
-    if (toObjectIdString(post.authorId) !== req.user!.userId) {
+    if (post.authorId !== req.user!.userId) {
       throw new ForbiddenException('You can only update your own posts');
     }
     return this.postsService.update(id, updatePostDto);
@@ -160,11 +162,11 @@ export class PostsController {
     type: ErrorResponseDto,
   })
   async deletePost(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Req() req: AuthenticatedRequest
   ): Promise<void> {
     const post = await this.postsService.findById(id);
-    if (toObjectIdString(post.authorId) !== req.user!.userId) {
+    if (post.authorId !== req.user!.userId) {
       throw new ForbiddenException('You can only delete your own posts');
     }
     return this.postsService.delete(id);
@@ -184,7 +186,7 @@ export class PostsController {
     type: ErrorResponseDto,
   })
   async viewPost(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Ip() ip: string,
     @Req() req: Request
   ): Promise<{ post: PostEntity; isNewView: boolean; message: string }> {
@@ -217,7 +219,7 @@ export class PostsController {
     type: ErrorResponseDto,
   })
   async toggleLikePost(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Ip() ip: string,
     @Req() req: AuthenticatedRequest
   ): Promise<{ post: PostEntity; isLiked: boolean; message: string }> {
@@ -247,7 +249,7 @@ export class PostsController {
     schema: { type: 'object', properties: { isLiked: { type: 'boolean' } } },
   })
   async checkIfPostLiked(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Ip() ip: string,
     @Req() req: AuthenticatedRequest
   ): Promise<{ isLiked: boolean }> {
@@ -270,7 +272,7 @@ export class PostsController {
     type: PostsResponseDto,
   })
   async findAllPostsByUserId(
-    @Param('userId') userId: string
+    @Param('userId', new ParseUUIDPipe({ version: '4' })) userId: string
   ): Promise<PostEntity[]> {
     return this.postsService.findAllByUserId(userId);
   }

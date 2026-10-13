@@ -1,28 +1,28 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
-import { User } from '../users/schemas/user.schema';
-import { createMockModel } from '../test/mongoose-mock';
+import { User } from '../users/entities/user.entity';
+import { createMockRepository } from '../test/repository-mock';
 
 jest.mock('bcrypt');
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userModel: ReturnType<typeof createMockModel>;
+  let userModel: ReturnType<typeof createMockRepository>;
   let jwtService: { sign: jest.Mock };
 
   beforeEach(async () => {
-    userModel = createMockModel();
+    userModel = createMockRepository();
     jwtService = { sign: jest.fn().mockReturnValue('jwt-token') };
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: getModelToken(User.name), useValue: userModel },
+        { provide: getRepositoryToken(User), useValue: userModel },
         { provide: JwtService, useValue: jwtService },
       ],
     }).compile();
@@ -39,9 +39,7 @@ describe('AuthService', () => {
         username: 'jane',
         email: 'jane@example.com',
       };
-      userModel.mockImplementation(() => ({
-        save: jest.fn().mockResolvedValue(savedUser),
-      }));
+      userModel.save.mockResolvedValue(savedUser);
 
       const result = await service.register({
         name: 'Jane',
@@ -51,7 +49,7 @@ describe('AuthService', () => {
       });
 
       expect(bcrypt.hash).toHaveBeenCalledWith('secret123', 10);
-      expect(userModel).toHaveBeenCalledWith(
+      expect(userModel.create).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Jane',
           username: 'jane',
@@ -64,9 +62,7 @@ describe('AuthService', () => {
 
     it('throws ConflictException on duplicate key', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
-      userModel.mockImplementation(() => ({
-        save: jest.fn().mockRejectedValue({ code: 11000 }),
-      }));
+      userModel.save.mockRejectedValue({ code: '23505' });
 
       await expect(
         service.register({
@@ -100,7 +96,16 @@ describe('AuthService', () => {
       });
 
       expect(userModel.findOne).toHaveBeenCalledWith({
-        $or: [{ username: 'jane' }, { email: 'jane' }],
+        where: [{ username: 'jane' }, { email: 'jane' }],
+        select: {
+          _id: true,
+          name: true,
+          username: true,
+          email: true,
+          password: true,
+          isNew: true,
+          role: true,
+        },
       });
       expect(jwtService.sign).toHaveBeenCalled();
       expect(result).toEqual({
@@ -136,26 +141,29 @@ describe('AuthService', () => {
 
   describe('changePassword', () => {
     it('updates password when old password is valid', async () => {
-      userModel.findById.mockResolvedValue({
+      userModel.findOne.mockResolvedValue({
         _id: 'user-1',
         password: 'old-hash',
       });
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       (bcrypt.hash as jest.Mock).mockResolvedValue('new-hash');
-      userModel.findByIdAndUpdate.mockResolvedValue(undefined);
+      userModel.update.mockResolvedValue(undefined);
 
       await service.changePassword('user-1', {
         old_password: 'old',
         new_password: 'new',
       });
 
-      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith('user-1', {
-        password: 'new-hash',
-      });
+      expect(userModel.update).toHaveBeenCalledWith(
+        { _id: 'user-1' },
+        {
+          password: 'new-hash',
+        }
+      );
     });
 
     it('throws when old password is invalid', async () => {
-      userModel.findById.mockResolvedValue({
+      userModel.findOne.mockResolvedValue({
         _id: 'user-1',
         password: 'old-hash',
       });
@@ -172,7 +180,7 @@ describe('AuthService', () => {
 
   describe('forgetPassword', () => {
     it('returns silently when email is not found', async () => {
-      userModel.findOne.mockResolvedValue(null);
+      userModel.findOneBy.mockResolvedValue(null);
 
       await expect(
         service.forgetPassword({ email: 'missing@example.com' })
@@ -180,7 +188,7 @@ describe('AuthService', () => {
     });
 
     it('signs reset token when user exists', async () => {
-      userModel.findOne.mockResolvedValue({ _id: 'user-1' });
+      userModel.findOneBy.mockResolvedValue({ _id: 'user-1' });
 
       await service.forgetPassword({ email: 'jane@example.com' });
 

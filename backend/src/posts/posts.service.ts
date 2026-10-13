@@ -1,67 +1,58 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Post } from './schemas/post.schema';
-import { PostView } from './schemas/post-view.schema';
-import { PostLike } from './schemas/post-like.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, ILike } from 'typeorm';
+import { Post } from './entities/post.entity';
+import { PostView } from './entities/post-view.entity';
+import { PostLike } from './entities/post-like.entity';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { NotificationType } from '../notifications/schemas/notification.schema';
-import { User, UserDocument } from '../users/schemas/user.schema';
+import { NotificationType } from '../notifications/entities/notification.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectModel(Post.name) private readonly postModel: Model<Post>,
-    @InjectModel(PostView.name) private readonly postViewModel: Model<PostView>,
-    @InjectModel(PostLike.name) private readonly postLikeModel: Model<PostLike>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    @InjectRepository(PostView)
+    private readonly postViewRepository: Repository<PostView>,
+    @InjectRepository(PostLike)
+    private readonly postLikeRepository: Repository<PostLike>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly notificationsService: NotificationsService
   ) {}
 
   async create(post: CreatePostDto): Promise<Post> {
-    const newPost = new this.postModel(post);
-    return newPost.save();
+    const newPost = this.postRepository.create(post);
+    return this.postRepository.save(newPost);
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postModel.find().exec();
+    return this.postRepository.find();
   }
 
   async findBySearch(query: string): Promise<Post[]> {
-    if (!query || query.trim() === '') {
-      return this.postModel.find().sort({ createdAt: -1 }).exec();
-    }
-
-    const searchQuery = query.trim();
-    return this.postModel
-      .find({
-        $or: [
-          { title: { $regex: searchQuery, $options: 'i' } },
-          { category: { $regex: searchQuery, $options: 'i' } },
-        ],
-      })
-      .sort({ createdAt: -1 })
-      .exec();
+    const value = query?.trim();
+    return this.postRepository.find({
+      where: value
+        ? [
+            { title: ILike('%' + value + '%') },
+            { category: ILike('%' + value + '%') },
+          ]
+        : {},
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  // find by category
   async findByCategory(category: string): Promise<Post[]> {
-    if (!category || category.trim() === '') {
-      return this.postModel.find().sort({ createdAt: -1 }).exec();
-    }
-
-    const categoryQuery = category.trim();
-    return this.postModel
-      .find({
-        category: { $regex: categoryQuery, $options: 'i' },
-      })
-      .sort({ createdAt: -1 })
-      .exec();
+    const value = category?.trim();
+    return this.postRepository.find({
+      where: value ? { category: ILike('%' + value + '%') } : {},
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findById(id: string): Promise<Post> {
-    const post = await this.postModel.findById(id).exec();
+    const post = await this.postRepository.findOneBy({ _id: id });
     if (!post) {
       throw new NotFoundException('Post not found');
     }
@@ -69,11 +60,10 @@ export class PostsService {
   }
 
   async update(id: string, post: UpdatePostDto): Promise<Post> {
-    const updatedPost = await this.postModel
-      .findByIdAndUpdate(id, post, {
-        new: true,
-      })
-      .exec();
+    const existing = await this.findById(id);
+    const updatedPost = await this.postRepository.save(
+      this.postRepository.merge(existing, post)
+    );
     if (!updatedPost) {
       throw new NotFoundException('Post not found');
     }
@@ -81,7 +71,9 @@ export class PostsService {
   }
 
   async findAllByUserId(userId: string): Promise<Post[]> {
-    const posts = await this.postModel.find({ authorId: userId }).exec();
+    const posts = await this.postRepository.find({
+      where: { authorId: userId },
+    });
     if (!posts || posts.length === 0) {
       throw new NotFoundException('No posts found for this user');
     }
@@ -89,43 +81,35 @@ export class PostsService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.postModel.findByIdAndDelete(id).exec();
+    await this.postRepository.delete({ _id: id });
   }
 
   async viewPost(
     postId: string,
     ipAddress: string
   ): Promise<{ post: Post; isNewView: boolean }> {
-    const post = await this.findById(postId);
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
-
-    let isNewView = false;
-    try {
-      const newView = new this.postViewModel({ postId, ipAddress });
-      await newView.save();
-      isNewView = true;
-
-      await this.postModel
-        .findByIdAndUpdate(postId, { $inc: { views: 1 } })
-        .exec();
-
-      // Get updated post with new view count
-      const updatedPost = await this.findById(postId);
-      return { post: updatedPost, isNewView };
-    } catch (error: unknown) {
-      // If error is due to duplicate key (same IP already viewed), just return the post
-      if (
-        error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        error.code === 11000
-      ) {
-        return { post, isNewView };
+    return this.postRepository.manager.transaction(async manager => {
+      const posts = manager.getRepository(Post);
+      const post = await posts.findOne({
+        where: { _id: postId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!post) throw new NotFoundException('Post not found');
+      const result = await manager
+        .getRepository(PostView)
+        .createQueryBuilder()
+        .insert()
+        .values({ postId, ipAddress })
+        .orIgnore()
+        .returning('_id')
+        .execute();
+      const isNewView = result.raw.length > 0;
+      if (isNewView) {
+        post.views = (post.views ?? 0) + 1;
+        await posts.save(post);
       }
-      throw error;
-    }
+      return { post, isNewView };
+    });
   }
 
   async toggleLikePost(
@@ -133,49 +117,41 @@ export class PostsService {
     ipAddress: string,
     userId?: string
   ): Promise<{ post: Post; isLiked: boolean }> {
-    const post = await this.findById(postId);
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
-
-    // Check if the IP or user has already liked the post
-    const query = userId
-      ? { postId, $or: [{ ipAddress }, { userId }] }
-      : { postId, ipAddress };
-
-    const existingLike = await this.postLikeModel.findOne(query).exec();
-
-    if (existingLike) {
-      // Unlike: Remove the like record and decrement the count
-      await this.postLikeModel.deleteOne({ _id: existingLike._id }).exec();
-
-      await this.postModel
-        .findByIdAndUpdate(postId, { $inc: { likes: -1 } })
-        .exec();
-
-      const updatedPost = await this.findById(postId);
-      return { post: updatedPost, isLiked: false };
-    } else {
-      // Like: Create a new like record and increment the count
-      const newLike = new this.postLikeModel({ postId, ipAddress, userId });
-      await newLike.save();
-
-      await this.postModel
-        .findByIdAndUpdate(postId, { $inc: { likes: 1 } })
-        .exec();
-
-      const updatedPost = await this.findById(postId);
-
+    const result = await this.postRepository.manager.transaction(
+      async manager => {
+        const posts = manager.getRepository(Post);
+        const likes = manager.getRepository(PostLike);
+        const post = await posts.findOne({
+          where: { _id: postId },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (!post) throw new NotFoundException('Post not found');
+        const where = userId
+          ? [
+              { postId, ipAddress },
+              { postId, userId },
+            ]
+          : { postId, ipAddress };
+        const existingLike = await likes.findOneBy(where);
+        if (existingLike) {
+          await likes.delete({ _id: existingLike._id });
+          post.likes = Math.max(0, (post.likes ?? 0) - 1);
+        } else {
+          await likes.save(likes.create({ postId, ipAddress, userId }));
+          post.likes = (post.likes ?? 0) + 1;
+        }
+        await posts.save(post);
+        return { post, isLiked: !existingLike };
+      }
+    );
+    const post = result.post;
+    if (result.isLiked) {
       // Create notification if user is authenticated and not liking their own post
-      // Convert ObjectId to string - authorId is ObjectId type from schema
-      const authorIdString =
-        typeof post.authorId === 'string'
-          ? post.authorId
-          : (post.authorId as { toString: () => string }).toString();
+      const authorIdString = post.authorId;
 
       if (userId && userId !== authorIdString) {
         try {
-          const liker = await this.userModel.findById(userId).exec();
+          const liker = await this.userRepository.findOneBy({ _id: userId });
 
           if (liker) {
             await this.notificationsService.create(
@@ -192,9 +168,8 @@ export class PostsService {
           console.error('Failed to create notification:', error);
         }
       }
-
-      return { post: updatedPost, isLiked: true };
     }
+    return result;
   }
 
   async checkIfLiked(
@@ -203,10 +178,13 @@ export class PostsService {
     userId?: string
   ): Promise<boolean> {
     const query = userId
-      ? { postId, $or: [{ ipAddress }, { userId }] }
+      ? [
+          { postId, ipAddress },
+          { postId, userId },
+        ]
       : { postId, ipAddress };
 
-    const existingLike = await this.postLikeModel.findOne(query).exec();
+    const existingLike = await this.postLikeRepository.findOneBy(query);
     return !!existingLike;
   }
 }

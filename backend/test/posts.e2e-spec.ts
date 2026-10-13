@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { clearDatabase, closeE2eApp, createE2eApp } from './utils/e2e-app';
 import {
-  PLACEHOLDER_MONGO_ID,
+  PLACEHOLDER_USER_ID,
   registerAndLogin,
   uniqueUser,
   withSession,
@@ -164,7 +164,7 @@ describe('Posts (e2e)', () => {
   it('requires authentication to create a post', async () => {
     await request(httpServer)
       .post('/posts')
-      .send(createPostPayload(PLACEHOLDER_MONGO_ID, 'Anonymous'))
+      .send(createPostPayload(PLACEHOLDER_USER_ID, 'Anonymous'))
       .expect(401);
   });
 });

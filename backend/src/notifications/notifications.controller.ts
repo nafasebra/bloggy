@@ -1,3 +1,4 @@
+import { ParseUUIDPipe } from '@nestjs/common';
 import {
   Controller,
   Get,
@@ -58,7 +59,7 @@ export class NotificationsController {
   @ApiParam({
     name: 'id',
     description: 'Notification ID',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @ApiResponse({
     status: 200,
@@ -66,7 +67,7 @@ export class NotificationsController {
     type: NotificationResponseDto,
   })
   async markAsRead(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Request() req: AuthenticatedRequest
   ) {
     return this.notificationsService.markAsRead(id, req.user.userId);

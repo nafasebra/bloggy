@@ -5,13 +5,13 @@ import {
   IsDate,
   IsOptional,
   IsArray,
-  IsMongoId,
+  IsUUID,
 } from 'class-validator';
 
 export class PostResponseDto {
   @ApiProperty({
     description: 'The unique identifier of the post',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsString()
   _id: string;
@@ -54,9 +54,9 @@ export class PostResponseDto {
 
   @ApiProperty({
     description: 'The author ID of the post',
-    example: '60d0fe4f5311236168a109ca',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @IsMongoId()
+  @IsUUID()
   authorId: string;
 
   @ApiProperty({
@@ -84,11 +84,14 @@ export class PostResponseDto {
 
   @ApiPropertyOptional({
     description: 'The comment IDs of the post',
-    example: ['60d0fe4f5311236168a109ca', '60d0fe4f5311236168a109cb'],
+    example: [
+      '550e8400-e29b-41d4-a716-446655440000',
+      '550e8400-e29b-41d4-a716-446655440000',
+    ],
   })
   @IsOptional()
   @IsArray()
-  @IsMongoId({ each: true })
+  @IsUUID('4', { each: true })
   commentIds?: string[];
 
   @ApiProperty({

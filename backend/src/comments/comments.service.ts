@@ -1,63 +1,66 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Comment } from './schemas/comment.schema';
+import { serializeRelations } from '../common/serialize-relations';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Comment } from './entities/comment.entity';
 import { CreateCommentDto, ReplyCommentDto } from './dto';
-import { CommentLike } from './schemas/comment-like.schema';
+import { CommentLike } from './entities/comment-like.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
-import { NotificationType } from 'src/notifications/schemas/notification.schema';
-import { Post } from '../posts/schemas/post.schema';
-import { User, UserDocument } from '../users/schemas/user.schema';
+import { NotificationType } from 'src/notifications/entities/notification.entity';
+import { Post } from '../posts/entities/post.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CommentsService {
   constructor(
-    @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
-    @InjectModel(CommentLike.name)
-    private readonly commentLikeModel: Model<CommentLike>,
-    @InjectModel(Post.name) private readonly postModel: Model<Post>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(CommentLike)
+    private readonly commentLikeRepository: Repository<CommentLike>,
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly notificationsService: NotificationsService
   ) {}
 
   async findByPostId(id: string): Promise<Comment[]> {
-    const comments = await this.commentModel
-      .find({ postId: id })
-      .populate('authorId')
-      .exec();
+    const comments = await this.commentRepository.find({
+      where: { postId: id },
+      relations: { author: true },
+    });
+
     if (!comments || comments.length === 0) {
       return [];
     }
-    return comments;
+    return comments.map(item =>
+      serializeRelations(item, { author: 'authorId' })
+    );
   }
 
   async create(postId: string, comment: CreateCommentDto): Promise<Comment> {
-    const newComment = new this.commentModel({ ...comment, postId });
-    const savedComment = await newComment.save();
+    const newComment = this.commentRepository.create({ ...comment, postId });
 
     // Get post to find the post author
-    const post = await this.postModel.findById(postId).exec();
+    const post = await this.postRepository.findOneBy({ _id: postId });
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    const commentAuthorIdString =
-      typeof comment.authorId === 'string'
-        ? comment.authorId
-        : (comment.authorId as { toString: () => string }).toString();
+    const savedComment = await this.commentRepository.save(newComment);
 
-    const postAuthorIdString =
-      typeof post.authorId === 'string'
-        ? post.authorId
-        : (post.authorId as { toString: () => string }).toString();
+    const commentAuthorIdString = comment.authorId;
+
+    const postAuthorIdString = post.authorId;
 
     // Notify post author when someone comments on their post (don't notify if commenting on own post)
     if (commentAuthorIdString !== postAuthorIdString) {
       try {
-        const commentAuthor = await this.userModel
-          .findById(commentAuthorIdString)
-          .exec();
-
+        const commentAuthor = await this.userRepository.findOneBy({
+          _id: commentAuthorIdString,
+        });
         if (commentAuthor) {
           await this.notificationsService.create(
             postAuthorIdString,
@@ -79,43 +82,36 @@ export class CommentsService {
   }
 
   async reply(postId: string, comment: ReplyCommentDto): Promise<Comment> {
-    const newComment = new this.commentModel({ ...comment, postId });
-    const savedReply = await newComment.save();
+    const newComment = this.commentRepository.create({ ...comment, postId });
 
     // Get parent comment to find the parent comment author
-    const parentComment = await this.commentModel
-      .findById(comment.parentId)
-      .exec();
+    const parentComment = await this.commentRepository.findOneBy({
+      _id: comment.parentId,
+    });
     if (!parentComment) {
       throw new NotFoundException('Parent comment not found');
     }
 
     // Get post to find the post author
-    const post = await this.postModel.findById(postId).exec();
+    const post = await this.postRepository.findOneBy({ _id: postId });
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    const replyAuthorIdString =
-      typeof comment.authorId === 'string'
-        ? comment.authorId
-        : (comment.authorId as { toString: () => string }).toString();
+    if (parentComment.postId !== postId)
+      throw new BadRequestException('Parent comment belongs to another post');
+    const savedReply = await this.commentRepository.save(newComment);
 
-    const parentAuthorIdString =
-      typeof parentComment.authorId === 'string'
-        ? parentComment.authorId
-        : (parentComment.authorId as { toString: () => string }).toString();
+    const replyAuthorIdString = comment.authorId;
 
-    const postAuthorIdString =
-      typeof post.authorId === 'string'
-        ? post.authorId
-        : (post.authorId as { toString: () => string }).toString();
+    const parentAuthorIdString = parentComment.authorId;
+
+    const postAuthorIdString = post.authorId;
 
     try {
-      const replyAuthor = await this.userModel
-        .findById(replyAuthorIdString)
-        .exec();
-
+      const replyAuthor = await this.userRepository.findOneBy({
+        _id: replyAuthorIdString,
+      });
       if (replyAuthor) {
         // Notify parent comment author when someone replies to their comment
         if (replyAuthorIdString !== parentAuthorIdString) {
@@ -155,46 +151,37 @@ export class CommentsService {
   }
 
   async like(commentId: string, ipAddress: string): Promise<Comment> {
-    const comment = await this.commentModel.findById(commentId);
-    if (!comment) {
-      throw new NotFoundException('Comment not found');
-    }
-
-    const existingLike = await this.commentLikeModel
-      .findOne({ commentId: comment._id, ipAddress })
-      .exec();
-
-    if (existingLike) {
-      await this.commentLikeModel
-        .deleteOne({ commentId: comment._id, ipAddress })
-        .exec();
-      await this.commentModel
-        .findByIdAndUpdate(comment._id, { $inc: { likes: -1 } })
-        .exec();
-    } else {
-      const newLike = new this.commentLikeModel({
-        commentId: comment._id,
-        ipAddress,
-      });
-      await newLike.save();
-      await this.commentModel
-        .findByIdAndUpdate(comment._id, { $inc: { likes: 1 } })
-        .exec();
-
+    const result = await this.commentRepository.manager.transaction(
+      async manager => {
+        const comments = manager.getRepository(Comment);
+        const likes = manager.getRepository(CommentLike);
+        const comment = await comments.findOne({
+          where: { _id: commentId },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (!comment) throw new NotFoundException('Comment not found');
+        const existingLike = await likes.findOneBy({ commentId, ipAddress });
+        if (existingLike) {
+          await likes.delete({ _id: existingLike._id });
+          comment.likes = Math.max(0, (comment.likes ?? 0) - 1);
+        } else {
+          await likes.save(likes.create({ commentId, ipAddress }));
+          comment.likes = (comment.likes ?? 0) + 1;
+        }
+        await comments.save(comment);
+        return { comment, isLiked: !existingLike };
+      }
+    );
+    const comment = result.comment;
+    if (result.isLiked) {
       // Notify comment author when someone likes their comment (IP-based like)
       try {
-        const commentAuthorIdString =
-          typeof comment.authorId === 'string'
-            ? comment.authorId
-            : (comment.authorId as { toString: () => string }).toString();
+        const commentAuthorIdString = comment.authorId;
 
-        const postIdString =
-          typeof comment.postId === 'string'
-            ? comment.postId
-            : (comment.postId as { toString: () => string }).toString();
+        const postIdString = comment.postId;
 
         // Get post for context
-        const post = await this.postModel.findById(postIdString).exec();
+        const post = await this.postRepository.findOneBy({ _id: postIdString });
 
         // Truncate comment content for notification message
         const commentPreview =
@@ -220,18 +207,19 @@ export class CommentsService {
       }
     }
 
-    return this.commentModel.findById(commentId).exec() as Promise<Comment>;
+    return comment;
   }
 
   async checkIfLiked(commentId: string, ipAddress: string): Promise<boolean> {
-    const like = await this.commentLikeModel
-      .findOne({ commentId, ipAddress })
-      .exec();
+    const like = await this.commentLikeRepository.findOneBy({
+      commentId,
+      ipAddress,
+    });
     return !!like;
   }
 
   async findById(commentId: string): Promise<Comment> {
-    const comment = await this.commentModel.findById(commentId).exec();
+    const comment = await this.commentRepository.findOneBy({ _id: commentId });
     if (!comment) {
       throw new NotFoundException('Comment not found');
     }
@@ -239,12 +227,11 @@ export class CommentsService {
   }
 
   async delete(commentId: string): Promise<void> {
-    const existing = await this.commentModel.findById(commentId).exec();
+    const existing = await this.commentRepository.findOneBy({ _id: commentId });
     if (!existing) {
       throw new NotFoundException('Comment not found');
     }
 
-    await this.commentModel.findByIdAndDelete(commentId).exec();
-    await this.commentLikeModel.deleteMany({ commentId: existing._id }).exec();
+    await this.commentRepository.delete({ _id: commentId });
   }
 }

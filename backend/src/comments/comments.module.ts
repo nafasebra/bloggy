@@ -1,24 +1,19 @@
 import { Module } from '@nestjs/common';
 import { CommentsController } from './comments.controller';
 import { CommentsService } from './comments.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Comment, CommentSchema } from './schemas/comment.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Comment } from './entities/comment.entity';
 import { AuthModule } from '../auth/auth.module';
-import { CommentLike, CommentLikeSchema } from './schemas/comment-like.schema';
+import { CommentLike } from './entities/comment-like.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
-import { Post, PostSchema } from '../posts/schemas/post.schema';
-import { User, UserSchema } from '../users/schemas/user.schema';
+import { Post } from '../posts/entities/post.entity';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
-    MongooseModule.forFeature([
-      { name: CommentLike.name, schema: CommentLikeSchema },
-    ]),
+    TypeOrmModule.forFeature([Comment, CommentLike, Post, User]),
     AuthModule,
     NotificationsModule,
-    MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [CommentsController],
   providers: [CommentsService],

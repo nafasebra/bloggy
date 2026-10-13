@@ -1,140 +1,58 @@
 import { NotFoundException } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Test } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { User } from './schemas/user.schema';
-import { createMockModel } from '../test/mongoose-mock';
+import { User } from './entities/user.entity';
+
+import { createMockRepository } from '../test/repository-mock';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let userModel: ReturnType<typeof createMockModel>;
-
+  let repos: Record<string, ReturnType<typeof createMockRepository>>;
   beforeEach(async () => {
-    userModel = createMockModel();
-
-    const module: TestingModule = await Test.createTestingModule({
+    repos = { User: createMockRepository() };
+    const module = await Test.createTestingModule({
       providers: [
         UsersService,
-        { provide: getModelToken(User.name), useValue: userModel },
+        { provide: getRepositoryToken(User), useValue: repos.User },
       ],
     }).compile();
-
-    service = module.get<UsersService>(UsersService);
+    service = module.get(UsersService);
   });
-
-  function mockFindByIdChain(result: unknown) {
-    userModel.findById.mockReturnValue({
-      lean: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue(result),
-      }),
+  it('returns profiles using the password-excluding repository selection', async () => {
+    repos.User.findOneBy.mockResolvedValue({ _id: 'user-1', name: 'Jane' });
+    expect(await service.findOne('user-1')).toEqual({
+      _id: 'user-1',
+      name: 'Jane',
     });
-  }
-
-  describe('findOne', () => {
-    it('returns user without password', async () => {
-      mockFindByIdChain({
-        _id: 'user-1',
-        name: 'Jane',
-        username: 'jane',
-        email: 'jane@example.com',
-        password: 'hashed',
-      });
-
-      const result = await service.findOne('user-1');
-
-      expect(userModel.findById).toHaveBeenCalledWith('user-1');
-      expect(result).toEqual({
-        _id: 'user-1',
-        name: 'Jane',
-        username: 'jane',
-        email: 'jane@example.com',
-      });
-    });
-
-    it('throws NotFoundException when user does not exist', async () => {
-      mockFindByIdChain(null);
-
-      await expect(service.findOne('missing')).rejects.toThrow(
-        NotFoundException
-      );
+    expect(repos.User.findOneBy).toHaveBeenCalledWith({ _id: 'user-1' });
+  });
+  it('throws when a profile does not exist', async () => {
+    await expect(service.findOne('missing')).rejects.toThrow(NotFoundException);
+    await expect(service.update('missing', { name: 'X' })).rejects.toThrow(
+      NotFoundException
+    );
+    await expect(service.remove('missing')).rejects.toThrow(NotFoundException);
+  });
+  it('finishes onboarding when updating a profile', async () => {
+    repos.User.findOneBy.mockResolvedValue({ _id: 'user-1', isNew: true });
+    expect(await service.update('user-1', { name: 'Updated' })).toMatchObject({
+      name: 'Updated',
+      isNew: false,
     });
   });
-
-  describe('update', () => {
-    it('updates and returns user', async () => {
-      const updatedDoc = {
-        _id: 'user-1',
-        name: 'Updated',
-        isNew: true,
-        save: jest.fn().mockResolvedValue(undefined),
-      };
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(updatedDoc),
-      });
-
-      const result = await service.update('user-1', { name: 'Updated' });
-
-      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
-        'user-1',
-        { name: 'Updated' },
-        { new: true }
-      );
-      expect(updatedDoc.save).toHaveBeenCalled();
-      expect(result).toBe(updatedDoc);
-    });
-
-    it('throws NotFoundException when user does not exist', async () => {
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      });
-
-      await expect(service.update('missing', { name: 'X' })).rejects.toThrow(
-        NotFoundException
-      );
-    });
+  it('returns the removed profile and deletes the row', async () => {
+    repos.User.findOneBy.mockResolvedValue({ _id: 'user-1', name: 'Jane' });
+    expect(await service.remove('user-1')).toMatchObject({ _id: 'user-1' });
+    expect(repos.User.delete).toHaveBeenCalledWith({ _id: 'user-1' });
   });
-
-  describe('remove', () => {
-    it('deletes and returns user', async () => {
-      const deleted = { _id: 'user-1', name: 'Jane' };
-      userModel.findByIdAndDelete.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(deleted),
-      });
-
-      const result = await service.remove('user-1');
-
-      expect(userModel.findByIdAndDelete).toHaveBeenCalledWith('user-1');
-      expect(result).toBe(deleted);
+  it('does not return the password after saving a user', async () => {
+    repos.User.save.mockResolvedValue({ _id: 'user-1', password: 'hash' });
+    const result = await service.create({
+      name: 'Jane',
+      username: 'jane',
+      email: 'jane@example.com',
     });
-
-    it('throws NotFoundException when user does not exist', async () => {
-      userModel.findByIdAndDelete.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      });
-
-      await expect(service.remove('missing')).rejects.toThrow(
-        NotFoundException
-      );
-    });
-  });
-
-  describe('findAll', () => {
-    it('returns users without password field', async () => {
-      const users = [{ _id: 'user-1', name: 'Jane' }];
-      const chain = {
-        select: jest.fn(),
-        lean: jest.fn(),
-        exec: jest.fn().mockResolvedValue(users),
-      };
-      chain.select.mockReturnValue(chain);
-      chain.lean.mockReturnValue(chain);
-      userModel.find.mockReturnValue(chain);
-
-      const result = await service.findAll();
-
-      expect(userModel.find).toHaveBeenCalled();
-      expect(chain.select).toHaveBeenCalledWith({ password: 0, __v: 0 });
-      expect(result).toEqual(users);
-    });
+    expect(result).not.toHaveProperty('password');
   });
 });

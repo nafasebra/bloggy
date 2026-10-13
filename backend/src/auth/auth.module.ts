@@ -6,8 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { AdminGuard } from './roles.guard';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
@@ -20,7 +20,7 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: JWT_EXPIRES_IN },
     }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    TypeOrmModule.forFeature([User]),
   ],
   exports: [AuthService, JwtModule, JwtAuthGuard, AdminGuard, PassportModule],
 })

@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 
-const PLACEHOLDER_MONGO_ID = '507f1f77bcf86cd799439011';
+const PLACEHOLDER_USER_ID = '550e8400-e29b-41d4-a716-446655440000';
 
 export interface TestUserCredentials {
   name: string;
@@ -81,4 +81,4 @@ export async function registerAndLogin(
   return { credentials, user, sessionToken };
 }
 
-export { PLACEHOLDER_MONGO_ID };
+export { PLACEHOLDER_USER_ID };

@@ -7,9 +7,9 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/schemas/user.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ChangePasswordDto } from './dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 
@@ -19,7 +19,7 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    @InjectModel(User.name) private readonly userModel: Model<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -30,15 +30,17 @@ export class AuthService {
       email: registerDto.email,
       password: hashed_password,
     };
-    const newUser = new this.userModel(user);
+    const newUser = this.userRepository.create(user);
     try {
-      return await newUser.save();
+      const saved = await this.userRepository.save(newUser);
+      delete (saved as Partial<User>).password;
+      return saved;
     } catch (err: unknown) {
       if (
         err &&
         typeof err === 'object' &&
         'code' in err &&
-        (err as { code: number }).code === 11000
+        (err as { code: string }).code === '23505'
       ) {
         throw new ConflictException('Username or email is already taken');
       }
@@ -47,8 +49,17 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.userModel.findOne({
-      $or: [{ username: loginDto.username }, { email: loginDto.username }],
+    const user = await this.userRepository.findOne({
+      where: [{ username: loginDto.username }, { email: loginDto.username }],
+      select: {
+        _id: true,
+        name: true,
+        username: true,
+        email: true,
+        password: true,
+        isNew: true,
+        role: true,
+      },
     });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -87,7 +98,10 @@ export class AuthService {
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userRepository.findOne({
+      where: { _id: userId },
+      select: { _id: true, password: true },
+    });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -104,13 +118,16 @@ export class AuthService {
       changePasswordDto.new_password,
       10
     );
-    await this.userModel.findByIdAndUpdate(userId, {
-      password: hashedNewPassword,
-    });
+    await this.userRepository.update(
+      { _id: userId },
+      {
+        password: hashedNewPassword,
+      }
+    );
   }
 
   async forgetPassword(forgetPasswordDto: ForgetPasswordDto) {
-    const user = await this.userModel.findOne({
+    const user = await this.userRepository.findOneBy({
       email: forgetPasswordDto.email,
     });
 

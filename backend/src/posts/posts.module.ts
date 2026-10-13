@@ -1,22 +1,17 @@
 import { Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Post, PostSchema } from './schemas/post.schema';
-import { PostView, PostViewSchema } from './schemas/post-view.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Post } from './entities/post.entity';
+import { PostView } from './entities/post-view.entity';
 import { AuthModule } from '../auth/auth.module';
-import { PostLike, PostLikeSchema } from './schemas/post-like.schema';
+import { PostLike } from './entities/post-like.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { User, UserSchema } from '../users/schemas/user.schema';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Post.name, schema: PostSchema },
-      { name: PostView.name, schema: PostViewSchema },
-      { name: PostLike.name, schema: PostLikeSchema },
-      { name: User.name, schema: UserSchema },
-    ]),
+    TypeOrmModule.forFeature([Post, PostView, PostLike, User]),
     AuthModule,
     NotificationsModule,
   ],

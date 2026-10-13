@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsUUID, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ReplyCommentDto {
@@ -14,32 +14,32 @@ export class ReplyCommentDto {
 
   @ApiProperty({
     description: 'ID of the comment being replied to',
-    example: '60d5ec49f1a4c12a4c8b4567',
+    example: '550e8400-e29b-41d4-a716-446655440000',
     type: String,
     required: true,
   })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsUUID()
   parentId: string;
 
   @ApiProperty({
     description: 'ID of the post that contains the comment thread',
-    example: '60d5ec49f1a4c12a4c8b1234',
+    example: '550e8400-e29b-41d4-a716-446655440000',
     type: String,
     required: true,
   })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsUUID()
   postId: string;
 
   @ApiProperty({
     description: 'Author (user) ID of the reply',
-    example: '60d5ec49f1a4c12a4c8b9876',
+    example: '550e8400-e29b-41d4-a716-446655440000',
     type: String,
     required: true,
   })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsUUID()
   authorId: string;
 
   @ApiProperty({

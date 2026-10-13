@@ -1,3 +1,4 @@
+import { ParseUUIDPipe } from '@nestjs/common';
 import {
   Controller,
   Get,
@@ -80,9 +81,9 @@ export class UsersController {
   @ApiParam({
     name: 'id',
     description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.usersService.findOne(id);
   }
 
@@ -100,11 +101,11 @@ export class UsersController {
   @ApiParam({
     name: 'id',
     description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @UseInterceptors(FileInterceptor('avatar', avatarUploadOptions))
   uploadAvatar(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @UploadedFile() file: Express.Multer.File,
     @Request() req: { user: { userId: string } }
   ) {
@@ -141,10 +142,10 @@ export class UsersController {
   @ApiParam({
     name: 'id',
     description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Request() req: { user: { userId: string } }
   ) {
@@ -171,10 +172,10 @@ export class UsersController {
   @ApiParam({
     name: 'id',
     description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   remove(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Request() req: { user: { userId: string } }
   ) {
     if (req.user.userId !== id) {

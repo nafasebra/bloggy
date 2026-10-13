@@ -1,3 +1,4 @@
+import { ParseUUIDPipe } from '@nestjs/common';
 import {
   Controller,
   Post,
@@ -18,7 +19,7 @@ import {
   SingleCommentResponseDto,
 } from './dto';
 import { CommentsService } from './comments.service';
-import { Comment } from './schemas/comment.schema';
+import { Comment } from './entities/comment.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
@@ -31,7 +32,6 @@ import {
 import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getClientIp } from '../common/http/get-client-ip';
-import { toObjectIdString } from '../common/mongo/to-object-id-string';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -57,7 +57,7 @@ export class CommentsController {
     type: CommentsResponseDto,
   })
   async findCommentsByPostId(
-    @Param('postId') postId: string
+    @Param('postId', new ParseUUIDPipe({ version: '4' })) postId: string
   ): Promise<Comment[]> {
     return this.commentsService.findByPostId(postId);
   }
@@ -74,7 +74,7 @@ export class CommentsController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async createComment(
-    @Param('postId') postId: string,
+    @Param('postId', new ParseUUIDPipe({ version: '4' })) postId: string,
     @Body() comment: CreateCommentDto,
     @Req() req: AuthenticatedRequest
   ): Promise<Comment> {
@@ -97,7 +97,7 @@ export class CommentsController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async replyComment(
-    @Param('postId') postId: string,
+    @Param('postId', new ParseUUIDPipe({ version: '4' })) postId: string,
     @Body() comment: ReplyCommentDto,
     @Req() req: AuthenticatedRequest
   ): Promise<Comment> {
@@ -117,7 +117,7 @@ export class CommentsController {
     type: SingleCommentResponseDto,
   })
   async likeComment(
-    @Param('commentId') commentId: string,
+    @Param('commentId', new ParseUUIDPipe({ version: '4' })) commentId: string,
     @Ip() ip: string,
     @Req() req: Request
   ): Promise<Comment> {
@@ -134,7 +134,7 @@ export class CommentsController {
     schema: { type: 'object', properties: { isLiked: { type: 'boolean' } } },
   })
   async checkIfLiked(
-    @Param('commentId') commentId: string,
+    @Param('commentId', new ParseUUIDPipe({ version: '4' })) commentId: string,
     @Ip() ip: string,
     @Req() req: Request
   ): Promise<{ isLiked: boolean }> {
@@ -156,11 +156,11 @@ export class CommentsController {
     description: 'Comment deleted successfully',
   })
   async deleteComment(
-    @Param('commentId') commentId: string,
+    @Param('commentId', new ParseUUIDPipe({ version: '4' })) commentId: string,
     @Req() req: AuthenticatedRequest
   ): Promise<{ message: string }> {
     const comment = await this.commentsService.findById(commentId);
-    if (toObjectIdString(comment.authorId) !== req.user.userId) {
+    if (comment.authorId !== req.user.userId) {
       throw new ForbiddenException('You can only delete your own comments');
     }
     await this.commentsService.delete(commentId);

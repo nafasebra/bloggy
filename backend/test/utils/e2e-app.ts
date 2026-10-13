@@ -1,9 +1,8 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getConnectionToken } from '@nestjs/mongoose';
+import { DataSource } from 'typeorm';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
-import { Connection } from 'mongoose';
 import { AppModule } from '../../src/app.module';
 
 export async function createE2eApp(): Promise<INestApplication> {
@@ -30,13 +29,12 @@ export async function closeE2eApp(app: INestApplication): Promise<void> {
 }
 
 export async function clearDatabase(app: INestApplication): Promise<void> {
-  const connection = app.get<Connection>(getConnectionToken());
-  const db = connection.db;
-  if (!db) {
-    return;
-  }
-  const collections = await db.collections();
-  for (const collection of collections) {
-    await collection.deleteMany({});
-  }
+  const schema = process.env.DATABASE_SCHEMA;
+  if (!schema || !/^bloggy_e2e_[a-f0-9]{32}$/.test(schema))
+    throw new Error('Refusing to clear a non-test schema');
+  const source = app.get(DataSource);
+  const tables = source.entityMetadatas.map(
+    entity => '"' + schema + '"."' + entity.tableName + '"'
+  );
+  await source.query('TRUNCATE TABLE ' + tables.join(', ') + ' CASCADE');
 }

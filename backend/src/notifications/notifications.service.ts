@@ -1,18 +1,21 @@
-import { Injectable, Inject, forwardRef, Optional } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { serializeRelations } from '../common/serialize-relations';
 import {
-  Notification,
-  NotificationDocument,
-  NotificationType,
-} from './schemas/notification.schema';
+  Injectable,
+  NotFoundException,
+  Inject,
+  forwardRef,
+  Optional,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Notification, NotificationType } from './entities/notification.entity';
 import { NotificationsGateway } from './notifications.gateway';
 
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectModel(Notification.name)
-    private readonly notificationModel: Model<NotificationDocument>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
     @Optional()
     @Inject(forwardRef(() => NotificationsGateway))
     private readonly notificationsGateway?: NotificationsGateway
@@ -27,7 +30,7 @@ export class NotificationsService {
     relatedPostId?: string,
     relatedCommentId?: string
   ): Promise<Notification> {
-    const notification = new this.notificationModel({
+    const notification = this.notificationRepository.create({
       userId,
       type,
       relatedUserId,
@@ -36,21 +39,24 @@ export class NotificationsService {
       message,
       link,
     });
-    const savedNotification = await notification.save();
+    const savedNotification =
+      await this.notificationRepository.save(notification);
 
     // Populate related data for WebSocket emission
-    const populatedNotification = await this.notificationModel
-      .findById(savedNotification._id)
-      .populate('relatedUserId', 'name username avatar')
-      .populate('relatedPostId', 'title')
-      .populate('relatedCommentId', 'content')
-      .exec();
+    const populatedNotification = await this.notificationRepository.findOne({
+      where: { _id: savedNotification._id },
+      relations: { relatedUser: true, relatedPost: true, relatedComment: true },
+    });
 
     // Emit notification via WebSocket
     if (populatedNotification && this.notificationsGateway) {
       this.notificationsGateway.emitNotification(
         userId,
-        populatedNotification.toObject()
+        serializeRelations(populatedNotification, {
+          relatedUser: 'relatedUserId',
+          relatedPost: 'relatedPostId',
+          relatedComment: 'relatedCommentId',
+        })
       );
 
       // Update unread count
@@ -62,30 +68,43 @@ export class NotificationsService {
   }
 
   async findByUserId(userId: string): Promise<Notification[]> {
-    return this.notificationModel
-      .find({ userId })
-      .populate('relatedUserId', 'name username avatar')
-      .populate('relatedPostId', 'title')
-      .populate('relatedCommentId', 'content')
-      .sort({ createdAt: -1 })
-      .exec();
+    return this.notificationRepository
+      .find({
+        where: { userId },
+        relations: {
+          relatedUser: true,
+          relatedPost: true,
+          relatedComment: true,
+        },
+        order: { createdAt: 'DESC' },
+      })
+      .then(items =>
+        items.map(item =>
+          serializeRelations(item, {
+            relatedUser: 'relatedUserId',
+            relatedPost: 'relatedPostId',
+            relatedComment: 'relatedCommentId',
+          })
+        )
+      );
   }
 
   async markAsRead(
     notificationId: string,
     userId: string
   ): Promise<Notification> {
-    const notification = await this.notificationModel.findOne({
+    const notification = await this.notificationRepository.findOneBy({
       _id: notificationId,
       userId,
     });
 
     if (!notification) {
-      throw new Error('Notification not found');
+      throw new NotFoundException('Notification not found');
     }
 
     notification.read = true;
-    const savedNotification = await notification.save();
+    const savedNotification =
+      await this.notificationRepository.save(notification);
 
     // Update unread count via WebSocket
     if (this.notificationsGateway) {
@@ -97,9 +116,10 @@ export class NotificationsService {
   }
 
   async markAllAsRead(userId: string): Promise<void> {
-    await this.notificationModel
-      .updateMany({ userId, read: false }, { read: true })
-      .exec();
+    await this.notificationRepository.update(
+      { userId, read: false },
+      { read: true }
+    );
 
     // Update unread count via WebSocket
     if (this.notificationsGateway) {
@@ -109,6 +129,6 @@ export class NotificationsService {
   }
 
   async getUnreadCount(userId: string): Promise<number> {
-    return this.notificationModel.countDocuments({ userId, read: false });
+    return this.notificationRepository.countBy({ userId, read: false });
   }
 }

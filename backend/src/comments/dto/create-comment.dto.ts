@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsUUID, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCommentDto {
@@ -12,18 +12,18 @@ export class CreateCommentDto {
 
   @ApiProperty({
     description: 'The ID of the post being commented on',
-    example: '507f1f77bcf86cd799439011',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsUUID()
   postId: string;
 
   @ApiProperty({
     description: 'The ID of the author of the comment',
-    example: '507f1f77bcf86cd799439012',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsUUID()
   authorId: string;
 
   @ApiProperty({ description: 'Name of the author', example: 'John Doe' })

@@ -1,6 +1,6 @@
 # Bloggy backend
 
-REST and WebSocket API for the [Bloggy](../) platform. Built with **NestJS 11** and **MongoDB**, it powers the public blog (`apps/web`) and admin dashboard (`apps/dashboard`).
+REST and WebSocket API for the [Bloggy](../) platform. Built with **NestJS 11** and **PostgreSQL**, it powers the public blog (`apps/web`) and admin dashboard (`apps/dashboard`).
 
 Default dev URL: **http://localhost:3030**
 
@@ -23,7 +23,7 @@ Default dev URL: **http://localhost:3030**
 
 ## Architecture
 
-The backend follows NestJS **modular, layered architecture**: each domain is a self-contained module with its own controller(s), service(s), DTOs, and Mongoose schemas.
+The backend follows NestJS **modular, layered architecture**: each domain is a self-contained module with its own controller(s), service(s), DTOs, and TypeORM entities.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -34,11 +34,11 @@ The backend follows NestJS **modular, layered architecture**: each domain is a s
      ┌─────────────────────┼─────────────────────┐
      ▼                     ▼                     ▼
  DatabaseModule      AuthModule            Feature modules
- (Mongoose root)     JWT + Passport        Users, Posts, Comments,
+ (TypeORM root)     JWT + Passport        Users, Posts, Comments,
                      Guards                Follow, Notifications
                            │
                            ▼
-                    MongoDB (bloggy)
+                    PostgreSQL (bloggy)
 ```
 
 ### Stack
@@ -46,7 +46,7 @@ The backend follows NestJS **modular, layered architecture**: each domain is a s
 | Layer | Technology |
 |-------|------------|
 | Framework | [NestJS 11](https://nestjs.com) (Express adapter) |
-| Database | [MongoDB](https://www.mongodb.com) via [Mongoose 8](https://mongoosejs.com) / `@nestjs/mongoose` |
+| Database | [PostgreSQL](https://www.postgresql.org/) via [TypeORM](https://typeorm.io/) / `@nestjs/typeorm` |
 | Auth | `@nestjs/jwt`, `@nestjs/passport`, `passport-jwt`, bcrypt |
 | Validation | `class-validator`, `class-transformer` (global `ValidationPipe`) |
 | Real-time | Socket.IO via `@nestjs/websockets` / `@nestjs/platform-socket.io` |
@@ -58,7 +58,7 @@ The backend follows NestJS **modular, layered architecture**: each domain is a s
 
 | Module | Responsibility |
 |--------|----------------|
-| `DatabaseModule` | Mongoose connection (`DATABASE_URI`) |
+| `DatabaseModule` | TypeORM connection (`DATABASE_URL`) |
 | `AuthModule` | Registration, login, JWT strategy, guards (`JwtAuthGuard`, `AdminGuard`) |
 | `UsersModule` | User CRUD and avatar upload |
 | `PostsModule` | Posts, views, likes |
@@ -66,7 +66,7 @@ The backend follows NestJS **modular, layered architecture**: each domain is a s
 | `FollowModule` | Follow relationships (mounted under `/users`) |
 | `NotificationsModule` | Notification persistence + WebSocket gateway |
 
-Each request flows **Controller → Service → Mongoose model**. DTOs define and validate the HTTP contract; response shapes are documented in Swagger.
+Each request flows **Controller → Service → TypeORM repository**. DTOs define and validate the HTTP contract; response shapes are documented in Swagger.
 
 ---
 
@@ -77,8 +77,8 @@ Each request flows **Controller → Service → Mongoose model**. DTOs define an
 Clients call JSON endpoints over HTTP. The global `ValidationPipe` strips unknown fields, validates input, and coerces types before handlers run.
 
 ```
-┌──────────────┐   HTTP (JSON)    ┌─────────────────┐   Mongoose    ┌──────────┐
-│ web (3000)   │ ───────────────► │ NestJS (3030)   │ ────────────► │ MongoDB  │
+┌──────────────┐   HTTP (JSON)    ┌─────────────────┐   TypeORM    ┌──────────┐
+│ web (3000)   │ ───────────────► │ NestJS (3030)   │ ────────────► │ PostgreSQL  │
 │ dashboard    │   credentials  │ Controllers     │               │          │
 │ (3001)       │   (cookies)    │ Services        │               │          │
 └──────────────┘                  └─────────────────┘               └──────────┘
@@ -105,9 +105,9 @@ Interactive API reference: **http://localhost:3030/api**
 
 ---
 
-## Entities & collections
+## Entities & tables
 
-MongoDB stores documents in **collections** (one per Mongoose schema). Relationships use `ObjectId` references and denormalized fields where useful (e.g. `authorName` on posts).
+PostgreSQL stores rows in tables mapped by TypeORM entities. Relationships use UUID foreign keys. The `_id` response field and populated relation fields are retained for frontend compatibility. Reverse lists come from queries by `authorId` and `postId`, rather than stored ID arrays.
 
 ### User
 
@@ -120,7 +120,6 @@ Account and profile data.
 | `bio`, `avatar`, `location`, `website`, `twitter` | string? | Profile |
 | `followers`, `following` | number? | Denormalized counts |
 | `category` | string | User category |
-| `postIds` | ObjectId[] | Ref → `Post` |
 | `role` | `admin` \| `user` | Default `user` |
 | `isNew` | boolean | Onboarding flag |
 
@@ -134,9 +133,8 @@ Blog articles.
 |-------|------|-------|
 | `title`, `content`, `excerpt` | string | Body content |
 | `tags`, `category` | string[] / string | Discovery & filtering |
-| `authorId`, `authorName` | ObjectId / string | Ref → `User`; name denormalized |
+| `authorId`, `authorName` | UUID / string | Ref → `User`; name denormalized |
 | `views`, `likes` | number | Aggregated counters |
-| `commentIds` | ObjectId[] | Ref → `Comment` |
 
 **Use case:** create/read/update/delete posts, search, per-user feeds, view and like counts.
 
@@ -147,9 +145,9 @@ Comments and replies on posts.
 | Field | Type | Notes |
 |-------|------|-------|
 | `content` | string | Comment body |
-| `postId`, `authorId` | ObjectId | Ref → `Post`, `User` |
+| `postId`, `authorId` | UUID | Ref → `Post`, `User` |
 | `authorName` | string | Denormalized |
-| `parentId` | ObjectId? | Ref → `Comment` (replies) |
+| `parentId` | UUID? | Ref → `Comment` (replies) |
 | `likes` | number? | Like counter |
 
 **Use case:** discussion threads, nested replies, moderation (author delete).
@@ -160,7 +158,7 @@ Directed follow edges between users.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `followerId`, `followingId` | ObjectId | Ref → `User` |
+| `followerId`, `followingId` | UUID | Ref → `User` |
 | Unique index | `(followerId, followingId)` | Prevents duplicate follows |
 
 **Use case:** social graph, follower/following lists and counts, follow notifications.
@@ -171,10 +169,10 @@ In-app alerts for the recipient.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `userId` | ObjectId | Recipient |
+| `userId` | UUID | Recipient |
 | `type` | `follow` \| `like` \| `comment` | Event kind |
-| `relatedUserId` | ObjectId | Actor |
-| `relatedPostId`, `relatedCommentId` | ObjectId? | Context |
+| `relatedUserId` | UUID | Actor |
+| `relatedPostId`, `relatedCommentId` | UUID? | Context |
 | `read` | boolean | Read state |
 | `message`, `link` | string | Display payload |
 
@@ -186,7 +184,7 @@ Deduped view records (one view per IP per post).
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `postId` | ObjectId | Ref → `Post` |
+| `postId` | UUID | Ref → `Post` |
 | `ipAddress` | string | Client IP |
 | Unique index | `(postId, ipAddress)` | Prevents double-counting |
 
@@ -198,10 +196,10 @@ Deduped post likes (by IP or authenticated user).
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `postId` | ObjectId | Ref → `Post` |
+| `postId` | UUID | Ref → `Post` |
 | `ipAddress` | string | Anonymous likes |
-| `userId` | ObjectId? | Authenticated likes |
-| Unique indexes | `(postId, ipAddress)`, `(postId, userId)` sparse | One like per identity |
+| `userId` | UUID? | Authenticated likes |
+| Unique indexes | `(postId, ipAddress)`, `(postId, userId)` where userId is non-null | One like per identity |
 
 **Use case:** toggle like state and keep `Post.likes` in sync.
 
@@ -211,7 +209,7 @@ Deduped comment likes by IP.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `commentId` | ObjectId | Ref → `Comment` |
+| `commentId` | UUID | Ref → `Comment` |
 | `ipAddress` | string | Client IP |
 | Unique index | `(commentId, ipAddress)` | One like per IP |
 
@@ -238,19 +236,39 @@ npm run start:prod
 
 ---
 
+## Database migrations
+
+Start PostgreSQL from the repository root with `docker compose up -d postgres`. The backend uses `TypeOrmModule.forRootAsync` with `ConfigService`, feature modules register entities with `TypeOrmModule.forFeature`, and services inject `Repository<Entity>` with `@InjectRepository`.
+
+Schema synchronization is disabled. The initial migration creates eight tables, UUID primary keys, foreign keys, enum columns, and unique indexes. Pending migrations run at startup; for deployments with multiple replicas, run migrations once before starting replicas and disable `migrationsRun` in the application configuration. Like and view changes run in transactions with row locks so records and counters remain consistent. User password columns are excluded from ordinary queries.
+
+```bash
+npm run migration:run
+npm run migration:generate -- src/database/migrations/DescribeChange
+npm run migration:revert
+```
+
+Existing MongoDB documents are not imported. This schema uses UUIDs and requires a separate data migration with an ID mapping if historical data must be retained. Log in again after switching databases.
+
+To grant dashboard access:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
+```
+
 ## Environment variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URI` | `mongodb://localhost:27017/bloggy` | MongoDB connection string |
+| `DATABASE_URL` | Required | PostgreSQL connection URL, e.g. `postgresql://bloggy:bloggy@localhost:5432/bloggy` |
 | `PORT` | `3030` | HTTP listen port |
 | `NODE_ENV` | — | `development`, `production`, or `test` |
 | `JWT_SECRET` | — | Secret for signing JWTs (required) |
 | `JWT_EXPIRES_IN` | `7d` | Token lifetime |
 | `COOKIE_DOMAIN` | — | Optional cookie domain (production) |
-| `E2E_DATABASE_URI` | `mongodb://127.0.0.1:27017/bloggy-e2e` | Local MongoDB for e2e tests |
+| `E2E_DATABASE_URL` | Required for e2e | PostgreSQL connection URL; tests create a temporary schema |
 
-> **Note:** `.env.example` lists `MONGODB_URI`, but the app reads **`DATABASE_URI`** in `src/database/database.module.ts`.
+> `DATABASE_URL` is required. Copy `.env.example` to `.env` for local development.
 
 ---
 
@@ -258,10 +276,11 @@ npm run start:prod
 
 ### Unit tests
 
-Unit tests live next to source files as `*.spec.ts` under `src/`. They use **Jest** and **@nestjs/testing** with mocked Mongoose models (`src/test/mongoose-mock.ts`) so services and controllers run without a real database.
+Unit tests live next to source files as `*.spec.ts` under `src/`. They use **Jest** and **@nestjs/testing** with mocked TypeORM repositories (`src/test/repository-mock.ts`) so services and controllers run without a real database.
 
 ```bash
-npm run test          # run once
+npm run test          # unit tests
+npm run test:database # migration checks against embedded PostgreSQL
 npm run test:watch    # watch mode
 npm run test:cov      # coverage report → coverage/
 ```
@@ -277,22 +296,24 @@ npm run test:cov      # coverage report → coverage/
 | `follow/follow.service.spec.ts` | Toggle follow, counts, follow status |
 | `follow/follow.controller.spec.ts` | Controller wiring |
 
-Unit tests focus on **business logic in isolation**: bcrypt/JWT and Mongoose are mocked; assertions target validation, error handling, and service behavior.
+Unit tests focus on **business logic in isolation**: bcrypt/JWT and TypeORM are mocked; assertions target validation, error handling, and service behavior.
 
 ### End-to-end (e2e) tests
 
-E2e tests live in `test/` as `*.e2e-spec.ts`. They boot the full `AppModule`, send real HTTP requests with **supertest**, and assert on status codes and response bodies against a real MongoDB instance.
+E2e tests live in `test/` as `*.e2e-spec.ts`. They boot the full `AppModule`, send real HTTP requests with **supertest**, and assert on status codes and response bodies against a real PostgreSQL instance.
 
 ```bash
 npm run test:e2e
 ```
 
-**Database setup** (`test/global-setup.ts`):
+**Database setup** (`test/global-setup.ts`): set `E2E_DATABASE_URL` to a running PostgreSQL database. Tests create a random `bloggy_e2e_*` schema, apply migrations, and drop that schema after the run. Database cleanup truncates only tables in this schema. Tests run serially.
 
-1. Prefer a local MongoDB at `E2E_DATABASE_URI` (or `mongodb://127.0.0.1:27017/bloggy-e2e`).
-2. If unavailable, fall back to **mongodb-memory-server** (in-process MongoDB for CI).
+```powershell
+$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5432/bloggy"
+npm run test:e2e
+```
 
-Each test file clears all collections in `beforeEach` via `clearDatabase()` so suites stay independent. Tests run with `maxWorkers: 1` to avoid cross-suite DB races.
+Migration tests also execute SQL against embedded PostgreSQL using PGlite, so foreign key, uniqueness, UUID default, and rollback checks run without a database server.
 
 | Spec file | What it covers |
 |-----------|----------------|

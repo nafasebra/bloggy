@@ -1,122 +1,115 @@
 import { NotFoundException } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Test } from '@nestjs/testing';
+import { ILike } from 'typeorm';
 import { PostsService } from './posts.service';
-import { Post } from './schemas/post.schema';
-import { PostView } from './schemas/post-view.schema';
-import { PostLike } from './schemas/post-like.schema';
-import { User } from '../users/schemas/user.schema';
+import { Post } from './entities/post.entity';
+import { PostView } from './entities/post-view.entity';
+import { PostLike } from './entities/post-like.entity';
+import { User } from '../users/entities/user.entity';
 import { NotificationsService } from '../notifications/notifications.service';
-import { createMockModel } from '../test/mongoose-mock';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { createMockRepository } from '../test/repository-mock';
 
 describe('PostsService', () => {
   let service: PostsService;
-  let postModel: ReturnType<typeof createMockModel>;
-
+  let repos: Record<string, ReturnType<typeof createMockRepository>>;
+  let notifications: { create: jest.Mock };
   beforeEach(async () => {
-    postModel = createMockModel();
-
-    const module: TestingModule = await Test.createTestingModule({
+    repos = {
+      Post: createMockRepository(),
+      PostView: createMockRepository(),
+      PostLike: createMockRepository(),
+      User: createMockRepository(),
+    };
+    notifications = { create: jest.fn().mockResolvedValue(undefined) };
+    const module = await Test.createTestingModule({
       providers: [
         PostsService,
-        { provide: getModelToken(Post.name), useValue: postModel },
-        { provide: getModelToken(PostView.name), useValue: createMockModel() },
-        { provide: getModelToken(PostLike.name), useValue: createMockModel() },
-        { provide: getModelToken(User.name), useValue: createMockModel() },
-        {
-          provide: NotificationsService,
-          useValue: { create: jest.fn() },
-        },
+        { provide: getRepositoryToken(Post), useValue: repos.Post },
+        { provide: getRepositoryToken(PostView), useValue: repos.PostView },
+        { provide: getRepositoryToken(PostLike), useValue: repos.PostLike },
+        { provide: getRepositoryToken(User), useValue: repos.User },
+        { provide: NotificationsService, useValue: notifications },
       ],
     }).compile();
-
-    service = module.get<PostsService>(PostsService);
+    service = module.get(PostsService);
   });
-
-  describe('findById', () => {
-    it('returns post when found', async () => {
-      const post = { _id: 'post-1', title: 'Hello' };
-      postModel.findById.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(post),
-      });
-
-      await expect(service.findById('post-1')).resolves.toBe(post);
+  it('throws for a missing post or update target', async () => {
+    await expect(service.findById('missing')).rejects.toThrow(
+      NotFoundException
+    );
+    await expect(
+      service.update('missing', { title: 'Updated' } as never)
+    ).rejects.toThrow(NotFoundException);
+  });
+  it('searches title and category with case-insensitive SQL matching', async () => {
+    await service.findBySearch(' tech ');
+    expect(repos.Post.find).toHaveBeenCalledWith({
+      where: [{ title: ILike('%tech%') }, { category: ILike('%tech%') }],
+      order: { createdAt: 'DESC' },
     });
-
-    it('throws NotFoundException when post is missing', async () => {
-      postModel.findById.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
+    await service.findBySearch('  ');
+    expect(repos.Post.find).toHaveBeenLastCalledWith({
+      where: {},
+      order: { createdAt: 'DESC' },
+    });
+    await service.findByCategory('Technology');
+    expect(repos.Post.find).toHaveBeenLastCalledWith({
+      where: { category: ILike('%Technology%') },
+      order: { createdAt: 'DESC' },
+    });
+  });
+  it.each([true, false])(
+    'counts a view only when its unique row was inserted: %s',
+    async inserted => {
+      const post = { _id: 'post-1', views: 4 };
+      repos.Post.findOne.mockResolvedValue(post);
+      const builder = {
+        insert: jest.fn().mockReturnThis(),
+        values: jest.fn().mockReturnThis(),
+        orIgnore: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockReturnThis(),
+        execute: jest
+          .fn()
+          .mockResolvedValue({ raw: inserted ? [{ _id: 'view-1' }] : [] }),
+      };
+      const manager = {
+        getRepository: (entity: unknown) =>
+          entity === Post ? repos.Post : { createQueryBuilder: () => builder },
+      };
+      repos.Post.manager.transaction.mockImplementation(fn => fn(manager));
+      expect(await service.viewPost('post-1', '127.0.0.1')).toMatchObject({
+        post: { views: inserted ? 5 : 4 },
+        isNewView: inserted,
       });
-
-      await expect(service.findById('missing')).rejects.toThrow(
-        NotFoundException
+      expect(repos.Post.save).toHaveBeenCalledTimes(inserted ? 1 : 0);
+    }
+  );
+  it.each([true, false])(
+    'toggles the like record and count together: existing=%s',
+    async existing => {
+      repos.Post.findOne.mockResolvedValue({
+        _id: 'post-1',
+        authorId: 'user-1',
+        likes: 2,
+      });
+      repos.PostLike.findOneBy.mockResolvedValue(
+        existing ? { _id: 'like-1' } : null
       );
-    });
-  });
-
-  describe('findBySearch', () => {
-    it('returns all posts when query is empty', async () => {
-      const posts = [{ _id: 'post-1' }];
-      const chain = {
-        sort: jest.fn(),
-        exec: jest.fn().mockResolvedValue(posts),
+      const manager = {
+        getRepository: (entity: unknown) =>
+          entity === Post ? repos.Post : repos.PostLike,
       };
-      chain.sort.mockReturnValue(chain);
-      postModel.find.mockReturnValue(chain);
-
-      const result = await service.findBySearch('   ');
-
-      expect(postModel.find).toHaveBeenCalled();
-      expect(chain.sort).toHaveBeenCalledWith({ createdAt: -1 });
-      expect(result).toEqual(posts);
-    });
-
-    it('searches title and category when query is provided', async () => {
-      const chain = {
-        sort: jest.fn(),
-        exec: jest.fn().mockResolvedValue([]),
-      };
-      chain.sort.mockReturnValue(chain);
-      postModel.find.mockReturnValue(chain);
-
-      await service.findBySearch('tech');
-
-      expect(postModel.find).toHaveBeenCalledWith({
-        $or: [
-          { title: { $regex: 'tech', $options: 'i' } },
-          { category: { $regex: 'tech', $options: 'i' } },
-        ],
+      repos.Post.manager.transaction.mockImplementation(fn => fn(manager));
+      const result = await service.toggleLikePost('post-1', '127.0.0.1');
+      expect(result).toMatchObject({
+        isLiked: !existing,
+        post: { likes: existing ? 1 : 3 },
       });
-    });
-  });
-
-  describe('findByCategory', () => {
-    it('filters by category', async () => {
-      const chain = {
-        sort: jest.fn(),
-        exec: jest.fn().mockResolvedValue([]),
-      };
-      chain.sort.mockReturnValue(chain);
-      postModel.find.mockReturnValue(chain);
-
-      await service.findByCategory('Technology');
-
-      expect(postModel.find).toHaveBeenCalledWith({
-        category: { $regex: 'Technology', $options: 'i' },
-      });
-    });
-  });
-
-  describe('update', () => {
-    it('throws NotFoundException when post does not exist', async () => {
-      postModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      });
-
-      await expect(
-        service.update('missing', { title: 'Updated' } as UpdatePostDto)
-      ).rejects.toThrow(NotFoundException);
-    });
-  });
+      expect(repos.Post.save).toHaveBeenCalled();
+      expect(
+        existing ? repos.PostLike.delete : repos.PostLike.save
+      ).toHaveBeenCalled();
+    }
+  );
 });

@@ -1,26 +1,27 @@
+import { serializeRelations } from '../common/serialize-relations';
 import {
   Injectable,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Follow, FollowDocument } from './schemas/follow.schema';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Follow } from './entities/follow.entity';
+import { User } from 'src/users/entities/user.entity';
 import { NotificationsService } from '../notifications/notifications.service';
-import { NotificationType } from '../notifications/schemas/notification.schema';
+import { NotificationType } from '../notifications/entities/notification.entity';
 
 @Injectable()
 export class FollowService {
   constructor(
-    @InjectModel(Follow.name)
-    private readonly followModel: Model<FollowDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectRepository(Follow)
+    private readonly followRepository: Repository<Follow>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly notificationsService: NotificationsService
   ) {}
 
   async validateUser(userId: string): Promise<User> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userRepository.findOneBy({ _id: userId });
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
@@ -44,29 +45,31 @@ export class FollowService {
     await this.validateUser(followerId);
     await this.validateUser(followingId);
 
-    const existingFollow = await this.followModel.findOne({
+    const existingFollow = await this.followRepository.findOneBy({
       followerId,
       followingId,
     });
 
     if (existingFollow) {
       // Unfollow
-      await this.followModel.deleteOne({
+      await this.followRepository.delete({
         followerId,
         followingId,
       });
       return { isFollowing: false };
     } else {
       // Follow
-      const newFollow = new this.followModel({
+      const newFollow = this.followRepository.create({
         followerId,
         followingId,
       });
-      await newFollow.save();
+      await this.followRepository.save(newFollow);
 
       // Create notification for the followed user
       try {
-        const follower = await this.userModel.findById(followerId).exec();
+        const follower = await this.userRepository.findOneBy({
+          _id: followerId,
+        });
         if (follower) {
           await this.notificationsService.create(
             followingId,
@@ -91,12 +94,17 @@ export class FollowService {
    * @returns Array of Follow documents with populated followingId
    */
   async getFollowing(userId: string): Promise<Follow[]> {
-    return this.followModel
-      .find({ followerId: userId })
-      .populate('followingId', 'name username avatar bio')
-      .sort({ createdAt: -1 })
-      .lean()
-      .exec();
+    return this.followRepository
+      .find({
+        where: { followerId: userId },
+        relations: { following: true },
+        order: { createdAt: 'DESC' },
+      })
+      .then(items =>
+        items.map(item =>
+          serializeRelations(item, { following: 'followingId' })
+        )
+      );
   }
 
   /**
@@ -105,12 +113,15 @@ export class FollowService {
    * @returns Array of Follow documents with populated followerId
    */
   async getFollowers(userId: string): Promise<Follow[]> {
-    return this.followModel
-      .find({ followingId: userId })
-      .populate('followerId', 'name username avatar bio')
-      .sort({ createdAt: -1 })
-      .lean()
-      .exec();
+    return this.followRepository
+      .find({
+        where: { followingId: userId },
+        relations: { follower: true },
+        order: { createdAt: 'DESC' },
+      })
+      .then(items =>
+        items.map(item => serializeRelations(item, { follower: 'followerId' }))
+      );
   }
 
   /**
@@ -119,7 +130,7 @@ export class FollowService {
    * @returns Number of followers
    */
   async getFollowerCount(userId: string): Promise<number> {
-    return this.followModel.countDocuments({ followingId: userId });
+    return this.followRepository.countBy({ followingId: userId });
   }
 
   /**
@@ -128,7 +139,7 @@ export class FollowService {
    * @returns Number of users they follow
    */
   async getFollowingCount(userId: string): Promise<number> {
-    return this.followModel.countDocuments({ followerId: userId });
+    return this.followRepository.countBy({ followerId: userId });
   }
 
   /**
@@ -141,7 +152,7 @@ export class FollowService {
     followerId: string,
     followingId: string
   ): Promise<{ isFollowing: boolean }> {
-    const follow = await this.followModel.findOne({
+    const follow = await this.followRepository.findOneBy({
       followerId,
       followingId,
     });
