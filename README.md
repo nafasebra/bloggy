@@ -123,7 +123,7 @@ npm install          # enables Husky git hooks (prepare script)
 
 ### 2. Start PostgreSQL
 
-Start the database from the repository root:
+Copy `.env.docker.example` to `.env` in the repository root if needed and configure it, then start the database:
 
 ```bash
 docker compose up -d postgres
@@ -132,7 +132,7 @@ docker compose up -d postgres
 Alternatively, install PostgreSQL locally and create a database and user. Set the connection in `backend/.env`:
 
 ```env
-DATABASE_URL=postgresql://bloggy:bloggy@localhost:5432/bloggy
+DATABASE_URL=postgresql://bloggy:bloggy@localhost:5433/bloggy
 ```
 
 The backend requires `DATABASE_URL` and applies TypeORM migrations on startup. Existing PostgreSQL data is not imported; this creates a new PostgreSQL schema with UUID IDs.
@@ -153,7 +153,7 @@ Backend runs at **http://localhost:3030**. Swagger UI: **http://localhost:3030/a
 **Backend `.env` (minimum):**
 
 ```env
-DATABASE_URL=postgresql://bloggy:bloggy@localhost:5432/bloggy
+DATABASE_URL=postgresql://bloggy:bloggy@localhost:5433/bloggy
 PORT=3030
 JWT_SECRET=your-secret-key-here
 JWT_EXPIRES_IN=7d
@@ -386,7 +386,7 @@ cd ..\frontend
 pnpm test
 ```
 
-Set `$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5432/bloggy"` before running backend e2e tests in PowerShell.
+Set `$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5433/bloggy"` before running backend e2e tests in PowerShell.
 
 ### Common Windows issues
 

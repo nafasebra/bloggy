@@ -238,10 +238,10 @@ npm run start:prod
 
 ## Run the backend with Docker Compose
 
-From the `backend` directory, copy `.env.example` to `.env` if needed and set `JWT_SECRET`, then run:
+Use the repository-root `docker-compose.yml`. From the repository root, copy `.env.docker.example` to `.env` if needed and set `JWT_SECRET`, then run:
 
 ```powershell
-docker compose up -d --build
+docker compose up -d --build backend
 docker compose logs -f backend
 ```
 
@@ -253,7 +253,11 @@ The Compose file sets the application database hostname to `postgres`. `POSTGRES
 docker compose down
 ```
 
-Stopping the stack keeps its data volumes. This backend stack has separate volumes from the repository-root stack; use one stack at a time with the default ports.
+Stopping the stack keeps its data volumes. Use `docker compose up -d postgres` for the database alone, or `docker compose up -d --build` for the backend, database, web, and dashboard. Compose reads the root `.env`; `backend/.env` is for running NestJS locally. Alternatively, pass `--env-file .env.docker.example` to Compose commands.
+
+For local NestJS with the Docker database, set `DATABASE_URL=postgresql://bloggy:bloggy@localhost:5433/bloggy` in `backend/.env`. The root stack exposes PostgreSQL on port 5433 by default; containers connect to `postgres:5432`.
+
+If you previously ran the deleted backend Compose file, its database volume is separate from the root stack's volume. Existing data is not automatically transferred.
 
 ## Database migrations
 
@@ -279,7 +283,7 @@ UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | Required | PostgreSQL connection URL, e.g. `postgresql://bloggy:bloggy@localhost:5432/bloggy` |
+| `DATABASE_URL` | Required | PostgreSQL connection URL, e.g. `postgresql://bloggy:bloggy@localhost:5433/bloggy` |
 | `PORT` | `3030` | HTTP listen port |
 | `NODE_ENV` | — | `development`, `production`, or `test` |
 | `JWT_SECRET` | — | Secret for signing JWTs (required) |
@@ -328,7 +332,7 @@ npm run test:e2e
 **Database setup** (`test/global-setup.ts`): set `E2E_DATABASE_URL` to a running PostgreSQL database. Tests create a random `bloggy_e2e_*` schema, apply migrations, and drop that schema after the run. Database cleanup truncates only tables in this schema. Tests run serially.
 
 ```powershell
-$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5432/bloggy"
+$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5433/bloggy"
 npm run test:e2e
 ```
 

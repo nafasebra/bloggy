@@ -5,13 +5,13 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-bloggy}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bloggy}
-      POSTGRES_DB: bloggy
+      POSTGRES_DB: ${POSTGRES_DB:-bloggy}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,6 +20,7 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       postgres:
@@ -27,12 +28,13 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3030
-      DATABASE_URL: postgresql://${POSTGRES_USER:-bloggy}:${POSTGRES_PASSWORD:-bloggy}@postgres:5432/bloggy
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bloggy}:${POSTGRES_PASSWORD:-bloggy}@postgres:5432/${POSTGRES_DB:-bloggy}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the root .env or use --env-file}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
     ports:
-      - "3030:3030"
+      - "${PORT:-3030}:3030"
     volumes:
       - backend-uploads:/app/uploads
 
@@ -41,17 +43,18 @@ services:
       context: ./frontend
       target: web
       args:
-        APP: web
-        API_URL: http://backend:3030
-        JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
-        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
-        NEXT_PUBLIC_DASHBOARD_URL: ${NEXT_PUBLIC_DASHBOARD_URL:-http://localhost:3001}
+        APP: ${WEB_APP:-web}
+        API_URL: ${API_URL:?Set API_URL in the root .env or use --env-file}
+        JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the root .env or use --env-file}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL in the root .env or use --env-file}
+        NEXT_PUBLIC_DASHBOARD_URL: ${NEXT_PUBLIC_DASHBOARD_URL:?Set NEXT_PUBLIC_DASHBOARD_URL in the root .env or use --env-file}
     restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
     environment:
-      API_URL: http://backend:3030
+      API_URL: ${API_URL:?Set API_URL in the root .env or use --env-file}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the root .env or use --env-file}
     ports:
       - "3000:3000"
 
@@ -60,9 +63,9 @@ services:
       context: ./frontend
       target: dashboard
       args:
-        APP: dashboard
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:3030}
-        VITE_WEB_URL: ${VITE_WEB_URL:-http://localhost:3000}
+        APP: ${DASHBOARD_APP:-dashboard}
+        VITE_API_URL: ${VITE_API_URL:?Set VITE_API_URL in the root .env or use --env-file}
+        VITE_WEB_URL: ${VITE_WEB_URL:?Set VITE_WEB_URL in the root .env or use --env-file}
     restart: unless-stopped
     depends_on:
       backend:
