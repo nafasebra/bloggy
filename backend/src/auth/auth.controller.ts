@@ -116,7 +116,6 @@ export class AuthController {
       status: 'success',
       message: 'User logged in successfully',
       user: result.user,
-      session_token: result.session_token,
     };
   }
 

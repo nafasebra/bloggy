@@ -10,7 +10,7 @@ Default dev URL: **http://localhost:3030**
 
 | Area | Capabilities |
 |------|--------------|
-| **Authentication** | Register, login, logout, change password, forgot-password flow. JWT stored in an HTTP-only `session_token` cookie (also returned in the login body). |
+| **Authentication** | Register, login, logout, change password, forgot-password flow. JWT is sent only in an HTTP-only `session_token` cookie; authentication response bodies contain no tokens. |
 | **Users** | List users, get profile, update own profile, upload avatar, delete own account. Roles: `user` and `admin`. |
 | **Posts** | CRUD (author-only update/delete), search by title/category, list by user, IP-based view tracking, toggle likes (IP or authenticated user). |
 | **Comments** | List by post, create, threaded replies, IP-based like toggle, author-only delete. |

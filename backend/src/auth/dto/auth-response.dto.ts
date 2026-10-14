@@ -19,18 +19,4 @@ export class AuthResponseDto {
     type: UserResponseDto,
   })
   user: UserResponseDto;
-
-  @ApiProperty({
-    description: 'Access token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: false,
-  })
-  access_token?: string;
-
-  @ApiProperty({
-    description: 'Refresh token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: false,
-  })
-  refresh_token?: string;
 }

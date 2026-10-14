@@ -60,10 +60,14 @@ describe('Auth (e2e)', () => {
       .expect(201);
 
     expect(response.body.status).toBe('success');
-    expect(response.body.session_token).toBeDefined();
+    expect(response.body).not.toHaveProperty('session_token');
+    expect(response.body).not.toHaveProperty('access_token');
+    expect(response.body).not.toHaveProperty('refresh_token');
     expect(response.body.user.username).toBe(credentials.username);
     expect(response.headers['set-cookie']).toEqual(
-      expect.arrayContaining([expect.stringContaining('session_token=')])
+      expect.arrayContaining([
+        expect.stringMatching(/session_token=.+;.*HttpOnly/),
+      ])
     );
   });
 

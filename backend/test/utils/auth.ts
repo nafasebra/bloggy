@@ -59,8 +59,17 @@ export async function loginUser(httpServer: App, login: LoginCredentials) {
     .send(login)
     .expect(201);
 
+  const cookies = response.headers['set-cookie'] as unknown as string[];
+  const sessionCookie = cookies.find(cookie =>
+    cookie.startsWith('session_token=')
+  );
+  if (!sessionCookie) throw new Error('Login did not set a session cookie');
+  const sessionToken = decodeURIComponent(
+    sessionCookie.split(';')[0].slice('session_token='.length)
+  );
+
   return {
-    sessionToken: response.body.session_token as string,
+    sessionToken,
     user: response.body.user as { _id: string; username: string },
   };
 }
