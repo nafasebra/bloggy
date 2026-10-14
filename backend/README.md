@@ -253,7 +253,7 @@ The Compose file sets the application database hostname to `postgres`. `POSTGRES
 docker compose down
 ```
 
-Stopping the stack keeps its data volumes. Use `docker compose up -d postgres` for the database alone, or `docker compose up -d --build` for the backend, database, web, and dashboard. Compose reads the root `.env`; `backend/.env` is for running NestJS locally. Alternatively, pass `--env-file .env.docker.example` to Compose commands.
+Stopping the stack keeps its data volumes. Use `docker compose up -d postgres` for the database alone, or `docker compose --profile frontend up -d --build` for the backend, database, web, and dashboard. Add `--profile tools` to include pgAdmin. Compose reads the root `.env`; `backend/.env` is for running NestJS locally. Alternatively, pass `--env-file .env.docker.example` to Compose commands.
 
 For local NestJS with the Docker database, set `DATABASE_URL=postgresql://bloggy:bloggy@localhost:5433/bloggy` in `backend/.env`. The root stack exposes PostgreSQL on port 5433 by default; containers connect to `postgres:5432`.
 

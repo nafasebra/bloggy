@@ -222,7 +222,7 @@ From the repo root:
 cp .env.docker.example .env
 # Edit JWT_SECRET in .env (required — do not use the default in production)
 
-docker compose up --build
+docker compose --profile frontend --profile tools up --build
 ```
 
 First build can take several minutes (frontend monorepo + Next.js standalone). Later runs use cached layers.
@@ -286,7 +286,7 @@ docker build -t bloggy-dashboard --target dashboard \
 ### Useful commands
 
 ```bash
-docker compose up -d --build   # detached
+docker compose --profile frontend --profile tools up -d --build   # detached
 docker compose logs -f backend
 docker compose ps
 docker compose down
@@ -461,7 +461,7 @@ pnpm storybook       # http://localhost:6006
 ### Docker (optional)
 
 ```bash
-docker compose up --build    # full stack — see Docker (optional) section
+docker compose --profile frontend --profile tools up --build    # full stack — see Docker (optional) section
 docker compose down          # stop containers
 docker compose logs -f web   # follow web logs
 ```
