@@ -37,3 +37,31 @@ In pgAdmin, select **Register → Server**, choose a name, and enter:
 pgAdmin connects directly to PostgreSQL over the Compose network. Its login password is separate from the database password. Both its configuration and the database use persistent named volumes.
 
 Inspect startup with `docker compose logs --tail=50 pgadmin`.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on pushes, pull requests, and manual dispatch. It checks backend lint, TypeScript, build, unit tests, embedded PostgreSQL migration tests, and HTTP e2e tests. The frontend job checks lint, types, unit tests, and builds web, dashboard, and Storybook. After both jobs pass, a matrix builds the backend, web, and dashboard Docker images with separate layer caches. Images are not published or deployed.
+
+CI uses Node 22 and the frontend's pinned pnpm version, installs from frozen lockfiles, and uses only disposable test credentials. No local `.env` files or production secrets are required. Runs have time limits and superseded runs on the same branch are canceled.
+
+`compose.ci.yml` is a standalone test database, not an override of the development stack. It avoids the root Compose file's required frontend variables and profiles. PostgreSQL data lives in temporary memory-backed storage; the database uses host port 55432 and a separate project name.
+
+To run the same backend checks locally from the repository root:
+
+```powershell
+docker compose -p bloggy-ci-local -f docker/compose.ci.yml up -d --wait
+$env:E2E_DATABASE_URL="postgresql://bloggy_ci:ci-test-password@127.0.0.1:55432/bloggy_ci"
+cd backend
+npm ci
+npm run lint:check
+npm run check-types
+npm run build
+npm test -- --runInBand
+npm run test:database
+npm run test:e2e -- --runInBand
+cd ..
+docker compose -p bloggy-ci-local -f docker/compose.ci.yml down --volumes
+Remove-Item Env:E2E_DATABASE_URL
+```
+
+The e2e harness creates an isolated schema and applies migrations before testing. CI always tears down its database and prints database logs if a step fails. For concurrent local runs, override `CI_POSTGRES_PORT` and update `E2E_DATABASE_URL` to match.

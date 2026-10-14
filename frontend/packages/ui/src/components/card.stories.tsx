@@ -22,16 +22,6 @@ const meta = {
     },
   },
   tags: ['!autodocs'],
-  argTypes: {
-    hover: {
-      control: 'boolean',
-      description: 'Enable hover effects',
-    },
-    clickable: {
-      control: 'boolean',
-      description: 'Make card clickable',
-    },
-  },
 } satisfies Meta<typeof Card>;
 
 export default meta;
@@ -62,7 +52,7 @@ export const Default: Story = {
  */
 export const HoverEffects: Story = {
   render: () => (
-    <Card className="w-[350px]" hover>
+    <Card className="w-[350px] transition-shadow hover:shadow-lg">
       <CardHeader>
         <CardTitle>Hover Card</CardTitle>
         <CardDescription>
@@ -82,8 +72,15 @@ export const HoverEffects: Story = {
 export const Clickable: Story = {
   render: () => (
     <Card
-      className="w-[350px]"
-      clickable
+      className="w-[350px] cursor-pointer transition-shadow hover:shadow-lg focus-visible:outline-2"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          alert('Card clicked!');
+        }
+      }}
       onClick={() => alert('Card clicked!')}
     >
       <CardHeader>
@@ -146,7 +143,7 @@ export const Simple: Story = {
 export const MultipleCards: Story = {
   render: () => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
-      <Card hover>
+      <Card className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <CardTitle>Card 1</CardTitle>
           <CardDescription>First card</CardDescription>
@@ -155,7 +152,7 @@ export const MultipleCards: Story = {
           <p>Content for card 1</p>
         </CardContent>
       </Card>
-      <Card hover>
+      <Card className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <CardTitle>Card 2</CardTitle>
           <CardDescription>Second card</CardDescription>
@@ -164,7 +161,7 @@ export const MultipleCards: Story = {
           <p>Content for card 2</p>
         </CardContent>
       </Card>
-      <Card hover>
+      <Card className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <CardTitle>Card 3</CardTitle>
           <CardDescription>Third card</CardDescription>

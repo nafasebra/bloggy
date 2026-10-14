@@ -5,11 +5,13 @@ ARG PNPM_VERSION=9.0.0
 ARG TURBO_VERSION=2.7.2
 
 FROM node:${NODE_VERSION}-alpine AS base
+ARG PNPM_VERSION
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 FROM base AS pruner
+ARG TURBO_VERSION
 ARG APP=web
 COPY . .
 RUN pnpm dlx turbo@${TURBO_VERSION} prune ${APP} --docker
@@ -17,7 +19,6 @@ RUN pnpm dlx turbo@${TURBO_VERSION} prune ${APP} --docker
 FROM base AS builder
 ARG APP=web
 ARG API_URL=http://localhost:3030
-ARG JWT_SECRET=change-me
 ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
 ARG NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001
 ARG VITE_API_URL=http://localhost:3030
@@ -33,7 +34,6 @@ COPY --from=pruner /app/out/full/ .
 
 ENV NODE_ENV=production
 ENV API_URL=${API_URL}
-ENV JWT_SECRET=${JWT_SECRET}
 ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 ENV NEXT_PUBLIC_DASHBOARD_URL=${NEXT_PUBLIC_DASHBOARD_URL}
 ENV VITE_API_URL=${VITE_API_URL}

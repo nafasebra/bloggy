@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  NEXT_TELEMETRY_DISABLED: "1"
+  TURBO_TELEMETRY_DISABLED: "1"
+  STORYBOOK_DISABLE_TELEMETRY: "1"
+
+jobs:
+  backend:
+    name: Backend checks and PostgreSQL e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COMPOSE_PROJECT_NAME: bloggy-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      E2E_DATABASE_URL: postgresql://bloggy_ci:ci-test-password@127.0.0.1:55432/bloggy_ci
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint:check
+      - run: npm run check-types
+      - run: npm run build
+      - run: npm test -- --runInBand
+      - run: npm run test:database
+      - name: Start isolated PostgreSQL
+        working-directory: .
+        run: docker compose -f docker/compose.ci.yml up -d --wait --wait-timeout 90
+      - name: HTTP e2e with migrations in a temporary schema
+        run: npm run test:e2e -- --runInBand
+      - name: Database logs on failure
+        if: failure()
+        working-directory: .
+        run: docker compose -f docker/compose.ci.yml logs --no-color
+      - name: Remove CI database
+        if: always()
+        working-directory: .
+        run: docker compose -f docker/compose.ci.yml down --volumes --remove-orphans
+
+  frontend:
+    name: Frontend checks, tests, and builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      API_URL: http://127.0.0.1:3030
+      JWT_SECRET: ci-only-jwt-secret-not-for-deployment
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_DASHBOARD_URL: http://localhost:3001
+      VITE_API_URL: http://localhost:3030
+      VITE_WEB_URL: http://localhost:3000
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm check-types
+      - run: pnpm test
+      - run: pnpm build
+
+  docker:
+    name: Docker build (${{ matrix.app }})
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: backend
+            context: ./backend
+            file: backend/Dockerfile
+            target: runner
+          - app: web
+            context: ./frontend
+            file: frontend/Dockerfile
+            target: web
+          - app: dashboard
+            context: ./frontend
+            file: frontend/Dockerfile
+            target: dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate full application Compose configuration
+        run: docker compose --env-file .env.docker.example --profile frontend --profile tools config --quiet
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          target: ${{ matrix.target }}
+          push: false
+          tags: bloggy-${{ matrix.app }}:ci
+          build-args: |
+            APP=${{ matrix.app }}
+            API_URL=http://backend:3030
+            NEXT_PUBLIC_APP_URL=http://localhost:3000
+            NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001
+            VITE_API_URL=http://localhost:3030
+            VITE_WEB_URL=http://localhost:3000
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}

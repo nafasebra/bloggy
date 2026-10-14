@@ -214,6 +214,10 @@ docker compose version
 
 On Windows, start **Docker Desktop** and wait until the engine is running before building.
 
+### Continuous integration
+
+GitHub Actions runs backend and frontend checks, PostgreSQL e2e tests, and Docker image builds on pushes and pull requests. The test database is isolated from development data. See [Docker and CI documentation](docker/README.md#continuous-integration) for the pipeline and local test commands.
+
 ### Run the full stack
 
 From the repo root:

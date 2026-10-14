@@ -65,7 +65,6 @@ services:
       args:
         APP: ${WEB_APP:-web}
         API_URL: ${API_URL:?Set API_URL in the root .env or use --env-file}
-        JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the root .env or use --env-file}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL in the root .env or use --env-file}
         NEXT_PUBLIC_DASHBOARD_URL: ${NEXT_PUBLIC_DASHBOARD_URL:?Set NEXT_PUBLIC_DASHBOARD_URL in the root .env or use --env-file}
     restart: unless-stopped
