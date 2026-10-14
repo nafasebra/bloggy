@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import {
-  isAuthRoute,
-  isProtectedRoute,
-} from '@/lib/auth/constants';
-import {
-  getSessionTokenFromCookie,
-  verifySession,
-} from '@/lib/auth/session';
+import { isAuthRoute, isProtectedRoute } from '@/lib/auth/constants';
+import { getSessionTokenFromCookie, verifySession } from '@/lib/auth/session';
 
 const DASHBOARD_URL =
   process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // API routes handle their own auth
