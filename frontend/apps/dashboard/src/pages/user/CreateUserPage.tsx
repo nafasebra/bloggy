@@ -14,7 +14,8 @@ const schema = z.object({
   username: z.string().min(1, 'Username is required'),
   email: z.string().email('Invalid email address'),
   role: z.enum(['admin', 'user'], {
-    required_error: 'Role is required',
+    error: (issue) =>
+      issue.input === undefined ? 'Role is required' : undefined,
   }),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
