@@ -216,7 +216,7 @@ On Windows, start **Docker Desktop** and wait until the engine is running before
 
 ### Continuous integration
 
-GitHub Actions runs backend and frontend checks, PostgreSQL e2e tests, and Docker image builds on pushes and pull requests. The test database is isolated from development data. See [Docker and CI documentation](docker/README.md#continuous-integration) for the pipeline and local test commands.
+GitHub Actions runs backend and frontend checks, SQLite e2e tests, and Docker image builds on pushes and pull requests. The test database is isolated from development data. See [Docker and CI documentation](docker/README.md#continuous-integration) for the pipeline and local test commands.
 
 ### Run the full stack
 
@@ -361,7 +361,7 @@ Edit `.env` files in VS Code or Cursor. Keep `JWT_SECRET` **identical** in `back
 
 Install PostgreSQL, create the `bloggy` user and database, then set `DATABASE_URL` in `backend/.env`. The default port is 5432. Manage PostgreSQL through Windows Services and inspect tables with pgAdmin or psql.
 
-E2E tests require `E2E_DATABASE_URL`. They create and remove an isolated temporary schema; the database account must be able to create schemas.
+E2E tests use SQLite in memory; no database server or connection URL is required.
 
 ### Git hooks (Husky)
 
@@ -390,7 +390,7 @@ cd ..\frontend
 pnpm test
 ```
 
-Set `$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5433/bloggy"` before running backend e2e tests in PowerShell.
+Backend e2e tests run on in-memory SQLite without Docker.
 
 ### Common Windows issues
 
@@ -480,7 +480,7 @@ docker compose logs -f web   # follow web logs
 | Backend e2e | Jest + supertest | `backend/test/*.e2e-spec.ts` | [backend README](backend/README.md#end-to-end-e2e-tests) |
 | Frontend unit | Vitest | `frontend/apps/*/src/**/*.test.ts` | [frontend README](frontend/README.md#testing-vitest) |
 
-**Backend e2e** uses PostgreSQL (`E2E_DATABASE_URL`) with a temporary schema created for each test run.
+**Backend e2e** uses an isolated in-memory SQLite database for each application instance.
 
 **Run everything before a PR:**
 

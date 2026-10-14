@@ -4,11 +4,15 @@ import { DataSource } from 'typeorm';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from '../../src/app.module';
+import { createSqliteDataSource } from './sqlite-data-source';
 
 export async function createE2eApp(): Promise<INestApplication> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+    .overrideProvider(DataSource)
+    .useFactory({ factory: createSqliteDataSource })
+    .compile();
 
   const app = moduleFixture.createNestApplication<NestExpressApplication>();
   app.use(cookieParser());
@@ -29,12 +33,8 @@ export async function closeE2eApp(app: INestApplication): Promise<void> {
 }
 
 export async function clearDatabase(app: INestApplication): Promise<void> {
-  const schema = process.env.DATABASE_SCHEMA;
-  if (!schema || !/^bloggy_e2e_[a-f0-9]{32}$/.test(schema))
-    throw new Error('Refusing to clear a non-test schema');
   const source = app.get(DataSource);
-  const tables = source.entityMetadatas.map(
-    entity => '"' + schema + '"."' + entity.tableName + '"'
-  );
-  await source.query('TRUNCATE TABLE ' + tables.join(', ') + ' CASCADE');
+  if (source.options.type !== 'sqljs')
+    throw new Error('Refusing to clear a non-SQLite test database');
+  await source.synchronize(true);
 }

@@ -37,10 +37,11 @@ export class AuthService {
       return saved;
     } catch (err: unknown) {
       if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        (err as { code: string }).code === '23505'
+        (err &&
+          typeof err === 'object' &&
+          'code' in err &&
+          (err as { code: string }).code === '23505') ||
+        (err instanceof Error && /^UNIQUE constraint failed:/.test(err.message))
       ) {
         throw new ConflictException('Username or email is already taken');
       }

@@ -157,7 +157,10 @@ export class CommentsService {
         const likes = manager.getRepository(CommentLike);
         const comment = await comments.findOne({
           where: { _id: commentId },
-          lock: { mode: 'pessimistic_write' },
+          lock:
+            manager.connection?.options.type === 'sqljs'
+              ? undefined
+              : { mode: 'pessimistic_write' },
         });
         if (!comment) throw new NotFoundException('Comment not found');
         const existingLike = await likes.findOneBy({ commentId, ipAddress });

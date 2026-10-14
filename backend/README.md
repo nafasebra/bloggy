@@ -289,7 +289,6 @@ UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
 | `JWT_SECRET` | — | Secret for signing JWTs (required) |
 | `JWT_EXPIRES_IN` | `7d` | Token lifetime |
 | `COOKIE_DOMAIN` | — | Optional cookie domain (production) |
-| `E2E_DATABASE_URL` | Required for e2e | PostgreSQL connection URL; tests create a temporary schema |
 
 > `DATABASE_URL` is required. Copy `.env.example` to `.env` for local development.
 
@@ -303,7 +302,8 @@ Unit tests live next to source files as `*.spec.ts` under `src/`. They use **Jes
 
 ```bash
 npm run test          # unit tests
-npm run test:database # migration checks against embedded PostgreSQL
+npm run test:database # SQLite schema checks
+npm run test:postgres # PostgreSQL migration checks
 npm run test:watch    # watch mode
 npm run test:cov      # coverage report → coverage/
 ```
@@ -323,20 +323,22 @@ Unit tests focus on **business logic in isolation**: bcrypt/JWT and TypeORM are 
 
 ### End-to-end (e2e) tests
 
-E2e tests live in `test/` as `*.e2e-spec.ts`. They boot the full `AppModule`, send real HTTP requests with **supertest**, and assert on status codes and response bodies against a real PostgreSQL instance.
+E2e tests live in `test/` as `*.e2e-spec.ts`. They boot the full `AppModule`, send real HTTP requests with **supertest**, and assert on status codes and response bodies against an in-memory SQLite database.
 
 ```bash
 npm run test:e2e
 ```
 
-**Database setup** (`test/global-setup.ts`): set `E2E_DATABASE_URL` to a running PostgreSQL database. Tests create a random `bloggy_e2e_*` schema, apply migrations, and drop that schema after the run. Database cleanup truncates only tables in this schema. Tests run serially.
+**Database setup**: the test harness overrides Nest's DataSource provider with an in-memory SQLite database (sql.js). It derives compatible schemas from production entity metadata, creates tables, and resets them between tests. No Docker or PostgreSQL credentials are needed.
 
-```powershell
-$env:E2E_DATABASE_URL="postgresql://bloggy:bloggy@localhost:5433/bloggy"
+```sh
+npm run test:database
 npm run test:e2e
+# Separate PostgreSQL-specific migration verification:
+npm run test:postgres
 ```
 
-Migration tests also execute SQL against embedded PostgreSQL using PGlite, so foreign key, uniqueness, UUID default, and rollback checks run without a database server.
+SQLite tests do not validate PostgreSQL migration SQL or row-lock behavior. Migration checks remain available separately using PGlite.
 
 | Spec file | What it covers |
 |-----------|----------------|

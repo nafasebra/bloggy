@@ -40,18 +40,13 @@ Inspect startup with `docker compose logs --tail=50 pgadmin`.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on pushes, pull requests, and manual dispatch. It checks backend lint, TypeScript, build, unit tests, embedded PostgreSQL migration tests, and HTTP e2e tests. The frontend job checks lint, types, unit tests, and builds web, dashboard, and Storybook. After both jobs pass, a matrix builds the backend, web, and dashboard Docker images with separate layer caches. Images are not published or deployed.
+`.github/workflows/ci.yml` runs on pushes, pull requests, and manual dispatch. Backend checks include lint, TypeScript, build, unit tests, SQLite database checks, and HTTP e2e tests. Frontend checks include lint, types, unit tests, and builds for web, dashboard, and Storybook. A Docker matrix builds backend, web, and dashboard images after both check jobs pass, with separate layer caches. Images are not published or deployed.
 
-CI uses Node 22 and the frontend's pinned pnpm version, installs from frozen lockfiles, and uses only disposable test credentials. No local `.env` files or production secrets are required. Runs have time limits and superseded runs on the same branch are canceled.
+Backend database and HTTP tests run against SQLite in memory using sql.js. Each application instance gets its own database; tables are reset between cases. Docker, PostgreSQL, local env credentials, and database ports are not required for these tests. Production continues to use PostgreSQL and its migrations.
 
-`compose.ci.yml` is a standalone test database, not an override of the development stack. It avoids the root Compose file's required frontend variables and profiles. PostgreSQL data lives in temporary memory-backed storage; the database uses host port 55432 and a separate project name.
+From `backend`:
 
-To run the same backend checks locally from the repository root:
-
-```powershell
-docker compose -p bloggy-ci-local -f docker/compose.ci.yml up -d --wait
-$env:E2E_DATABASE_URL="postgresql://bloggy_ci:ci-test-password@127.0.0.1:55432/bloggy_ci"
-cd backend
+```sh
 npm ci
 npm run lint:check
 npm run check-types
@@ -59,9 +54,8 @@ npm run build
 npm test -- --runInBand
 npm run test:database
 npm run test:e2e -- --runInBand
-cd ..
-docker compose -p bloggy-ci-local -f docker/compose.ci.yml down --volumes
-Remove-Item Env:E2E_DATABASE_URL
 ```
 
-The e2e harness creates an isolated schema and applies migrations before testing. CI always tears down its database and prints database logs if a step fails. For concurrent local runs, override `CI_POSTGRES_PORT` and update `E2E_DATABASE_URL` to match.
+SQLite schemas are derived from production entity metadata, mapping enums and timestamps to SQLite types and arrays to JSON. SQLite uses transactions without PostgreSQL row locks, and post-view deduplication uses its SQLite-compatible path. These tests cover application behavior, not PostgreSQL migration SQL or PostgreSQL concurrency semantics.
+
+PostgreSQL migration checks remain available separately with `npm run test:postgres`, using embedded PostgreSQL (PGlite). They are not part of the SQLite CI job. The former `compose.ci.yml` and PostgreSQL e2e setup have been removed.

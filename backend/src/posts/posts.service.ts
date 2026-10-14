@@ -92,9 +92,21 @@ export class PostsService {
       const posts = manager.getRepository(Post);
       const post = await posts.findOne({
         where: { _id: postId },
-        lock: { mode: 'pessimistic_write' },
+        lock:
+          manager.connection?.options.type === 'sqljs'
+            ? undefined
+            : { mode: 'pessimistic_write' },
       });
       if (!post) throw new NotFoundException('Post not found');
+      if (manager.connection?.options.type === 'sqljs') {
+        const views = manager.getRepository(PostView);
+        const existing = await views.findOneBy({ postId, ipAddress });
+        if (existing) return { post, isNewView: false };
+        await views.save(views.create({ postId, ipAddress }));
+        post.views = (post.views ?? 0) + 1;
+        await posts.save(post);
+        return { post, isNewView: true };
+      }
       const result = await manager
         .getRepository(PostView)
         .createQueryBuilder()
@@ -123,7 +135,10 @@ export class PostsService {
         const likes = manager.getRepository(PostLike);
         const post = await posts.findOne({
           where: { _id: postId },
-          lock: { mode: 'pessimistic_write' },
+          lock:
+            manager.connection?.options.type === 'sqljs'
+              ? undefined
+              : { mode: 'pessimistic_write' },
         });
         if (!post) throw new NotFoundException('Post not found');
         const where = userId

@@ -20,12 +20,9 @@ env:
 
 jobs:
   backend:
-    name: Backend checks and PostgreSQL e2e
+    name: Backend checks and SQLite e2e
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      COMPOSE_PROJECT_NAME: bloggy-ci-${{ github.run_id }}-${{ github.run_attempt }}
-      E2E_DATABASE_URL: postgresql://bloggy_ci:ci-test-password@127.0.0.1:55432/bloggy_ci
     defaults:
       run:
         working-directory: backend
@@ -42,19 +39,8 @@ jobs:
       - run: npm run build
       - run: npm test -- --runInBand
       - run: npm run test:database
-      - name: Start isolated PostgreSQL
-        working-directory: .
-        run: docker compose -f docker/compose.ci.yml up -d --wait --wait-timeout 90
-      - name: HTTP e2e with migrations in a temporary schema
+      - name: HTTP e2e with an isolated in-memory SQLite database
         run: npm run test:e2e -- --runInBand
-      - name: Database logs on failure
-        if: failure()
-        working-directory: .
-        run: docker compose -f docker/compose.ci.yml logs --no-color
-      - name: Remove CI database
-        if: always()
-        working-directory: .
-        run: docker compose -f docker/compose.ci.yml down --volumes --remove-orphans
 
   frontend:
     name: Frontend checks, tests, and builds
