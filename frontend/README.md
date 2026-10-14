@@ -162,8 +162,8 @@ pnpm dev --filter=dashboard # admin only
 **Storybook** (UI components):
 
 ```bash
-cd apps/storybook
 pnpm storybook
+pnpm build-storybook # static catalog in apps/storybook/storybook-static
 ```
 
 **Environment variables** (see `turbo.json` `globalEnv`):

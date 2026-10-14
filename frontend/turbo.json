@@ -11,6 +11,10 @@
     "VITE_WEB_URL"
   ],
   "tasks": {
+    "storybook#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],

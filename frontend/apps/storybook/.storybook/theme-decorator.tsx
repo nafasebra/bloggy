@@ -1,4 +1,4 @@
-import type { Decorator } from '@storybook/react';
+import type { Decorator } from '@storybook/react-vite';
 import { addons } from 'storybook/preview-api';
 import { ThemeToggle } from '@repo/ui/theme-toggle';
 
