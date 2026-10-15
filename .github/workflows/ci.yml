@@ -72,9 +72,26 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+  performance-config:
+    name: Monitoring and k6 configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate monitoring and loadtest profiles
+        run: docker compose --env-file .env.docker.example --profile monitoring --profile loadtest config --quiet
+      - name: Validate Prometheus scrape configuration
+        run: docker run --rm --entrypoint promtool -v "$PWD/docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro" prom/prometheus:v3.5.5 check config /etc/prometheus/prometheus.yml
+      - name: Validate k6 load and stress scenarios without sending traffic
+        run: |
+          docker run --rm -v "$PWD/tests/performance:/scripts:ro" grafana/k6:1.4.0 inspect /scripts/load.js
+          docker run --rm -v "$PWD/tests/performance:/scripts:ro" grafana/k6:1.4.0 inspect /scripts/stress.js
+      - name: Validate dashboard JSON
+        run: python -m json.tool docker/monitoring/grafana/dashboards/bloggy.json > /dev/null
+
   docker:
     name: Docker build (${{ matrix.app }})
-    needs: [backend, frontend]
+    needs: [backend, frontend, performance-config]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:

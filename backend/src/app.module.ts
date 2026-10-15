@@ -7,9 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { FollowModule } from './follow/follow.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
+    MetricsModule,
     DatabaseModule,
     UsersModule,
     CommentsModule,

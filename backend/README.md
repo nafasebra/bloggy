@@ -84,10 +84,50 @@ Clients call JSON endpoints over HTTP. The global `ValidationPipe` strips unknow
 └──────────────┘                  └─────────────────┘               └──────────┘
 ```
 
-- **Session auth:** login sets an HTTP-only `session_token` cookie. Protected routes use `JwtAuthGuard`, which reads the cookie or `Authorization: Bearer <token>`.
+- **Session auth:** login sets an HTTP-only `session_token` cookie. Protected REST routes use `JwtAuthGuard` and extract the JWT from that cookie only; a Bearer header is not a substitute for the REST session cookie.
 - **Optional auth:** some routes (e.g. post likes) use `OptionalJwtAuthGuard` so anonymous users can interact via IP while logged-in users are tracked by user ID.
 - **Static files:** avatars are served from `/uploads` (files stored under `uploads/avatars/`).
 - **CORS:** `http://localhost:3000` and `http://localhost:3001` with `credentials: true`.
+
+### JWT authentication flow
+
+1. Register with `POST /auth/register`. Passwords are hashed with bcrypt; registration does not sign the user in.
+2. Login with `POST /auth/login` using `username` (username or email) and `password`. The backend verifies the password and signs a JWT containing `sub` (user ID), `username`, `email`, and `role`. `JWT_EXPIRES_IN` controls expiration (default: `7d`).
+3. The token is delivered through `Set-Cookie: session_token=...; HttpOnly`. The JSON body contains only `status`, `message`, and `user`; it contains no session, access, or refresh tokens.
+4. Browsers send the cookie on API requests. Use Axios `withCredentials: true` or Fetch `credentials: 'include'`. Frontend JavaScript does not read the HTTP-only JWT or store it in localStorage.
+5. Passport verifies the signature and expiration using `JWT_SECRET` and populates `request.user`. Protected routes reject missing, expired, or invalid JWTs with HTTP 401. Admin routes also check the role.
+6. `POST /auth/logout` clears the cookie. This is a stateless JWT session: logout does not revoke a token already copied elsewhere. No refresh-token endpoint is implemented; sign in again after expiration.
+
+#### Cookie and deployment settings
+
+| Setting | Backend behavior |
+| --- | --- |
+| Cookie name | `session_token` |
+| HttpOnly | Always enabled |
+| Secure | Enabled when `NODE_ENV=production` |
+| SameSite | `strict` in production, `lax` otherwise |
+| Path | `/` |
+| Domain | `localhost` in development; optional `COOKIE_DOMAIN` in production/test |
+| Lifetime | Backend cookie has no explicit Max-Age; the JWT still expires according to `JWT_EXPIRES_IN` |
+
+Use HTTPS for production. Keep cookie domain, SameSite rules, frontend/API origins, and `CORS_ORIGINS` consistent: enabling credentials alone does not override browser cookie restrictions. The API enables credentialed CORS for the configured origins. In local development, consistently use `localhost` instead of mixing it with `127.0.0.1`.
+
+The Next.js login route reads the backend's `Set-Cookie` header and sets the browser session cookie. Its cookie settings are managed separately in `frontend/apps/web/src/lib/auth/server-cookies.ts` (SameSite lax, seven-day Max-Age). The web proxy verifies the JWT with the same secret; `JWT_SECRET` must match between backend and the web server. In Docker, pass it at runtime, not as a build argument. Server-side requests must explicitly forward cookies when authentication is needed; `credentials: 'include'` on a Node.js request does not automatically copy a browser's cookies.
+
+#### Testing with a cookie jar
+
+From a shell with curl (on PowerShell, use `curl.exe`):
+
+```sh
+curl -c cookies.txt -H "Content-Type: application/json" \
+  -d '{"username":"your-username","password":"your-password"}' \
+  http://localhost:3030/auth/login
+
+curl -b cookies.txt http://localhost:3030/users/me
+curl -b cookies.txt -c cookies.txt -X POST http://localhost:3030/auth/logout
+```
+
+The login token is stored in the cookie jar, not returned in the JSON body. SQLite HTTP tests assert the absence of token fields and authenticate using the returned session cookie. The Socket.IO handshake has its own extraction logic, documented below.
 
 ### WebSocket (notifications)
 

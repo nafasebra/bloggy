@@ -104,7 +104,7 @@ Production **`Dockerfile`**s are also included (`backend/Dockerfile`, `frontend/
 
 | Tool | Version | Used by |
 |------|---------|---------|
-| Node.js | 20+ recommended | everywhere |
+| Node.js | 22 LTS recommended (backend Docker and CI use 22) | everywhere |
 | npm | latest | `backend/`, root hooks |
 | pnpm | 9+ | `frontend/` |
 | PostgreSQL | local, Docker, or hosted PostgreSQL | backend |
@@ -216,6 +216,8 @@ On Windows, start **Docker Desktop** and wait until the engine is running before
 
 ### Continuous integration
 
+Optional Grafana/Prometheus monitoring and k6 load/stress scenarios are available through Compose profiles. See [performance testing](tests/performance/README.md) for the dashboard, startup commands, and configurable thresholds.
+
 GitHub Actions runs backend and frontend checks, SQLite e2e tests, and Docker image builds on pushes and pull requests. The test database is isolated from development data. See [Docker and CI documentation](docker/README.md#continuous-integration) for the pipeline and local test commands.
 
 ### Run the full stack
@@ -254,7 +256,7 @@ VITE_WEB_URL=http://localhost:3000
 
 | Variable | Notes |
 |----------|-------|
-| `JWT_SECRET` | Must match between backend and web build |
+| `JWT_SECRET` | Must match between backend and web server at runtime |
 | `CORS_ORIGINS` | Comma-separated browser origins allowed by the API |
 | `VITE_API_URL` | URL the **browser** uses to reach the API (not the internal `http://backend:3030` hostname) |
 | `NEXT_PUBLIC_*`, `VITE_WEB_URL` | Public URLs for links and redirects |
@@ -277,7 +279,6 @@ docker build -t bloggy-backend ./backend
 # Next.js web
 docker build -t bloggy-web --target web \
   --build-arg APP=web \
-  --build-arg JWT_SECRET=your-secret \
   ./frontend
 
 # Admin dashboard (static nginx)
@@ -306,7 +307,7 @@ Tested on **Windows 10/11**. You can use **Git Bash** (recommended — matches t
 
 ### Install tools
 
-1. **[Node.js LTS](https://nodejs.org/)** — check `node -v` (20+).
+1. **[Node.js LTS](https://nodejs.org/)** — check `node -v` (22 LTS recommended).
 2. **pnpm** (after Node is installed):
 
    ```powershell

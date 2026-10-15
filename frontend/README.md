@@ -75,13 +75,13 @@ Both apps use **Axios** with **`withCredentials: true`** so session cookies from
 
 - **Browser:** requests go to `/api/backend/...`; Next rewrites to `API_URL` (see `apps/web/next.config.js`).
 - **Server components / route handlers:** call `API_URL` directly via `fetch` or Axios (`apps/web/src/lib/http.ts`).
-- **Auth:** Next route handlers (e.g. `/api/login`) proxy login to the backend and set HTTP-only session cookies.
+- **Auth:** Next route handlers (e.g. `/api/login`) forward login to the backend, read its `Set-Cookie` header, and set the HTTP-only session cookie. Authentication JSON contains no tokens. The web server uses the same runtime `JWT_SECRET` as the backend. See [backend JWT flow](../backend/README.md#jwt-authentication-flow).
 
 ### Dashboard
 
 - **Dev:** Vite proxies `/api` → `VITE_API_URL` (strip `/api` prefix).
 - **Prod:** Axios uses `VITE_API_URL` as `baseURL`.
-- **Auth:** reads the same session cookie; `ProtectedRoute` requires `user.role === 'admin'`.
+- **Auth:** the browser sends the session cookie using `withCredentials: true`; JavaScript cannot read the HTTP-only token. `ProtectedRoute` requires `user.role === 'admin'`, and backend guards enforce authorization.
 
 ### Shared API layer
 

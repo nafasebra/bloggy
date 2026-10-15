@@ -52,10 +52,71 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
       COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
+      METRICS_ENABLED: "true"
+      METRICS_PORT: "9464"
+    expose:
+      - "9464"
     ports:
       - "${PORT:-3030}:3030"
     volumes:
       - backend-uploads:/app/uploads
+
+  prometheus:
+    image: prom/prometheus:v3.5.5
+    profiles: ["monitoring", "loadtest"]
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-remote-write-receiver
+    volumes:
+      - ./docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  grafana:
+    image: grafana/grafana:12.4.0
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me-now}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3002}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  k6:
+    image: grafana/k6:1.4.0
+    profiles: ["loadtest"]
+    depends_on:
+      backend:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+    command: ["run", "--out", "experimental-prometheus-rw", "/scripts/${K6_TEST:-load}.js"]
+    environment:
+      BASE_URL: ${K6_BASE_URL:-http://backend:3030}
+      RUN_ID: ${K6_RUN_ID:-local}
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      K6_PROMETHEUS_RW_TREND_STATS: "p(95),p(99),avg,max"
+      K6_PROMETHEUS_RW_STALE_MARKERS: "true"
+    volumes:
+      - ./tests/performance:/scripts:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   web:
     profiles: ["frontend"]
@@ -97,3 +158,5 @@ volumes:
   postgres-data:
   backend-uploads:
   pgadmin-data:
+  prometheus-data:
+  grafana-data:

@@ -11,6 +11,7 @@ Run commands from the repository root. Compose reads the root `.env`; all requir
 | `docker compose --profile frontend up -d --build` | PostgreSQL, backend, web, dashboard |
 | `docker compose --profile frontend --profile tools up -d --build` | All services |
 | `docker compose up -d postgres pgadmin` | PostgreSQL and pgAdmin only |
+| `docker compose --profile monitoring up -d --build` | PostgreSQL, backend, Prometheus, Grafana |
 
 Explicitly naming a profiled service starts it and its dependencies without activating the profile manually. These commands do not stop services that are already running. pgAdmin is pinned to version 9.18; upgrade the tag deliberately when needed.
 
@@ -37,6 +38,10 @@ In pgAdmin, select **Register → Server**, choose a name, and enter:
 pgAdmin connects directly to PostgreSQL over the Compose network. Its login password is separate from the database password. Both its configuration and the database use persistent named volumes.
 
 Inspect startup with `docker compose logs --tail=50 pgadmin`.
+
+## Monitoring and performance tests
+
+Optional profiles `monitoring` (Prometheus and Grafana) and `loadtest` (k6) provide backend metrics and load/stress test results. Grafana is at http://localhost:3002 with a provisioned Bloggy dashboard. See [performance test instructions](../tests/performance/README.md) for startup commands, credentials, scenarios, thresholds, and limitations.
 
 ## Continuous integration
 
