@@ -47,6 +47,9 @@ importers:
       '@repo/http-client':
         specifier: workspace:*
         version: link:../../packages/http-client
+      '@repo/sentry':
+        specifier: workspace:*
+        version: link:../../packages/sentry
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -286,6 +289,9 @@ importers:
       '@repo/http-client':
         specifier: workspace:*
         version: link:../../packages/http-client
+      '@repo/sentry':
+        specifier: workspace:*
+        version: link:../../packages/sentry
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -437,6 +443,15 @@ importers:
       axios:
         specifier: ^1.17.0
         version: 1.17.0
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+
+  packages/sentry:
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
