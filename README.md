@@ -9,7 +9,7 @@ Full-stack blogging platform: a public blog, an admin CMS, and a shared NestJS A
 | **Backend** — REST + WebSocket API | NestJS 11, TypeORM 0.3 | http://localhost:3030 |
 | **Storybook** — UI component catalog | Storybook 10 | http://localhost:6006 |
 
-**New here?** Follow [Quick start](#quick-start) below, then read the focused guides:
+**New here?** Start with the [How to start Bloggy](docs/how-to-start.md) guide for local development, Docker profiles, database tools, monitoring, and troubleshooting. A shorter [Quick start](#quick-start) is also available below.
 
 - [Frontend README](frontend/README.md) — Turborepo layout, web vs dashboard, proxies, Vitest
 - [Backend README](backend/README.md) — modules, entities, Swagger, Jest unit & e2e tests
