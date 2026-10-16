@@ -43,6 +43,9 @@ The **public blog**. Built with **Next.js 16** (App Router).
 
 The **admin CMS**. Built with **Vite 7 + React Router 7** (SPA).
 
+The dashboard uses a [feature-based architecture](apps/dashboard/README.md), with
+auth, overview, posts, users, and comments grouped under `src/features`.
+
 **Audience:** users with `role: admin` only. Non-admins are redirected to web login.
 
 **Features:**
