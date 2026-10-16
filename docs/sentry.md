@@ -7,10 +7,15 @@ sets `enabled: false`.
 
 | Application | Configuration | Environment template |
 | --- | --- | --- |
-| Dashboard | `frontend/apps/dashboard/src/config/sentry.ts` | `frontend/apps/dashboard/env-example` |
-| Web browser | `frontend/apps/web/src/config/sentry.client.ts` | `frontend/apps/web/env-example` |
-| Web server | `frontend/apps/web/src/config/sentry.server.ts` | `frontend/apps/web/env-example` |
+| Dashboard | `@repo/sentry/dashboard` | `frontend/apps/dashboard/env-example` |
+| Web browser | `@repo/sentry/web/client` | `frontend/apps/web/env-example` |
+| Web server | `@repo/sentry/web/server` | `frontend/apps/web/env-example` |
 | Backend | `backend/src/common/config/sentry.config.ts` | `backend/.env.example` |
+
+Frontend configuration lives in [`@repo/sentry`](../frontend/packages/sentry/README.md),
+with separate entry points for Vite, Next.js browser, and Next.js server code.
+The backend uses a separate npm project outside the frontend pnpm workspace and
+retains its local configuration placeholder.
 
 Use separate Sentry projects/DSNs for the web, dashboard, and backend. Copy the
 relevant variables into each app's local environment file when preparing setup.

@@ -1,0 +1,19 @@
+{
+  "name": "@repo/sentry",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./dashboard": "./src/dashboard.ts",
+    "./web/client": "./src/web-client.ts",
+    "./web/server": "./src/web-server.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "5.9.2"
+  }
+}
