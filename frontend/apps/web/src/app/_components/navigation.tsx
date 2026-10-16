@@ -1,0 +1,165 @@
+'use client';
+
+import Link from 'next/link';
+
+import { useCallback, useState } from 'react';
+
+import { Button } from '@repo/ui/button';
+
+import ThemeButton from '@/shared/components/theme-button';
+
+import NotificationButton from '@/features/notifications/components/notification-button';
+
+import { Menu, User, LayoutDashboard } from 'lucide-react';
+
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@repo/ui/sheet';
+
+import { useAuth } from '@/features/auth/providers/auth-provider';
+
+const DASHBOARD_URL =
+  process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:3001';
+
+export default function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { user, isLoading } = useAuth();
+
+  const isLoggedIn = Boolean(user?._id);
+
+  const isAdmin = user?.role === 'admin';
+
+  const changeMenuState = useCallback((state: boolean) => {
+    setIsMenuOpen(state);
+  }, []);
+
+  return (
+    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">B</span>
+            </div>
+
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
+              Bloggy
+            </span>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {isLoggedIn && <NotificationButton />}
+
+          <ThemeButton />
+
+          <div className="flex items-center gap-4">
+            {isLoading ? (
+              <div className="hidden sm:block w-20 h-9" />
+            ) : isLoggedIn ? (
+              <>
+                {isAdmin && (
+                  <a
+                    href={DASHBOARD_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </a>
+                )}
+
+                <Link href="/user/me">
+                  <Button className="hidden sm:flex">
+                    <User />
+
+                    <span>My Account</span>
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button>Login</Button>
+                </Link>
+
+                <Link href="/auth/signup">
+                  <Button variant={'outline'}>Sign Up</Button>
+                </Link>
+              </>
+            )}
+          </div>
+
+          {!isLoading && !isLoggedIn ? (
+            <div className="md:hidden flex">
+              <Sheet open={isMenuOpen} onOpenChange={changeMenuState}>
+                <SheetTrigger asChild>
+                  <Button variant={'outline'}>
+                    <Menu />
+                  </Button>
+                </SheetTrigger>
+
+                <SheetContent
+                  side="left"
+                  className="w-75 sm:w-100 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700"
+                >
+                  <SheetHeader className="pb-4">
+                    <SheetTitle className="text-left text-lg font-semibold text-gray-900 dark:text-white">
+                      Bloggy
+                    </SheetTitle>
+                  </SheetHeader>
+
+                  <nav className="px-4 flex flex-col gap-3 mt-4 space-y-3 pt-4">
+                    <Link href="/auth/login">
+                      <Button
+                        onClick={() => setIsMenuOpen(false)}
+                        className="w-full"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+
+                    <Link
+                      href="/auth/signup"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Button variant="outline" className="w-full">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
+          ) : !isLoading && isLoggedIn ? (
+            <div className="md:hidden flex items-center gap-2">
+              {isAdmin && (
+                <a
+                  href={DASHBOARD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </a>
+              )}
+
+              <Link href="/user/me">
+                <Button>
+                  <User />
+                </Button>
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </nav>
+  );
+}

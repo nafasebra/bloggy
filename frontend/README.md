@@ -24,6 +24,9 @@ Both apps talk to the same [NestJS backend](../backend) (default `http://localho
 
 The **public blog**. Built with **Next.js 16** (App Router).
 
+The web app uses a [feature-based architecture](apps/web/README.md), with domain
+code in `src/features` and thin Next.js route entry points in `src/app`.
+
 **Audience:** readers and logged-in authors.
 
 **Features:**
@@ -77,7 +80,7 @@ Both apps use **Axios** with **`withCredentials: true`** so session cookies from
 ### Web
 
 - **Browser:** requests go to `/api/backend/...`; Next rewrites to `API_URL` (see `apps/web/next.config.js`).
-- **Server components / route handlers:** call `API_URL` directly via `fetch` or Axios (`apps/web/src/lib/http.ts`).
+- **Server components / route handlers:** call `API_URL` through the shared `@repo/http-client/web` package.
 - **Auth:** Next route handlers (e.g. `/api/login`) forward login to the backend, read its `Set-Cookie` header, and set the HTTP-only session cookie. Authentication JSON contains no tokens. The web server uses the same runtime `JWT_SECRET` as the backend. See [backend JWT flow](../backend/README.md#jwt-authentication-flow).
 
 ### Dashboard
@@ -128,7 +131,7 @@ cd apps/web && pnpm test          # single run
 cd apps/web && pnpm test:watch    # watch mode
 ```
 
-**What we test today:** shared helpers used in both apps — e.g. `getReadTime` from `@repo/shared` and `cn` from `@repo/ui/utils` (`apps/web/src/lib/utils.test.ts`, `apps/dashboard/src/lib/utils.test.ts`).
+**What we test today:** shared helpers used in both apps — e.g. `getReadTime` from `@repo/shared` and `cn` from `@repo/ui/utils` (`apps/web/src/shared/lib/utils.test.ts`, `apps/dashboard/src/shared/lib/utils.test.ts`) — plus shared HTTP client defaults and middleware behavior.
 
 **Config:**
 

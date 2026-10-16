@@ -1,0 +1,103 @@
+'use server';
+
+import Link from 'next/link';
+import { Badge } from '@repo/ui/badge';
+import { UserAvatar } from '@/features/users/components/user-avatar';
+
+const mockLatestUsers = [
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    bio: 'Tech enthusiast and web developer passionate about creating meaningful digital experiences.',
+    avatar: 'SJ',
+    postsCount: 24,
+    followers: 1200,
+    category: 'Technology',
+  },
+  {
+    id: 2,
+    name: 'Michael Chen',
+    bio: 'Mindfulness coach helping people find balance in their busy lives through simple practices.',
+    avatar: 'MC',
+    postsCount: 18,
+    followers: 890,
+    category: 'Lifestyle',
+  },
+  {
+    id: 3,
+    name: 'Emma Davis',
+    bio: 'Food blogger and sustainability advocate sharing recipes that are good for you and the planet.',
+    avatar: 'ED',
+    postsCount: 32,
+    followers: 2100,
+    category: 'Food',
+  },
+  {
+    id: 4,
+    name: 'Alex Rodriguez',
+    bio: "Travel photographer capturing the world's most beautiful moments and sharing stories from the road.",
+    avatar: 'AR',
+    postsCount: 15,
+    followers: 750,
+    category: 'Travel',
+  },
+];
+
+export default async function LatestUsers() {
+  return (
+    <section className="py-16 bg-white dark:bg-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Meet Our Writers
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Discover talented authors sharing their unique perspectives
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {mockLatestUsers.map((user) => (
+            <div
+              key={user.id}
+              className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300"
+            >
+              <UserAvatar
+                name={user.name}
+                src={user.avatar}
+                size="xl"
+                className="mx-auto mb-4"
+              />
+
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <Link
+                  href={`/user/${user.id}`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {user.name}
+                </Link>
+              </h3>
+
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                {user.bio}
+              </p>
+
+              <div className="flex items-center justify-center space-x-4 mb-4">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {user.postsCount} posts
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {user.followers} followers
+                </span>
+              </div>
+
+              <Badge variant="info" className="text-xs">
+                {user.category}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

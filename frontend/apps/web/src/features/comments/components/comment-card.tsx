@@ -1,0 +1,150 @@
+import React, { useState } from 'react';
+import { UserAvatar } from '@/features/users/components/user-avatar';
+import { LoginPrompt } from '@/features/auth/components/login-prompt';
+import { CommentWithAuthor } from '@/features/comments/types';
+import { Heart } from 'lucide-react';
+import { useAuth } from '@/features/auth/providers/auth-provider';
+import { Button } from '@repo/ui/button';
+import { Input } from '@repo/ui/input';
+import { toast } from 'sonner';
+import { useCommentLikeQuery } from '@/features/comments/hooks/use-comment-like';
+import { useToggleCommentLikeMutation } from '@/features/comments/hooks/use-like-comment';
+import { useReplyToCommentMutation } from '@/features/comments/hooks/use-reply-comment';
+
+interface CommentCardProps {
+  comment: CommentWithAuthor;
+}
+
+const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
+  const [isReply, setIsReply] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const { user } = useAuth();
+
+  const { data: likeStatus } = useCommentLikeQuery(comment._id);
+  const likeMutation = useToggleCommentLikeMutation(
+    comment._id,
+    comment.postId
+  );
+  const replyMutation = useReplyToCommentMutation(comment.postId, {
+    onSuccess: () => {
+      setReplyText('');
+      setIsReply(false);
+    },
+  });
+
+  const handleLike = () => {
+    likeMutation.mutate();
+  };
+
+  const handleReply = () => {
+    if (!user?._id) {
+      toast.error('You must be logged in to reply');
+      return;
+    }
+    if (!replyText.trim()) return;
+    replyMutation.mutate({
+      content: replyText,
+      authorId: user._id,
+      authorName: user.name,
+      postId: comment.postId,
+      parentId: comment._id,
+    });
+  };
+
+  return (
+    <div key={comment._id} className="flex space-x-4">
+      <UserAvatar name={comment.author?.name || 'User'} size="md" />
+
+      <div className="flex-1">
+        <div className="flex items-center space-x-2 mb-2">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+            {comment.author?.name || 'Anonymous'}
+          </h4>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {new Date(comment.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        </div>
+
+        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+          {comment.content}
+        </p>
+
+        <div className="flex items-center space-x-4 mt-3">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsReply(!isReply)}
+            className={`cursor-pointer text-xs h-auto py-0 px-0 ${
+              isReply
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
+            }`}
+          >
+            Reply
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleLike}
+            disabled={likeMutation.isPending}
+            className={`cursor-pointer text-xs h-auto py-0 px-0 ${
+              likeStatus?.isLiked
+                ? 'text-red-600 dark:text-red-400'
+                : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
+            } flex items-center`}
+          >
+            <Heart
+              className="mr-1"
+              size={16}
+              fill={likeStatus?.isLiked ? 'red' : 'none'}
+              color={likeStatus?.isLiked ? 'red' : 'currentColor'}
+            />
+            {likeMutation.isPending
+              ? 'Liking...'
+              : `Like (${comment.likes || 0})`}
+          </Button>
+        </div>
+
+        {isReply && (
+          <>
+            {user?._id ? (
+              <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                <Input
+                  type="text"
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Add a reply..."
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleReply}
+                  disabled={replyMutation.isPending}
+                >
+                  {replyMutation.isPending ? 'Replying...' : 'Reply'}
+                </Button>
+              </div>
+            ) : (
+              <LoginPrompt
+                message="You should be logged in to reply."
+                variant="dashed"
+                buttonSize="sm"
+              />
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CommentCard;
