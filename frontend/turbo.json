@@ -15,7 +15,13 @@
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**"],
-      "env": ["VITE_API_URL", "VITE_WEB_URL"]
+      "env": [
+        "VITE_API_URL",
+        "VITE_WEB_URL",
+        "VITE_SENTRY_DSN",
+        "VITE_SENTRY_ENVIRONMENT",
+        "VITE_SENTRY_RELEASE"
+      ]
     },
     "storybook#build": {
       "dependsOn": ["^build"],
@@ -31,7 +37,13 @@
         "NEXT_PUBLIC_APP_URL",
         "NEXT_PUBLIC_DASHBOARD_URL",
         "VITE_API_URL",
-        "VITE_WEB_URL"
+        "VITE_WEB_URL",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_PUBLIC_SENTRY_ENVIRONMENT",
+        "NEXT_PUBLIC_SENTRY_RELEASE",
+        "SENTRY_DSN",
+        "SENTRY_ENVIRONMENT",
+        "SENTRY_RELEASE"
       ]
     },
     "lint": {

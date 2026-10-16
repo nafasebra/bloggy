@@ -7,3 +7,13 @@ JWT_SECRET=your-secret-key-here
 # Public URLs
 NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Sentry browser placeholders (public; SDK integration is not enabled)
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_ENVIRONMENT=development
+NEXT_PUBLIC_SENTRY_RELEASE=
+
+# Sentry server placeholders
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_RELEASE=

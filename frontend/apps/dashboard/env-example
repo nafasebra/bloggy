@@ -3,3 +3,8 @@ VITE_API_URL=http://localhost:3030
 
 # Web app URL (login / logout redirects)
 VITE_WEB_URL=http://localhost:3000
+
+# Sentry placeholders (SDK integration is not enabled)
+VITE_SENTRY_DSN=
+VITE_SENTRY_ENVIRONMENT=development
+VITE_SENTRY_RELEASE=
