@@ -6,7 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import http from '@/lib/http';
+import http from '@repo/http-client/dashboard';
 
 interface User {
   _id: string;
@@ -52,8 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    const webLoginUrl =
-      import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
+    const webLoginUrl = import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
     try {
       await http.post('/auth/logout');
     } catch {

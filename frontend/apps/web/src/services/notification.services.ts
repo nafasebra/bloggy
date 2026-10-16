@@ -1,4 +1,4 @@
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import type {
   Notification,
   NotificationsResponse,

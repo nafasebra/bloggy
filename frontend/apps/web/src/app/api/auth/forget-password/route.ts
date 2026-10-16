@@ -1,4 +1,4 @@
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -14,7 +14,9 @@ export async function POST(request: NextRequest) {
     };
     const status = axiosError.response?.status ?? 500;
     const message =
-      axiosError.response?.data?.message ?? axiosError.message ?? 'Request failed';
+      axiosError.response?.data?.message ??
+      axiosError.message ??
+      'Request failed';
 
     return NextResponse.json({ error: message }, { status });
   }

@@ -1,4 +1,4 @@
-import http, { getApiBaseUrl } from '@/lib/http';
+import http, { getApiBaseUrl } from '@repo/http-client/web';
 import type { User } from '@/types/user';
 
 export function resolveAvatarUrl(src?: string): string | undefined {

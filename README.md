@@ -11,6 +11,8 @@ Full-stack blogging platform: a public blog, an admin CMS, and a shared NestJS A
 
 **New here?** Start with the [How to start Bloggy](docs/how-to-start.md) guide for local development, Docker profiles, database tools, monitoring, and troubleshooting. A shorter [Quick start](#quick-start) is also available below.
 
+Dashboard and web share cookie credentials, timeouts, and rate-limit middleware through [`@repo/http-client`](frontend/packages/http-client/README.md).
+
 - [Frontend README](frontend/README.md) — Turborepo layout, web vs dashboard, proxies, Vitest
 - [Backend README](backend/README.md) — modules, entities, Swagger, Jest unit & e2e tests
 

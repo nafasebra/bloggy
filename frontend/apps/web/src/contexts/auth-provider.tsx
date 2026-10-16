@@ -11,7 +11,7 @@ import React, {
 import { hasSessionHint } from '@/lib/auth/client-session';
 import { UserService } from '@/services/user.services';
 import { User } from '@/types/user';
-import axios from 'axios';
+import { appHttp } from '@repo/http-client/web';
 
 interface AuthContextType {
   user: User | null;
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/api/logout', {}, { withCredentials: true });
+      await appHttp.post('/api/logout');
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {

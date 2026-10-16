@@ -4,7 +4,7 @@ import SearchBar from '@/components/shared/search-bar';
 import { PostCard } from '@/components/shared/post-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import CategoryButtons from '@/components/pages/blog/category-buttons';
-import { serverGet } from '@/lib/http';
+import { serverGet } from '@repo/http-client/web';
 import type { Post } from '@/types/post';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@repo/ui/button';

@@ -1,4 +1,4 @@
-import http from '@/lib/http';
+import http from '@repo/http-client/dashboard';
 import type { User } from '@/types';
 
 class UserService {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import { clearSessionCookies } from '@/lib/auth/server-cookies';
 
 export async function POST() {

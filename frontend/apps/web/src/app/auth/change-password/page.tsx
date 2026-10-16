@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import { AuthFormLayout } from '@/components/shared/auth-form-layout';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@repo/ui/button';

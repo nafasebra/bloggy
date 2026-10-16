@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-provider';
 import { z } from 'zod';

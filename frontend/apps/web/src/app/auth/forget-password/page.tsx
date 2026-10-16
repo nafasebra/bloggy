@@ -9,6 +9,7 @@ import { AuthFormLayout } from '@/components/shared/auth-form-layout';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
+import { appHttp } from '@repo/http-client/web';
 
 const forgetPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -27,20 +28,8 @@ export default function ForgetPasswordPage() {
 
   const onSubmit = async (data: ForgetPasswordFormData) => {
     try {
-      const response = await fetch('/api/auth/forget-password', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        toast.success('Password reset link sent to your email!');
-      } else {
-        toast.error('Failed to send reset email');
-      }
+      await appHttp.post('/api/auth/forget-password', data);
+      toast.success('Password reset link sent to your email!');
     } catch {
       toast.error('Request failed. Please try again.');
     }

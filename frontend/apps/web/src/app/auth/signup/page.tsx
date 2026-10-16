@@ -11,7 +11,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
-import axios from 'axios';
+import { appHttp } from '@repo/http-client/web';
 
 const signupSchema = z.object({
   username: z.string().min(2, 'Username must be at least 2 characters'),
@@ -35,15 +35,9 @@ export default function SignupPage() {
 
   const onSubmit = async (data: signupFormData) => {
     try {
-      const response = await axios.post(
-        '/api/register',
-        {
-          ...data,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await appHttp.post('/api/register', {
+        ...data,
+      });
 
       if (response.data) {
         toast.success('Account created successfully! Please log in.');

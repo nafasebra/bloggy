@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CommentSection from '@/components/pages/blog/comment-section';
 import { ChevronLeft } from 'lucide-react';
-import { serverGet, serverPost } from '@/lib/http';
+import { serverGet, serverPost } from '@repo/http-client/web';
 import { Post } from '@/types/post';
 import { MarkdownPreview } from '@repo/ui/markdown-preview';
 import { Badge } from '@repo/ui/badge';

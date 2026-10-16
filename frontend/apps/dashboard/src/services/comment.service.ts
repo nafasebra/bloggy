@@ -1,4 +1,4 @@
-import http from '@/lib/http';
+import http from '@repo/http-client/dashboard';
 import type { Comment, CommentRow, Post } from '@/types';
 
 class CommentService {

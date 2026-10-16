@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import { queryKeys } from '@/constants/key-query';
 import type { FollowingResponse } from '@/types/follow';
 

@@ -12,7 +12,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@repo/ui/button';
 import { Input } from '@repo/ui/input';
 import { Label } from '@repo/ui/label';
-import axios from 'axios';
+import { appHttp } from '@repo/http-client/web';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -35,16 +35,10 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await axios.post(
-        '/api/login',
-        {
-          username: data.username,
-          password: data.password,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await appHttp.post('/api/login', {
+        username: data.username,
+        password: data.password,
+      });
 
       const result = response.data;
 

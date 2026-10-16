@@ -17,8 +17,10 @@ function redirectToRateLimitPage(): void {
   window.location.assign(RATE_LIMIT_PATH);
 }
 
-export function attachRateLimitInterceptor(instance: AxiosInstance): void {
-  instance.interceptors.response.use(
+export function attachRateLimitInterceptor(
+  instance: AxiosInstance
+): () => void {
+  const interceptor = instance.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
       if (error.response?.status === 429) {
@@ -28,4 +30,5 @@ export function attachRateLimitInterceptor(instance: AxiosInstance): void {
       return Promise.reject(error);
     }
   );
+  return () => instance.interceptors.response.eject(interceptor);
 }

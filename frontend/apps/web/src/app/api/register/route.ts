@@ -1,4 +1,4 @@
-import http from '@/lib/http';
+import http from '@repo/http-client/web';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -15,7 +15,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response.data);
   } catch (error: unknown) {
     const axiosError = error as {
-      response?: { status?: number; data?: { message?: string; error?: string } };
+      response?: {
+        status?: number;
+        data?: { message?: string; error?: string };
+      };
       message?: string;
     };
     const status = axiosError.response?.status ?? 500;

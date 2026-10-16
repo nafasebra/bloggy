@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./web": "./src/web.ts",
+    "./dashboard": "./src/dashboard.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
