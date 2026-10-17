@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { Button } from '@repo/ui/button';
-import { AvatarCropDialog } from './avatar-crop-dialog';
+import { AvatarEditorDialog } from './avatar-editor-dialog';
 import {
   AVATAR_ACCEPT,
   resolveAvatarUrl,
@@ -103,7 +103,7 @@ export function AvatarPicker({
         </p>
       )}
       {pendingPhoto && (
-        <AvatarCropDialog
+        <AvatarEditorDialog
           file={pendingPhoto}
           onCancel={() => setPendingPhoto(null)}
           onSave={(cropped) => {

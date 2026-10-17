@@ -1,9 +1,12 @@
 # Profile photos
 
 Users can choose a photo during `/auth/setup` or from the profile editing dialog.
-After selection, a crop dialog provides zoom and horizontal/vertical positioning,
-with a round guide. **Use photo** creates a 512×512 PNG for preview and eventual
-upload; **Cancel** keeps the previous selection. Animated images become a still
+After selection, a photo editor dialog offers **Crop** and **Filter** tabs with
+one shared preview. Crop provides zoom and horizontal/vertical positioning with
+a round guide. Filter offers Original, Grayscale, Sepia, Warm, and Cool. Switching
+tabs preserves both edits; **Save photo** creates a 512×512 PNG with the crop and
+filter applied for eventual upload. **Cancel** discards both edits and keeps the
+previous selection. Animated images become a still
 image when cropped. Cropping runs locally without sending the original photo.
 Both flows use the users feature's `AvatarPicker`, with a local preview, selection
 cancel action, and client-side format/size checks. Saving sends the selected file
