@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { Button } from '@repo/ui/button';
+import { AvatarCropDialog } from './avatar-crop-dialog';
 import {
   AVATAR_ACCEPT,
   resolveAvatarUrl,
@@ -26,6 +27,7 @@ export function AvatarPicker({
   const input = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string>();
   const [error, setError] = useState<string>();
+  const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
   useEffect(() => {
     if (!file) {
       setPreview(undefined);
@@ -68,7 +70,7 @@ export function AvatarPicker({
           if (!selected) return;
           const message = validateAvatarFile(selected);
           setError(message);
-          if (!message) onChange(selected);
+          if (!message) setPendingPhoto(selected);
         }}
       />
       <Button
@@ -99,6 +101,18 @@ export function AvatarPicker({
         <p role="alert" className="text-sm text-destructive">
           {error}
         </p>
+      )}
+      {pendingPhoto && (
+        <AvatarCropDialog
+          file={pendingPhoto}
+          onCancel={() => setPendingPhoto(null)}
+          onSave={(cropped) => {
+            const message = validateAvatarFile(cropped);
+            setError(message);
+            if (!message) onChange(cropped);
+            setPendingPhoto(null);
+          }}
+        />
       )}
     </div>
   );
