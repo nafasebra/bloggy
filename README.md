@@ -18,6 +18,8 @@ Dashboard and web share cookie credentials, timeouts, and rate-limit middleware 
 [Feature flags](docs/feature-flags.md) use an optional Dockerized Flipt dashboard,
 backend evaluation, and a shared frontend package with a test flag.
 
+[Profile photo uploads](docs/profile-photos.md) work during account setup and profile editing.
+
 - [Frontend README](frontend/README.md) — Turborepo layout, web vs dashboard, proxies, Vitest
 - [Backend README](backend/README.md) — modules, entities, Swagger, Jest unit & e2e tests
 

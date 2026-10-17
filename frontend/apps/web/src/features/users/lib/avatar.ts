@@ -14,21 +14,23 @@ export async function uploadUserAvatar(
   userId: string,
   file: File
 ): Promise<User> {
+  const error = validateAvatarFile(file);
+  if (error) throw new Error(error);
   const formData = new FormData();
   formData.append('avatar', file);
 
-  const response = await http.post<User>(`/users/${userId}/avatar`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const response = await http.post<User>(`/users/${userId}/avatar`, formData);
 
   return response.data;
 }
 
-export function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+export const AVATAR_ACCEPT = 'image/jpeg,image/png,image/gif,image/webp';
+
+export function validateAvatarFile(
+  file: Pick<File, 'type' | 'size'>
+): string | undefined {
+  if (!AVATAR_ACCEPT.split(',').includes(file.type))
+    return 'Choose a JPEG, PNG, GIF, or WebP image.';
+  if (file.size === 0) return 'The selected image is empty.';
+  if (file.size > 5 * 1024 * 1024) return 'Image must be 5MB or smaller.';
 }

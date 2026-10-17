@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  HttpCode,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
@@ -89,8 +90,16 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/avatar')
+  @HttpCode(200)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['avatar'],
+      properties: { avatar: { type: 'string', format: 'binary' } },
+    },
+  })
   @ApiOperation({ summary: 'Upload user avatar' })
   @ApiResponse({
     status: 200,
@@ -115,8 +124,7 @@ export class UsersController {
     if (!file) {
       throw new BadRequestException('Avatar file is required');
     }
-    const avatar = `/uploads/avatars/${file.filename}`;
-    return this.usersService.update(id, { avatar });
+    return this.usersService.uploadAvatar(id, file);
   }
 
   @UseGuards(JwtAuthGuard)

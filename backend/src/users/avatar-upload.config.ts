@@ -1,6 +1,7 @@
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
+import { BadRequestException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
-import { extname, join } from 'path';
+import { join } from 'path';
 
 export const AVATAR_UPLOAD_DIR = join(process.cwd(), 'uploads', 'avatars');
 
@@ -18,17 +19,7 @@ export function ensureAvatarUploadDir() {
 }
 
 export const avatarUploadOptions = {
-  storage: diskStorage({
-    destination: (_req, _file, cb) => {
-      ensureAvatarUploadDir();
-      cb(null, AVATAR_UPLOAD_DIR);
-    },
-    filename: (req, file, cb) => {
-      const userId = req.params.id;
-      const ext = extname(file.originalname).toLowerCase() || '.jpg';
-      cb(null, `${userId}-${Date.now()}${ext}`);
-    },
-  }),
+  storage: memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (
     _req: Express.Request,
@@ -36,7 +27,12 @@ export const avatarUploadOptions = {
     cb: (error: Error | null, acceptFile: boolean) => void
   ) => {
     if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
-      cb(new Error('Only JPEG, PNG, GIF, and WebP images are allowed'), false);
+      cb(
+        new BadRequestException(
+          'Only JPEG, PNG, GIF, and WebP images are allowed'
+        ),
+        false
+      );
       return;
     }
     cb(null, true);

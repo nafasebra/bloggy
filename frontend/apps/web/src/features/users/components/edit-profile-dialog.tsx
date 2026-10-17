@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { Camera } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -21,11 +19,7 @@ import {
   editProfileSchema,
   type EditProfileFormData,
 } from '@/features/users/schemas/edit-profile';
-import {
-  readFileAsDataUrl,
-  resolveAvatarUrl,
-} from '@/features/users/lib/avatar';
-import { toast } from 'sonner';
+import { AvatarPicker } from './avatar-picker';
 import { useUpdateProfileMutation } from '@/features/users/hooks/use-update-profile';
 import type { User } from '@/features/users/types';
 
@@ -42,7 +36,6 @@ export function EditProfileDialog({
   onOpenChange,
   onSuccess,
 }: EditProfileDialogProps) {
-  const [avatarPreview, setAvatarPreview] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfileMutation();
 
@@ -67,28 +60,9 @@ export function EditProfileDialog({
         twitter: user.twitter || '',
         category: user.category || '',
       });
-      setAvatarPreview(resolveAvatarUrl(user.avatar) || '');
       setAvatarFile(null);
     }
   }, [open, user, reset]);
-
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be smaller than 5MB');
-      return;
-    }
-
-    setAvatarFile(file);
-    setAvatarPreview(await readFileAsDataUrl(file));
-  };
 
   const onSubmit = async (data: EditProfileFormData) => {
     try {
@@ -115,42 +89,12 @@ export function EditProfileDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="relative shrink-0">
-              <div className="size-20 rounded-full overflow-hidden border-2 border-border bg-muted">
-                {avatarPreview ? (
-                  <Image
-                    src={avatarPreview}
-                    alt="Avatar preview"
-                    width={80}
-                    height={80}
-                    className="size-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="size-full flex items-center justify-center text-muted-foreground">
-                    <Camera className="size-8" />
-                  </div>
-                )}
-              </div>
-              <label
-                htmlFor="edit-profile-avatar"
-                className="absolute -bottom-1 -right-1 flex size-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
-              >
-                <Camera className="size-4" />
-              </label>
-              <input
-                id="edit-profile-avatar"
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Upload a profile photo (max 5MB). JPEG, PNG, GIF, or WebP.
-            </p>
-          </div>
+          <AvatarPicker
+            file={avatarFile}
+            onChange={setAvatarFile}
+            src={user.avatar}
+            disabled={isPending}
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">

@@ -2,17 +2,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { uploadUserAvatar } from '@/features/users/lib/avatar';
 import { queryKeys } from '@/shared/lib/query-keys';
 import { UserService } from '@/features/users/api/user.services';
-import type { EditProfileFormData } from '@/features/users/schemas/edit-profile';
+import type { UpdateUserData } from '@/features/users/types';
+import { useAuth } from '@/features/auth/providers/auth-provider';
 import { toast } from 'sonner';
 
 type UpdateProfileInput = {
   userId: string;
-  data: EditProfileFormData;
+  data: UpdateUserData;
   avatarFile?: File | null;
 };
 
 export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
+  const { setUser } = useAuth();
 
   return useMutation({
     mutationFn: async ({ userId, data, avatarFile }: UpdateProfileInput) => {
@@ -22,7 +24,9 @@ export function useUpdateProfileMutation() {
 
       return UserService.updateUser(userId, data);
     },
-    onSuccess: () => {
+    onSuccess: (user) => {
+      setUser(user);
+      queryClient.setQueryData(queryKeys.userMe(), user);
       queryClient.invalidateQueries({ queryKey: queryKeys.userMe() });
       toast.success('Profile updated successfully');
     },

@@ -10,6 +10,7 @@ describe('UsersController', () => {
     update: jest.Mock;
     findAll: jest.Mock;
     remove: jest.Mock;
+    uploadAvatar: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -18,6 +19,7 @@ describe('UsersController', () => {
       update: jest.fn(),
       findAll: jest.fn(),
       remove: jest.fn(),
+      uploadAvatar: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -62,7 +64,7 @@ describe('UsersController', () => {
         _id: 'user-1',
         avatar: '/uploads/avatars/user-1-123.jpg',
       };
-      usersService.update.mockResolvedValue(updated);
+      usersService.uploadAvatar.mockResolvedValue(updated);
 
       const file = {
         filename: 'user-1-123.jpg',
@@ -72,9 +74,7 @@ describe('UsersController', () => {
         user: { userId: 'user-1' },
       });
 
-      expect(usersService.update).toHaveBeenCalledWith('user-1', {
-        avatar: '/uploads/avatars/user-1-123.jpg',
-      });
+      expect(usersService.uploadAvatar).toHaveBeenCalledWith('user-1', file);
       expect(result).toBe(updated);
     });
 

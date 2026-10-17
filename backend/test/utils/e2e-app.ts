@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from '../../src/app.module';
 import { createSqliteDataSource } from './sqlite-data-source';
+import { join } from 'node:path';
 
 export async function createE2eApp(): Promise<INestApplication> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,6 +16,7 @@ export async function createE2eApp(): Promise<INestApplication> {
     .compile();
 
   const app = moduleFixture.createNestApplication<NestExpressApplication>();
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,9 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+import { AvatarPicker } from '@/features/users/components/avatar-picker';
+import { useUpdateProfileMutation } from '@/features/users/hooks/use-update-profile';
 import { useForm } from 'react-hook-form';
-import Image from 'next/image';
-import { Camera } from 'lucide-react';
-import http from '@repo/http-client/web';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/providers/auth-provider';
 import { z } from 'zod';
@@ -16,7 +16,6 @@ import { Label } from '@repo/ui/label';
 
 const setupSchema = z.object({
   bio: z.string().optional(),
-  avatar: z.any().optional(),
   location: z.string().optional(),
   website: z
     .string()
@@ -45,23 +44,19 @@ export default function CreateUserPage() {
   });
 
   const { user } = useAuth();
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
 
   const onSubmit = async (data: FormData) => {
-    const tempdata = { ...data };
-    delete tempdata.avatar;
-
+    if (!user?._id) {
+      toast.error('Please sign in before setting up your profile.');
+      return;
+    }
     try {
-      const response = await http.patch(`/users/${user?._id}`, tempdata);
-      if (response.data) {
-        toast.success('Profile created successfully!');
-        router.push(`/user/me`);
-      } else {
-        toast.error(
-          `Failed with error: ${response.statusText} - ${response.status}`
-        );
-      }
+      await updateProfile({ userId: user._id, data, avatarFile });
+      router.push('/user/me');
     } catch {
-      toast.error('Failed to create profile. Please try again.');
+      // The shared profile mutation displays upload/save errors.
     }
   };
 
@@ -69,55 +64,13 @@ export default function CreateUserPage() {
     <div className="py-10 min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-5">
       <div className="w-full max-w-5xl bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
-          {/* Left Column - Avatar Upload */}
           <div className="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-8 flex items-center justify-center">
-            <div className="text-center">
-              <div className="mb-6">
-                <div className="relative mx-auto w-32 h-32 mb-4">
-                  <div className="w-32 h-32 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden">
-                    <Image
-                      src="/placeholder-avatar.jpg"
-                      alt="Avatar preview"
-                      width={128}
-                      height={128}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                      onError={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        const sibling =
-                          target.nextElementSibling as HTMLElement;
-                        target.style.display = 'none';
-                        if (sibling) {
-                          sibling.style.display = 'flex';
-                        }
-                      }}
-                    />
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-                      <Camera className="w-12 h-12" />
-                    </div>
-                  </div>
-                  <label
-                    htmlFor="avatar"
-                    className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-2 cursor-pointer shadow-lg transition-colors duration-200"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </label>
-                  <input
-                    id="avatar"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    {...register('avatar')}
-                  />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                  Upload Your Photo
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Choose a photo that represents you best
-                </p>
-              </div>
-            </div>
+            <AvatarPicker
+              file={avatarFile}
+              onChange={setAvatarFile}
+              src={user?.avatar}
+              disabled={isSubmitting}
+            />
           </div>
 
           {/* Right Column - Form */}
