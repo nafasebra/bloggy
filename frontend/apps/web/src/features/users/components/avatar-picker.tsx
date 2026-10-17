@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 import { AvatarEditorDialog } from './avatar-editor-dialog';
+import { ProfilePhotoDialog } from './profile-photo-dialog';
 import {
   AVATAR_ACCEPT,
   resolveAvatarUrl,
@@ -28,6 +29,7 @@ export function AvatarPicker({
   const [preview, setPreview] = useState<string>();
   const [error, setError] = useState<string>();
   const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
+  const [showPhoto, setShowPhoto] = useState(false);
   useEffect(() => {
     if (!file) {
       setPreview(undefined);
@@ -77,9 +79,9 @@ export function AvatarPicker({
         type="button"
         variant="outline"
         disabled={disabled}
-        onClick={() => input.current?.click()}
+        onClick={() => (image ? setShowPhoto(true) : input.current?.click())}
       >
-        {file || src ? 'Change photo' : 'Choose photo'}
+        {file || src ? 'Edit photo' : 'Choose photo'}
       </Button>
       {file && (
         <Button
@@ -112,6 +114,15 @@ export function AvatarPicker({
             if (!message) onChange(cropped);
             setPendingPhoto(null);
           }}
+        />
+      )}
+      {showPhoto && (
+        <ProfilePhotoDialog
+          src={image}
+          file={file}
+          onClose={() => setShowPhoto(false)}
+          onSave={onChange}
+          onRemove={file ? () => onChange(null) : undefined}
         />
       )}
     </div>

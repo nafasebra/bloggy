@@ -83,6 +83,19 @@ export class UsersService {
       await unlink(diskPath).catch(() => undefined);
       throw error;
     }
+    await this.deleteAvatarFile(id, previousAvatar);
+    return updated;
+  }
+
+  async removeAvatar(id: string): Promise<User> {
+    const user = await this.findOne(id);
+    const previousAvatar = user.avatar;
+    const updated = await this.update(id, { avatar: '' });
+    await this.deleteAvatarFile(id, previousAvatar);
+    return updated;
+  }
+
+  private async deleteAvatarFile(id: string, previousAvatar?: string) {
     // Only remove files in our avatar directory; never follow arbitrary paths.
     const prefix = '/uploads/avatars/';
     if (previousAvatar?.startsWith(prefix)) {
@@ -100,6 +113,5 @@ export class UsersService {
         );
       }
     }
-    return updated;
   }
 }

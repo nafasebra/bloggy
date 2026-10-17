@@ -128,6 +128,20 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete(':id/avatar')
+  @ApiOperation({ summary: 'Remove your profile photo' })
+  @ApiResponse({ status: 200, type: SingleUserResponseDto })
+  removeAvatar(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Request() req: { user: { userId: string } }
+  ) {
+    if (req.user.userId !== id) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
+    return this.usersService.removeAvatar(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user by id' })
   @ApiResponse({

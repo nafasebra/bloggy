@@ -20,7 +20,7 @@ import { exportAvatarCrop, getAvatarCrop } from '../lib/crop-avatar';
 
 interface AvatarEditorDialogProps {
   file: File;
-  onSave: (file: File) => void;
+  onSave: (file: File) => Promise<void> | void;
   onCancel: () => void;
 }
 
@@ -93,9 +93,9 @@ export function AvatarEditorDialog({
     setError(undefined);
     try {
       const cropped = await exportAvatarCrop(canvas.current, file.name);
-      onSave(cropped);
+      await onSave(cropped);
     } catch {
-      setError('Could not save this photo. Please try another image.');
+      setError('Could not save this photo. Please try again.');
       setSaving(false);
     }
   };

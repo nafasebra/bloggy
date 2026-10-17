@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs';
 import FollowerList from '@/features/follows/components/follower-list';
 import FollowingList from '@/features/follows/components/following-list';
 import { UserProfileHeader } from '@/features/users/components/user-profile-header';
+import { ProfilePhotoButton } from '@/features/users/components/profile-photo-button';
 import { UserStatsBar } from '@/features/users/components/user-stats-bar';
 import { UserProfileSkeleton } from '@/features/users/components/user-profile-skeleton';
 import { EmptyState } from '@/shared/components/empty-state';
@@ -85,6 +86,12 @@ export default function UserPage() {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <UserProfileHeader user={userData} />
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button asChild variant="outline">
+              <Link href="/user/me/edit">Edit profile</Link>
+            </Button>
+            <ProfilePhotoButton user={userData} />
+          </div>
           <UserStatsBar
             postsCount={userData.postIds?.length || 0}
             followersCount={userData.followers || 0}

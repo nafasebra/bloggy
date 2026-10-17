@@ -1,10 +1,55 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import http from '@repo/http-client/web';
-import { uploadUserAvatar, validateAvatarFile } from './avatar';
+import {
+  loadAvatarFile,
+  removeUserAvatar,
+  uploadUserAvatar,
+  validateAvatarFile,
+} from './avatar';
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('avatar uploads', () => {
+  it('removes the photo through the shared authenticated client', async () => {
+    const user = { _id: 'user-1', avatar: '' };
+    const remove = vi.spyOn(http, 'delete').mockResolvedValue({ data: user });
+    expect(await removeUserAvatar('user-1')).toBe(user);
+    expect(remove).toHaveBeenCalledWith('/users/user-1/avatar');
+  });
+
+  it('loads the saved photo into an editable file with credentials', async () => {
+    const fetchPhoto = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(new Blob(['photo'], { type: 'image/png' }))
+      );
+    vi.stubGlobal('fetch', fetchPhoto);
+    const file = await loadAvatarFile('/api/backend/uploads/avatars/photo.png');
+    expect(file.type).toBe('image/png');
+    expect(await file.text()).toBe('photo');
+    expect(fetchPhoto).toHaveBeenCalledWith(
+      '/api/backend/uploads/avatars/photo.png',
+      { credentials: 'include' }
+    );
+  });
+
+  it('rejects unavailable or invalid saved photos instead of opening the editor', async () => {
+    const fetchPhoto = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('', { status: 404 }))
+      .mockResolvedValueOnce(
+        new Response(new Blob(['html'], { type: 'text/html' }))
+      );
+    vi.stubGlobal('fetch', fetchPhoto);
+    await expect(loadAvatarFile('/missing.png')).rejects.toThrow(
+      'Could not load'
+    );
+    await expect(loadAvatarFile('/bad.png')).rejects.toThrow('JPEG');
+  });
+
   it('accepts supported images and rejects empty, oversized, or unsupported files', () => {
     for (const type of ['image/jpeg', 'image/png', 'image/gif', 'image/webp']) {
       expect(validateAvatarFile({ type, size: 1024 })).toBeUndefined();

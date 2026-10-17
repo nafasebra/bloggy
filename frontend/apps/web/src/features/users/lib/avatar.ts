@@ -26,6 +26,21 @@ export async function uploadUserAvatar(
 
 export const AVATAR_ACCEPT = 'image/jpeg,image/png,image/gif,image/webp';
 
+export async function removeUserAvatar(userId: string): Promise<User> {
+  const response = await http.delete<User>(`/users/${userId}/avatar`);
+  return response.data;
+}
+
+export async function loadAvatarFile(url: string): Promise<File> {
+  const response = await fetch(url, { credentials: 'include' });
+  if (!response.ok) throw new Error('Could not load profile photo');
+  const blob = await response.blob();
+  const file = new File([blob], 'profile-photo', { type: blob.type });
+  const error = validateAvatarFile(file);
+  if (error) throw new Error(error);
+  return file;
+}
+
 export function validateAvatarFile(
   file: Pick<File, 'type' | 'size'>
 ): string | undefined {

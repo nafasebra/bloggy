@@ -127,6 +127,46 @@ describe('Users (e2e)', () => {
     expect(me.body.password).toBeUndefined();
   });
 
+  it('removes only the signed-in users photo and cleans up its file', async () => {
+    const owner = await registerAndLogin(httpServer, uniqueUser('removephoto'));
+    const other = await registerAndLogin(httpServer, uniqueUser('otherphoto'));
+    const path = `/users/${owner.user._id}/avatar`;
+    const uploaded = await request(httpServer)
+      .post(path)
+      .set(withSession(owner.sessionToken))
+      .attach('avatar', png, 'photo.png')
+      .expect(200);
+    const diskPath = join(
+      AVATAR_UPLOAD_DIR,
+      basename(uploaded.body.avatar as string)
+    );
+    uploadedFiles.push(diskPath);
+    await request(httpServer).delete(path).expect(401);
+    await request(httpServer)
+      .delete(path)
+      .set(withSession(other.sessionToken))
+      .expect(403);
+    expect(await readFile(diskPath)).toEqual(png);
+    const removed = await request(httpServer)
+      .delete(path)
+      .set(withSession(owner.sessionToken))
+      .expect(200);
+    expect(removed.body.avatar).toBe('');
+    expect(removed.body.username).toBe(owner.user.username);
+    expect(removed.body.password).toBeUndefined();
+    await expect(readFile(diskPath)).rejects.toMatchObject({ code: 'ENOENT' });
+    const me = await request(httpServer)
+      .get('/users/me')
+      .set(withSession(owner.sessionToken))
+      .expect(200);
+    expect(me.body.avatar).toBe('');
+    // Removal also works when the photo is already absent.
+    await request(httpServer)
+      .delete(path)
+      .set(withSession(owner.sessionToken))
+      .expect(200);
+  });
+
   it('rejects missing, spoofed, unsupported, and oversized images', async () => {
     const { user, sessionToken } = await registerAndLogin(httpServer);
     const upload = () =>

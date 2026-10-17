@@ -1,5 +1,21 @@
 # Profile photos
 
+On `/user/me`, **Edit profile photo** opens a photo management dialog with a
+large circular preview, **Edit**, **Upload photo**, and **Remove** actions.
+Edit loads the current saved photo into the crop/filter editor; Upload opens the
+same editor for a replacement. Saving here persists the photo immediately and
+refreshes the current user. Removing requires confirmation and restores the
+initials avatar; it does not delete the account. Failed saves keep the editor
+open for retry. Previously saved crops/filters are flattened into the stored image.
+
+During setup, the first upload opens the same crop/filter editor. **Edit photo**
+then opens the photo management dialog to edit, replace, or remove that local
+selection. These changes are uploaded only when the setup form is submitted.
+
+`DELETE /users/:id/avatar` removes the owner's photo, returns the updated user,
+and cleans up the previously owned file after the database update succeeds.
+It requires the same session cookie and ownership checks as uploading.
+
 Users can choose a photo during `/auth/setup` or from the profile editing dialog.
 After selection, a photo editor dialog offers **Crop** and **Filter** tabs with
 one shared preview. Crop provides zoom and horizontal/vertical positioning with
