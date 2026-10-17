@@ -9,6 +9,8 @@ import Navigation from '@/app/_components/navigation';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { Toaster } from '@repo/ui/sonner';
+import { TestFeatureBanner } from '@repo/feature-flags/react';
+import http from '@repo/http-client/web';
 
 const queryClient = new QueryClient();
 const RATE_LIMIT_PATH = '/rate-limited';
@@ -25,6 +27,7 @@ function Wrapper({ children }: WrapperProps) {
   return (
     <>
       <QueryClientProvider client={queryClient}>
+        {!isRateLimitedPage && <TestFeatureBanner client={http} />}
         <AuthProvider>
           <SocketProvider>
             {!isRateLimitedPage && <Navigation />}

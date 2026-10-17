@@ -1,0 +1,15 @@
+# Local development only: the dashboard port is bound to loopback in Compose.
+authentication:
+  required: false
+storage:
+  default:
+    backend:
+      type: local
+      path: /var/opt/flipt/repository
+environments:
+  default:
+    name: Local development
+    default: true
+    storage: default
+telemetry:
+  enabled: false

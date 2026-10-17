@@ -1,0 +1,11 @@
+{
+  "key": "test-feature",
+  "payload": {
+    "@type": "flipt.core.Flag",
+    "key": "test-feature",
+    "name": "Bloggy test feature",
+    "description": "Shows the demonstration banner in Web and Dashboard. Safe to toggle.",
+    "type": "BOOLEAN_FLAG_TYPE",
+    "enabled": true
+  }
+}

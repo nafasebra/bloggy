@@ -8,10 +8,12 @@ import { FollowModule } from './follow/follow.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MetricsModule } from './metrics/metrics.module';
+import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 
 @Module({
   imports: [
     MetricsModule,
+    FeatureFlagsModule,
     DatabaseModule,
     UsersModule,
     CommentsModule,

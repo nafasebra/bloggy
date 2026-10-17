@@ -12,6 +12,10 @@ Run commands from the repository root. Compose reads the root `.env`; all requir
 | `docker compose --profile frontend --profile tools up -d --build` | All services |
 | `docker compose up -d postgres pgadmin` | PostgreSQL and pgAdmin only |
 | `docker compose --profile monitoring up -d --build` | PostgreSQL, backend, Prometheus, Grafana |
+| `docker compose --profile flags up -d flipt flipt-seed` | Flipt dashboard and an idempotent test flag seed |
+
+See [feature flag setup](../docs/feature-flags.md) for the Flipt dashboard at
+http://localhost:8080, frontend consumption, and local backend configuration.
 
 Explicitly naming a profiled service starts it and its dependencies without activating the profile manually. These commands do not stop services that are already running. pgAdmin is pinned to version 9.18; upgrade the tag deliberately when needed.
 

@@ -72,6 +72,37 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+  feature-flags:
+    name: Flipt feature flag smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start local Flipt
+        run: docker compose -p bloggy-flags-ci --env-file .env.docker.example --profile flags up -d flipt
+      - name: Seed the test flag and verify repeatability
+        run: |
+          docker compose -p bloggy-flags-ci --env-file .env.docker.example run --rm flipt-seed
+          docker compose -p bloggy-flags-ci --env-file .env.docker.example run --rm flipt-seed
+      - name: Evaluate the seeded boolean flag
+        run: |
+          for attempt in $(seq 1 15); do
+            if curl --fail --silent --show-error http://localhost:8080/evaluate/v1/boolean \
+              -H 'Content-Type: application/json' \
+              -d '{"environmentKey":"default","namespaceKey":"default","flagKey":"test-feature","entityId":"ci","context":{}}' \
+              | jq -e '.enabled == true'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+      - name: Flipt logs
+        if: failure()
+        run: docker compose -p bloggy-flags-ci --env-file .env.docker.example logs flipt
+      - name: Clean up isolated CI services
+        if: always()
+        run: docker compose -p bloggy-flags-ci --env-file .env.docker.example down --volumes
+
   performance-config:
     name: Monitoring and k6 configuration
     runs-on: ubuntu-latest

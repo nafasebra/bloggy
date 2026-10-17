@@ -205,6 +205,13 @@ npm.cmd run test:e2e
 
 Database and HTTP tests use isolated in-memory SQLite databases. Optional PostgreSQL-specific migration checks run with `npm.cmd run test:postgres` using embedded PostgreSQL. See [CI and Docker documentation](../docker/README.md#continuous-integration) for the automated checks.
 
+## Optional feature flag dashboard
+
+Run `docker compose --profile flags up -d flipt flipt-seed` from the repository
+root, then open http://localhost:8080. The seeded `test-feature` flag controls a
+demo banner in Web and Dashboard. For host-run backend setup, usage, defaults,
+and credentials, see [feature flag documentation](feature-flags.md).
+
 ## Troubleshooting
 
 | Symptom | What to check |

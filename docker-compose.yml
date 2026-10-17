@@ -1,6 +1,27 @@
 name: bloggy
 
 services:
+  flipt:
+    image: ghcr.io/flipt-io/flipt:v2.13.0
+    profiles: ["flags"]
+    restart: unless-stopped
+    volumes:
+      - ./docker/flipt/config.yml:/etc/flipt/config/default.yml:ro
+      - flipt-data:/var/opt/flipt
+    ports:
+      - "127.0.0.1:${FLIPT_PORT:-8080}:8080"
+
+  flipt-seed:
+    image: node:22-alpine
+    profiles: ["flags"]
+    restart: "no"
+    depends_on:
+      flipt:
+        condition: service_started
+    command: ["node", "/seed/seed.mjs"]
+    volumes:
+      - ./docker/flipt:/seed:ro
+
   postgres:
     container_name: bloggy-postgres
     image: postgres:17-alpine
@@ -54,6 +75,10 @@ services:
       COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
       METRICS_ENABLED: "true"
       METRICS_PORT: "9464"
+      FLIPT_URL: ${FLIPT_URL:-http://flipt:8080}
+      FLIPT_ENVIRONMENT: ${FLIPT_ENVIRONMENT:-default}
+      FLIPT_NAMESPACE: ${FLIPT_NAMESPACE:-default}
+      FLIPT_TOKEN: ${FLIPT_TOKEN:-}
     expose:
       - "9464"
     ports:
@@ -155,6 +180,7 @@ services:
       - "3001:80"
 
 volumes:
+  flipt-data:
   postgres-data:
   backend-uploads:
   pgadmin-data:
