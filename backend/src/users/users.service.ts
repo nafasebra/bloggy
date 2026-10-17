@@ -6,12 +6,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { writeFile, unlink } from 'node:fs/promises';
+import { unlink } from 'node:fs/promises';
 import { basename, join } from 'node:path';
-import {
-  AVATAR_UPLOAD_DIR,
-  ensureAvatarUploadDir,
-} from './avatar-upload.config';
+import { AVATAR_UPLOAD_DIR } from './avatar-upload.config';
+import { AVATAR_KEY_PATTERN, AvatarStorage } from '../storage/avatar-storage';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -21,7 +19,8 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly avatarStorage: AvatarStorage
   ) {}
   findAll(): Promise<User[]> {
     return this.userRepository.find();
@@ -71,16 +70,16 @@ export class UsersService {
     const user = await this.findOne(id);
     const previousAvatar = user.avatar;
     const filename = `${id}-${randomUUID()}${extension}`;
-    const diskPath = join(AVATAR_UPLOAD_DIR, filename);
-    ensureAvatarUploadDir();
-    await writeFile(diskPath, file.buffer, { flag: 'wx' });
+    await this.avatarStorage.put(filename, file.buffer, file.mimetype);
     let updated: User;
     try {
       updated = await this.update(id, {
         avatar: `/uploads/avatars/${filename}`,
       });
     } catch (error) {
-      await unlink(diskPath).catch(() => undefined);
+      await this.avatarStorage.remove(filename).catch(() => {
+        this.logger.warn('Could not clean up an unreferenced profile photo');
+      });
       throw error;
     }
     await this.deleteAvatarFile(id, previousAvatar);
@@ -105,6 +104,12 @@ export class UsersService {
         oldName === basename(oldName) &&
         !oldName.includes('\\')
       ) {
+        if (AVATAR_KEY_PATTERN.test(oldName)) {
+          await this.avatarStorage.remove(oldName).catch(() => {
+            this.logger.warn('Could not remove the previous photo from MinIO');
+          });
+        }
+        // Retain cleanup for photos uploaded before the move to MinIO.
         await unlink(join(AVATAR_UPLOAD_DIR, oldName)).catch(
           (error: NodeJS.ErrnoException) => {
             if (error.code !== 'ENOENT')

@@ -50,11 +50,11 @@ Existing PostgreSQL volumes retain their original users and passwords; changing 
 From the repository root:
 
 ```powershell
-docker compose up -d postgres
-docker compose ps postgres
+docker compose up -d --build postgres minio
+docker compose ps postgres minio
 ```
 
-Wait for PostgreSQL to be healthy. Create the application env files without overwriting existing settings:
+Wait for PostgreSQL and MinIO to be healthy. Create the application env files without overwriting existing settings:
 
 ```powershell
 if (!(Test-Path backend/.env)) { Copy-Item backend/.env.example backend/.env }
@@ -71,6 +71,11 @@ Check these settings:
 | `frontend/apps/dashboard/.env` | `VITE_API_URL=http://localhost:3030`, `VITE_WEB_URL=http://localhost:3000` |
 
 The database URL above assumes the default root Compose credentials. Adjust it if you changed them; URL-encode special characters in credentials used in a connection URL.
+
+Set `MINIO_ENDPOINT=http://localhost:9000` in `backend/.env`, and match
+`MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` to the root `.env` values
+`MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD`. The console is at
+http://localhost:9001 using the root credentials. See [photo storage](profile-photos.md).
 
 ### Start the backend
 
@@ -112,7 +117,7 @@ Complete the root `.env` setup, then choose a command from the repository root:
 | --- | --- |
 | Database only | `docker compose up -d postgres` |
 | Database and pgAdmin only | `docker compose up -d postgres pgadmin` |
-| Database and backend | `docker compose up -d --build` |
+| Database, MinIO, and backend | `docker compose up -d --build` |
 | Database, backend, web, dashboard | `docker compose --profile frontend up -d --build` |
 | Applications plus pgAdmin | `docker compose --profile frontend --profile tools up -d --build` |
 | Applications, pgAdmin, and monitoring | `docker compose --profile frontend --profile tools --profile monitoring up -d --build` |
@@ -142,6 +147,7 @@ Do not add `--volumes` unless you intend to delete the stack's stored data. The 
 | Public website | http://localhost:3000 |
 | Admin dashboard | http://localhost:3001 |
 | Backend API documentation | http://localhost:3030/api |
+| MinIO photo storage console | http://localhost:9001 |
 | Storybook, when started locally | http://localhost:6006 |
 | pgAdmin, when started | http://localhost:5050 |
 | Grafana, when started | http://localhost:3002 |

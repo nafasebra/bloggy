@@ -1,4 +1,4 @@
-# PostgreSQL browser UI
+# Docker services and browser tools
 
 ## Compose profiles
 
@@ -6,18 +6,29 @@ Run commands from the repository root. Compose reads the root `.env`; all requir
 
 | Command | Services started |
 | --- | --- |
-| `docker compose up -d --build` | PostgreSQL and backend |
-| `docker compose --profile tools up -d --build` | PostgreSQL, backend, pgAdmin |
-| `docker compose --profile frontend up -d --build` | PostgreSQL, backend, web, dashboard |
+| `docker compose up -d --build` | PostgreSQL, MinIO, and backend |
+| `docker compose --profile tools up -d --build` | PostgreSQL, MinIO, backend, pgAdmin |
+| `docker compose --profile frontend up -d --build` | PostgreSQL, MinIO, backend, web, dashboard |
 | `docker compose --profile frontend --profile tools up -d --build` | All services |
 | `docker compose up -d postgres pgadmin` | PostgreSQL and pgAdmin only |
-| `docker compose --profile monitoring up -d --build` | PostgreSQL, backend, Prometheus, Grafana |
+| `docker compose --profile monitoring up -d --build` | PostgreSQL, MinIO, backend, Prometheus, Grafana |
+| `docker compose up -d --build minio` | MinIO server and its embedded browser console |
 | `docker compose --profile flags up -d flipt flipt-seed` | Flipt dashboard and an idempotent test flag seed |
 
 See [feature flag setup](../docs/feature-flags.md) for the Flipt dashboard at
 http://localhost:8080, frontend consumption, and local backend configuration.
 
 Explicitly naming a profiled service starts it and its dependencies without activating the profile manually. These commands do not stop services that are already running. pgAdmin is pinned to version 9.18; upgrade the tag deliberately when needed.
+
+## Open MinIO
+
+Run `docker compose up -d --build minio`, then open http://localhost:9001.
+Use `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` from the root `.env`.
+The S3 API is on localhost:9000; backend containers use `http://minio:9000`.
+The default stack includes MinIO, with photos in `minio-data` and a private bucket
+created on first upload. See [profile photo storage](../docs/profile-photos.md)
+for host backend credentials, the pinned source build, and compatibility with
+older disk uploads.
 
 ## Open pgAdmin
 
@@ -52,6 +63,10 @@ Optional profiles `monitoring` (Prometheus and Grafana) and `loadtest` (k6) prov
 `.github/workflows/ci.yml` runs on pushes, pull requests, and manual dispatch. Backend checks include lint, TypeScript, build, unit tests, SQLite database checks, and HTTP e2e tests. Frontend checks include lint, types, unit tests, and builds for web, dashboard, and Storybook. A Docker matrix builds backend, web, and dashboard images after both check jobs pass, with separate layer caches. Images are not published or deployed.
 
 Backend database and HTTP tests run against SQLite in memory using sql.js. Each application instance gets its own database; tables are reset between cases. Docker, PostgreSQL, local env credentials, and database ports are not required for these tests. Production continues to use PostgreSQL and its migrations.
+
+HTTP photo tests override object storage with an in-memory adapter. A separate
+MinIO CI job builds the pinned source image and verifies real object upload,
+read, deletion, private access, and its browser console.
 
 From `backend`:
 

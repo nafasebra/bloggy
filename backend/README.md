@@ -51,7 +51,7 @@ The backend follows NestJS **modular, layered architecture**: each domain is a s
 | Validation | `class-validator`, `class-transformer` (global `ValidationPipe`) |
 | Real-time | Socket.IO via `@nestjs/websockets` / `@nestjs/platform-socket.io` |
 | Docs | `@nestjs/swagger` + Swagger UI |
-| File uploads | Multer (avatar images → `uploads/avatars/`) |
+| File uploads | Multer validation + MinIO private object storage |
 | Security | Helmet, `@nestjs/throttler`, CORS with credentials |
 
 ### Module layout
@@ -86,7 +86,7 @@ Clients call JSON endpoints over HTTP. The global `ValidationPipe` strips unknow
 
 - **Session auth:** login sets an HTTP-only `session_token` cookie. Protected REST routes use `JwtAuthGuard` and extract the JWT from that cookie only; a Bearer header is not a substitute for the REST session cookie.
 - **Optional auth:** some routes (e.g. post likes) use `OptionalJwtAuthGuard` so anonymous users can interact via IP while logged-in users are tracked by user ID.
-- **Static files:** avatars are served from `/uploads` (files stored under `uploads/avatars/`).
+- **Profile photos:** new photos are stored in MinIO and streamed through `/uploads/avatars/:key`. Legacy disk photos remain readable. See [storage setup](../docs/profile-photos.md).
 - **CORS:** `http://localhost:3000` and `http://localhost:3001` with `credentials: true`.
 
 ### JWT authentication flow
@@ -285,7 +285,7 @@ docker compose up -d --build backend
 docker compose logs -f backend
 ```
 
-This starts PostgreSQL and builds the NestJS application using `Dockerfile`. The API is available at **http://localhost:3030**, with Swagger at **http://localhost:3030/api**. The application waits for PostgreSQL to be healthy and applies pending migrations on startup. Database files and uploaded avatars persist in named volumes.
+This starts PostgreSQL, MinIO (console: http://localhost:9001), and builds the NestJS application using `Dockerfile`. The API is available at **http://localhost:3030**, with Swagger at **http://localhost:3030/api**. The application waits for PostgreSQL and MinIO to be healthy and applies pending migrations on startup. Database files and uploaded avatars persist in named volumes.
 
 The Compose file sets the application database hostname to `postgres`. `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, and `POSTGRES_PORT` configure the database; `PORT` sets the API's host port. Set frontend API URLs to `http://localhost:3030` when running the frontends locally.
 
@@ -328,6 +328,11 @@ UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
 | `NODE_ENV` | — | `development`, `production`, or `test` |
 | `JWT_SECRET` | — | Secret for signing JWTs (required) |
 | `JWT_EXPIRES_IN` | `7d` | Token lifetime |
+| `MINIO_ENDPOINT` | Required | S3 origin: host backend uses `http://localhost:9000`; Compose uses `http://minio:9000` |
+| `MINIO_ACCESS_KEY` | Required | Server-only storage username / access key |
+| `MINIO_SECRET_KEY` | Required | Server-only storage password / secret key |
+| `MINIO_BUCKET` | `profile-photos` | Private photo bucket, created on first upload |
+| `MINIO_REGION` | `us-east-1` | S3 region |
 | `COOKIE_DOMAIN` | — | Optional cookie domain (production) |
 
 > `DATABASE_URL` is required. Copy `.env.example` to `.env` for local development.
@@ -369,7 +374,7 @@ E2e tests live in `test/` as `*.e2e-spec.ts`. They boot the full `AppModule`, se
 npm run test:e2e
 ```
 
-**Database setup**: the test harness overrides Nest's DataSource provider with an in-memory SQLite database (sql.js). It derives compatible schemas from production entity metadata, creates tables, and resets them between tests. No Docker or PostgreSQL credentials are needed.
+**Database setup**: the test harness overrides Nest's DataSource provider with an in-memory SQLite database (sql.js). It derives compatible schemas from production entity metadata, creates tables, and resets them between tests. Object storage uses an in-memory adapter. No Docker, MinIO, or PostgreSQL credentials are needed.
 
 ```sh
 npm run test:database

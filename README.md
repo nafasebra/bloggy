@@ -18,7 +18,7 @@ Dashboard and web share cookie credentials, timeouts, and rate-limit middleware 
 [Feature flags](docs/feature-flags.md) use an optional Dockerized Flipt dashboard,
 backend evaluation, and a shared frontend package with a test flag.
 
-[Profile photo uploads](docs/profile-photos.md) work during account setup and profile editing.
+[Profile photo uploads](docs/profile-photos.md) use MinIO during account setup and profile editing. Its Dockerized browser console is at http://localhost:9001.
 
 - [Frontend README](frontend/README.md) — Turborepo layout, web vs dashboard, proxies, Vitest
 - [Backend README](backend/README.md) — modules, entities, Swagger, Jest unit & e2e tests
@@ -117,6 +117,7 @@ Production **`Dockerfile`**s are also included (`backend/Dockerfile`, `frontend/
 | npm | latest | `backend/`, root hooks |
 | pnpm | 9+ | `frontend/` |
 | PostgreSQL | local, Docker, or hosted PostgreSQL | backend |
+| MinIO | Docker or an existing MinIO server | profile photo storage |
 | Docker Desktop / Engine | latest | optional — [full stack in containers](#docker-optional) |
 | Git for Windows | latest | clone, Husky hooks |
 
@@ -130,12 +131,12 @@ cd bloggy
 npm install          # enables Husky git hooks (prepare script)
 ```
 
-### 2. Start PostgreSQL
+### 2. Start PostgreSQL and MinIO
 
-Copy `.env.docker.example` to `.env` in the repository root if needed and configure it, then start the database:
+Copy `.env.docker.example` to `.env` in the repository root if needed and configure it, then start the database and photo storage:
 
 ```bash
-docker compose up -d postgres
+docker compose up -d --build postgres minio
 ```
 
 Alternatively, install PostgreSQL locally and create a database and user. Set the connection in `backend/.env`:
@@ -151,7 +152,7 @@ The backend requires `DATABASE_URL` and applies TypeORM migrations on startup. E
 ```bash
 cd backend
 npm install
-cp .env.example .env   # then edit JWT_SECRET and DATABASE_URL
+cp .env.example .env   # then edit JWT_SECRET, DATABASE_URL, and MINIO_* credentials
 npm run start:dev
 ```
 
@@ -166,7 +167,14 @@ DATABASE_URL=postgresql://bloggy:bloggy@localhost:5433/bloggy
 PORT=3030
 JWT_SECRET=your-secret-key-here
 JWT_EXPIRES_IN=7d
+MINIO_ENDPOINT=http://localhost:9000
+MINIO_ACCESS_KEY=bloggy-minio
+MINIO_SECRET_KEY=change-me-minio-password
+MINIO_BUCKET=profile-photos
 ```
+
+Match the MinIO access/secret keys to `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD`
+in the root `.env`. Open http://localhost:9001 for the storage console.
 
 ### 4. Frontend
 
@@ -247,6 +255,7 @@ First build can take several minutes (frontend monorepo + Next.js standalone). L
 | Web (public blog) | http://localhost:3000 |
 | Dashboard (admin) | http://localhost:3001 |
 | Backend API + Swagger | http://localhost:3030/api |
+| MinIO storage console | http://localhost:9001 |
 
 Stop containers: `docker compose down`. Add `-v` to remove PostgreSQL and upload volumes.
 
@@ -277,7 +286,8 @@ The web container talks to the API over the Docker network (`API_URL=http://back
 Compose creates named volumes:
 
 - **`postgres-data`** — database files
-- **`backend-uploads`** — avatar uploads under `uploads/avatars/`
+- **`minio-data`** — profile photos in MinIO (console: http://localhost:9001)
+- **`backend-uploads`** — legacy disk photos retained for compatibility
 
 ### Build individual images
 
@@ -411,7 +421,7 @@ Backend e2e tests run on in-memory SQLite without Docker.
 | Husky hook permission errors | Use Git Bash; run `npm install` at repo root |
 | `EPERM` / file locks on `node_modules` | Close dev servers and editors locking files; retry install |
 | Long path errors | Enable long paths: **Settings → System → For developers → Developer Mode**, or group policy `LongPathsEnabled` |
-| Avatar uploads | Backend writes to `backend\uploads\avatars\` — path is created on startup |
+| Avatar uploads | New photos use MinIO; open http://localhost:9001 (see [photo storage](docs/profile-photos.md)) |
 | Cookie not sent in browser | Use `localhost` (not `127.0.0.1`) for web and API during local dev |
 
 ### Recommended VS Code / Cursor extensions

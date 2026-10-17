@@ -1,17 +1,17 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ServiceUnavailableException } from '@nestjs/common';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { clearDatabase, closeE2eApp, createE2eApp } from './utils/e2e-app';
 import { registerAndLogin, uniqueUser, withSession } from './utils/auth';
-import { readFile, readdir, unlink } from 'node:fs/promises';
 import { UsersService } from '../src/users/users.service';
-import { basename, join } from 'node:path';
-import { AVATAR_UPLOAD_DIR } from '../src/users/avatar-upload.config';
+import { basename } from 'node:path';
+import { AvatarStorage } from '../src/storage/avatar-storage';
+import { InMemoryAvatarStorage } from './utils/in-memory-avatar-storage';
 
 describe('Users (e2e)', () => {
   let app: INestApplication;
   let httpServer: App;
-  const uploadedFiles: string[] = [];
+  let storage: InMemoryAvatarStorage;
   const png = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jGZkAAAAASUVORK5CYII=',
     'base64'
@@ -20,17 +20,16 @@ describe('Users (e2e)', () => {
   beforeAll(async () => {
     app = await createE2eApp();
     httpServer = app.getHttpServer();
+    storage = app.get(AvatarStorage);
   });
 
   afterAll(async () => {
-    await Promise.all(
-      uploadedFiles.map(file => unlink(file).catch(() => undefined))
-    );
     await closeE2eApp(app);
   });
 
   beforeEach(async () => {
     await clearDatabase(app);
+    storage.objects.clear();
   });
 
   it('lists users and returns profile by id', async () => {
@@ -102,23 +101,18 @@ describe('Users (e2e)', () => {
           contentType: 'image/png',
         });
     const first = await upload().expect(200);
-    const firstPath = join(
-      AVATAR_UPLOAD_DIR,
-      basename(first.body.avatar as string)
-    );
-    uploadedFiles.push(firstPath);
+    const firstKey = basename(first.body.avatar as string);
     expect(first.body.avatar).toMatch(/\.png$/);
-    expect(await readFile(firstPath)).toEqual(png);
-    await request(httpServer)
+    expect(storage.objects.get(firstKey)).toEqual(png);
+    const photo = await request(httpServer)
       .get(first.body.avatar as string)
       .expect(200)
+      .expect('Cross-Origin-Resource-Policy', 'cross-origin')
       .expect('Content-Type', /image\/png/);
+    expect(photo.body).toEqual(png);
     const second = await upload().expect(200);
-    uploadedFiles.push(
-      join(AVATAR_UPLOAD_DIR, basename(second.body.avatar as string))
-    );
     expect(second.body.avatar).not.toBe(first.body.avatar);
-    await expect(readFile(firstPath)).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(storage.objects.has(firstKey)).toBe(false);
     const me = await request(httpServer)
       .get('/users/me')
       .set(withSession(sessionToken))
@@ -136,17 +130,13 @@ describe('Users (e2e)', () => {
       .set(withSession(owner.sessionToken))
       .attach('avatar', png, 'photo.png')
       .expect(200);
-    const diskPath = join(
-      AVATAR_UPLOAD_DIR,
-      basename(uploaded.body.avatar as string)
-    );
-    uploadedFiles.push(diskPath);
+    const key = basename(uploaded.body.avatar as string);
     await request(httpServer).delete(path).expect(401);
     await request(httpServer)
       .delete(path)
       .set(withSession(other.sessionToken))
       .expect(403);
-    expect(await readFile(diskPath)).toEqual(png);
+    expect(storage.objects.get(key)).toEqual(png);
     const removed = await request(httpServer)
       .delete(path)
       .set(withSession(owner.sessionToken))
@@ -154,7 +144,7 @@ describe('Users (e2e)', () => {
     expect(removed.body.avatar).toBe('');
     expect(removed.body.username).toBe(owner.user.username);
     expect(removed.body.password).toBeUndefined();
-    await expect(readFile(diskPath)).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(storage.objects.has(key)).toBe(false);
     const me = await request(httpServer)
       .get('/users/me')
       .set(withSession(owner.sessionToken))
@@ -194,6 +184,42 @@ describe('Users (e2e)', () => {
       .expect(413);
   });
 
+  it('does not change the profile when MinIO rejects an upload', async () => {
+    const { user, sessionToken } = await registerAndLogin(httpServer);
+    const put = jest
+      .spyOn(storage, 'put')
+      .mockRejectedValueOnce(
+        new ServiceUnavailableException(
+          'Photo storage is temporarily unavailable'
+        )
+      );
+    try {
+      await request(httpServer)
+        .post(`/users/${user._id}/avatar`)
+        .set(withSession(sessionToken))
+        .attach('avatar', png, 'photo.png')
+        .expect(503);
+      const me = await request(httpServer)
+        .get('/users/me')
+        .set(withSession(sessionToken))
+        .expect(200);
+      expect(me.body.avatar).toBeFalsy();
+    } finally {
+      put.mockRestore();
+    }
+  });
+
+  it('returns 404 for missing or invalid photo keys', async () => {
+    await request(httpServer)
+      .get('/uploads/avatars/not-an-avatar.svg')
+      .expect(404);
+    await request(httpServer)
+      .get(
+        '/uploads/avatars/00000000-0000-4000-8000-000000000000-00000000-0000-4000-8000-000000000001.png'
+      )
+      .expect(404);
+  });
+
   it('requires authentication and refuses uploads for another user', async () => {
     const owner = await registerAndLogin(httpServer, uniqueUser('avatarowner'));
     const other = await registerAndLogin(httpServer, uniqueUser('avatarother'));
@@ -220,7 +246,7 @@ describe('Users (e2e)', () => {
         .attach('avatar', png, 'photo.png')
         .expect(500);
       expect(
-        (await readdir(AVATAR_UPLOAD_DIR)).filter(file =>
+        [...storage.objects.keys()].filter(file =>
           file.startsWith(`${user._id}-`)
         )
       ).toEqual([]);

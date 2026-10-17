@@ -36,17 +36,78 @@ WebP, up to 5MB; the backend validates image file signatures as well as the supp
 MIME type. Original filenames are not used for storage.
 
 Uploads remain in bounded memory until validation and ownership checks pass. Files
-then persist under `backend/uploads/avatars` for host development, or in the
-existing `backend-uploads` Docker volume. Static assets are served at
-`/uploads/avatars/...`, and Web uses its existing backend proxy to display them.
-Successful replacements clean up the previous owned file. A failed database save
-removes the newly written upload. The directory must be writable by the backend.
+then persist in a private MinIO bucket (default `profile-photos`). NestJS creates
+the bucket on the first upload. It streams reads through `GET /uploads/avatars/:key`,
+so database URLs remain relative and stable, and the frontend needs no MinIO
+credentials, public bucket policy, signed URL refresh, or storage-specific CORS.
+Web uses its existing backend proxy to display and edit these images.
+Successful replacements remove the previous owned object. A failed database save
+removes the new object; failed storage writes leave the profile unchanged. Missing
+photos return 404 and storage outages return 503. Cleanup failures are logged.
+
+The existing `backend-uploads` volume and static route remain for photos uploaded
+before this change. They are not copied to MinIO automatically; they still display
+and are cleaned up when replaced or removed. All new uploads use MinIO.
 
 Photo upload and profile-field saving are separate requests: if the second request
 fails, the uploaded photo may already be saved. The form stays open for retry.
-For multiple backend replicas, replace local storage with shared/object storage
-before scaling across hosts.
+Backend replicas can share the same MinIO endpoint and bucket.
+
+## Start MinIO and its UI
+
+From the repository root, set the MinIO values in `.env` using
+`.env.docker.example` as the template. Then:
+
+```sh
+docker compose up -d --build minio
+```
+
+Open **http://localhost:9001** and log in with `MINIO_ROOT_USER` and
+`MINIO_ROOT_PASSWORD` from the root `.env`. Port **9000** is the S3 API; port
+**9001** is the browser console. The bucket appears after the first photo upload.
+Files persist in the `minio-data` named volume. Normal `docker compose down`
+retains them. MinIO is part of the default stack and the backend waits for its
+health check. To run both services and PostgreSQL:
+
+```sh
+docker compose up -d --build backend
+```
+
+For a host-run backend, set these in `backend/.env`:
+
+```dotenv
+MINIO_ENDPOINT=http://localhost:9000
+MINIO_ACCESS_KEY=<root MINIO_ROOT_USER>
+MINIO_SECRET_KEY=<root MINIO_ROOT_PASSWORD>
+MINIO_BUCKET=profile-photos
+MINIO_REGION=us-east-1
+```
+
+Compose supplies `http://minio:9000` inside Docker. Credentials stay server-side.
+Root credentials are convenient for local development; a deployed backend should
+use a dedicated storage account restricted to its bucket. If the bucket is
+pre-provisioned, its account needs bucket existence/read plus object put/get/delete
+permissions. If not, it also needs bucket creation permission.
+
+The [MinIO community distribution](https://github.com/minio/minio#source-only-distribution)
+is source-only. `docker/minio/Dockerfile` builds official release
+`RELEASE.2025-10-15T17-29-55Z`, including its embedded object-browser console.
+The first build downloads Go dependencies and takes longer; subsequent builds
+reuse the cache. Change the pinned release deliberately when updating.
+
+## Verification
 
 `npm run test:e2e` enables Node VM modules so Jest can execute Nest's ESM file-type
-validator. Upload tests exercise the actual multipart endpoint and clean up their
-generated files. Frontend tests cover validation and multipart request handling.
+validator. HTTP tests use an in-memory storage adapter and SQLite, so they require
+no Docker or MinIO credentials. Adapter unit tests cover bucket creation races,
+outages, metadata, reads, and deletion. Frontend tests cover validation and multipart
+request handling.
+
+The separate CI object-storage job builds and starts real MinIO and checks
+upload/read/delete, private bucket access, and the console HTML. To run that check
+locally with Node 22 and MinIO running:
+
+```sh
+cd backend
+node --env-file=.env --test --require ts-node/register test/minio.integration.cjs
+```

@@ -23,6 +23,7 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/database/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
+    "test:minio": "node --test --require ts-node/register test/minio.integration.cjs",
     "test:database": "node --test --require ts-node/register test/sqlite.test.cjs",
     "test:postgres": "node --test --require ts-node/register test/database.test.cjs"
   },
@@ -47,6 +48,7 @@
     "dotenv": "^18.0.7",
     "express-session": "^1.18.2",
     "helmet": "^8.2.0",
+    "minio": "^8.0.7",
     "multer": "^2.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

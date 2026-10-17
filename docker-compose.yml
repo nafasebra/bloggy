@@ -1,6 +1,27 @@
 name: bloggy
 
 services:
+  minio:
+    image: bloggy-minio:local
+    build:
+      context: ./docker/minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in the root .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in the root .env}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_CONSOLE_URL:-http://localhost:9001}
+    ports:
+      - "127.0.0.1:${MINIO_API_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
   flipt:
     image: ghcr.io/flipt-io/flipt:v2.13.0
     profiles: ["flags"]
@@ -63,6 +84,8 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
+      minio:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     environment:
@@ -73,6 +96,11 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
       COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in the root .env}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in the root .env}
+      MINIO_BUCKET: ${MINIO_BUCKET:-profile-photos}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
       METRICS_ENABLED: "true"
       METRICS_PORT: "9464"
       FLIPT_URL: ${FLIPT_URL:-http://flipt:8080}
@@ -180,6 +208,7 @@ services:
       - "3001:80"
 
 volumes:
+  minio-data:
   flipt-data:
   postgres-data:
   backend-uploads:

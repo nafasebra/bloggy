@@ -6,11 +6,15 @@ import * as cookieParser from 'cookie-parser';
 import { AppModule } from '../../src/app.module';
 import { createSqliteDataSource } from './sqlite-data-source';
 import { join } from 'node:path';
+import { AvatarStorage } from '../../src/storage/avatar-storage';
+import { InMemoryAvatarStorage } from './in-memory-avatar-storage';
 
 export async function createE2eApp(): Promise<INestApplication> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
+    .overrideProvider(AvatarStorage)
+    .useClass(InMemoryAvatarStorage)
     .overrideProvider(DataSource)
     .useFactory({ factory: createSqliteDataSource })
     .compile();
